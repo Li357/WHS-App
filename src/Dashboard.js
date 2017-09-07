@@ -30,27 +30,18 @@ const SCHEDULE = (() => {
     ['11:49', '12:06'],
     ['12:11', '12:28'],
     ['12:33', '12:50'],
-    ['12:55', '1:10'],
-    ['1:15', '1:50'],
-    ['1:55', '2:30'],
-    ['2:35', '3:10']
+    ['12:55', '13:10'],
+    ['13:15', '13:50'],
+    ['13:55', '14:30'],
+    ['14:35', '15:10']
   ];
 
-  const wednesday = regular.slice(1).map(timePair => //TODO: Rewrite this whole thing (too complex)
+  const wednesday = regular.slice(1).map(timePair =>
     timePair.map(time => {
       const split = time.split(':');
-      let hour = +split[0];
-      let minutes = +split[1];
-      if(minutes < 20) {
-        if(hour === 1) {
-          hour = 12;
-        } else {
-          hour -= 1;
-        }
-        minutes += 60;
-      }
-      const subtractedMinutes = minutes - 20 + '';
-      return `${hour}:${subtractedMinutes.length < 2 ? '0' : ''}${subtractedMinutes}`;
+      const lessThan20 = split[1] < 20;
+      const subtracted = +split[1] + (lessThan20 && 60) - 20 + '';
+      return `${split[0] - lessThan20}:${subtracted.length < 2 ? '0' : ''}${subtracted}`;
     })
   );
 
@@ -62,60 +53,84 @@ const SCHEDULE = (() => {
 
 class Dashboard extends Component {
   state = {
-    timeUntil: 0
+    timeUntil: 0,
+    username: '',
+    password: '',
+    name: '',
+    classOf: '',
+    schedule: null
   }
 
-  componentDidMount() {
-    /*try {
+  async componentDidMount() {
+    try {
       const username = await AsyncStorage.getItem('username');
       const password = await AsyncStorage.getItem('password');
+      const storedName = await AsyncStorage.getItem('name');
+      const storedClassOf = await AsyncStorage.getItem('classOf');
+      const storedSchedule = await AsyncStorage.getItem('schedule');
+
+      const params = this.props.navigation.state.params;
+      if(params) {
+        const {
+          name,
+          classOf,
+          scheduleJSON
+        } = params;
+
+        await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('password', password);
+        await AsyncStorage.setItem('name', name);
+        await AsyncStorage.setItem('classOf', classOf);
+        await AsyncStorage.setItem('schedule', scheduleJSON);
+      }
+
       this.setState({
         username,
-        password
+        password,
+        name: storedName,
+        classOf: storedClassOf,
+        schedule: storedSchedule
       });
     } catch(error) {
-      Alert.alert('Something went wrong with getting your login information.');
-    }*/
-    const currentMod = this.getCurrentMod(); //TODO: Rewrite this crap
-    let timeUntil = 0;
-    const now = new Date(2017, 8, 5, 9, 34);
-    const nowDay = now.getDay();
-    const schedule = SCHEDULE[nowDay === 3 ? 'wednesday' : 'regular'];
+      Alert.alert('Something went wrong with getting/saving your login information.');
+    }
+
+    const currentMod = this.getCurrentMod(new Date());
+    this.setState({
+      timeUntil: this.calculateModCountdown(currentMod),
+      currentMod
+    });
+    this.startModCountdown();
+  }
+
+  calculateModCountdown = (currentMod) => {
+    const now = new Date();
+    const wednesday = now.getDay() === 3;
+    const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
     if(typeof currentMod === 'number' || currentMod === 'HR') {
-      const mod = schedule[currentMod !== 'HR' && currentMod - (nowDay === 3)][1].split(':').map(part => +part - 1); //Minutes and seconds are 0 based?!
-      console.log(mod);
-
       const endMod = new Date(now.getTime());
-      console.log(endMod);
-      endMod.setHours(...mod);
+      endMod.setHours(...schedule[currentMod !== 'HR' && currentMod - wednesday][1].split(':'));
 
-      console.log(endMod);
-
-      timeUntil = endMod - now;
+      return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
       const nextMod = schedule.filter((timePair, index) => {
-        const startTime = timePair[0].split(':').map(part => +part - 1);
-        const prevModEndTime = schedule[index > 0 && index - 1][1].split(':').map(part => +part - 1);
-
         const startMod = new Date(now.getTime());
-        startMod.setHours(...startTime);
+        startMod.setHours(...timePair[0].split(':'));
 
-        const prevEndMod = new Date(now.getTime());
-        prevEndMod.setHours(...prevModEndTime);
+        if(index > 0) {
+          const prevEndMod = new Date(now.getTime());
+          prevEndMod.setHours(...schedule[index - 1][1].split(':'));
 
-        return now < startMod && now < prevEndMod;
-      })[0][0].split(':').map(part => +part - 1);
+          return prevEndMod <= now < startMod;
+        }
+      })[0][0].split(':');
 
       const nextModStart = new Date(now.getTime());
       nextModStart.setHours(...nextMod);
 
-      timeUntil = nextModStart - now;
+      return nextModStart - now;
     }
-    this.setState({
-      timeUntil
-    });
-    this.startModCountdown();
   }
 
   startModCountdown = () => {
@@ -127,57 +142,52 @@ class Dashboard extends Component {
         }));
       } else {
         clearInterval(this.interval);
-        //move to diff screen
+        const future = new Date();
+        const nextMod = this.getCurrentMod(future);
+        this.setState({
+          timeUntil: this.calculateModCountdown(nextMod, false),
+          currentMod: nextMod
+        });
+        this.startModCountdown();
       }
     }, 1000);
   }
 
-  normalizeHours = (hours) => hours < 8 ? hours + 12 : hours
+  getCurrentMod = (now) => {
+    const nowHours = now.getHours();
+    const nowMinutes = now.getMinutes();
+    const wednesday = now.getDay() === 3;
+    const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-  getCurrentMod = () => { //TODO: Complete rewrite (this code sucks)
-    const now = new Date();
-    const nowHours = 10//now.getHours() + 1;
-    const nowMinutes = 35//now.getMinutes() + 1;
-    const nowDay = now.getDay();
-    const schedule = SCHEDULE[nowDay === 3 ? 'wednesday' : 'regular'];
-
-    const last = schedule.slice(-1)[0][1].split(':');
-    let lastHours = this.normalizeHours(+last[0]);
-    const lastMinutes = last[1];
-
-    if(nowHours > lastHours || nowHours < 8 || nowHours === lastHours && nowMinutes > lastMinutes) {
+    const lastMod = schedule.slice(-1)[0][1].split(':');
+    if(nowHours > lastMod[0] || nowHours === lastMod[0] && nowMinutes > lastMod[1]) {
       return 'N/A';
     }
 
-    const currentMod = schedule.reduce((currentMod, timePair, index) => {
-      const revisedTimes = timePair.map(time => {
-        const splitTime = time.split(':');
-        let hours = splitTime[0];
-        const minutes = splitTime[1];
-        if(hours < 8) {
-          hours += 12;
-        }
-        return {
-          hours,
-          minutes
-        }
-      });
-      return nowHours >= revisedTimes[0].hours && nowMinutes >= revisedTimes[0].minutes &&
-             nowHours <= revisedTimes[1].hours && nowMinutes <= revisedTimes[1].minutes ?
-               nowDay === 3 ? index + 1 : index : currentMod;
+    const currentMod = schedule.reduce((current, timePair, index) => {
+      const splitTimes = timePair.map(time => time.split(':'));
+      return nowHours >= splitTimes[0][0] && nowMinutes >= splitTimes[0][1] &&
+             nowHours <= splitTimes[1][0] && nowMinutes < splitTimes[1][1] ?
+               wednesday ? index + 1 : index : current;
     }, -1);
 
-    if(currentMod === -1) {
-      return 'PASSING PERIOD';
-    } else if(currentMod === 0) {
-      return 'HR';
-    }
-    return currentMod;
+    return currentMod === -1 ? 'PASSING PERIOD' :
+             currentMod === 0 ? 'HR' : currentMod;
+  }
+
+  getNextClass = () => {
+
   }
 
   handleLogout = async () => {
     try {
-      AsyncStorage.multiRemove(['username', 'password'], (error) => {
+      AsyncStorage.multiRemove([
+        'username',
+        'password',
+        'name',
+        'classOf',
+        'schedule'
+      ], (error) => {
         if(error) {
           throw error;
         }
@@ -193,18 +203,11 @@ class Dashboard extends Component {
   }
 
   render() {
-    /*const {
-      Name,
-      ClassOf,
-      Schedule
-    } = this.props.navigation.state.params;*/
-
-    const name = 'Andrew Li';
-    const classOf = 'Class of 2021';
-    const currentMod = this.getCurrentMod();
-
     const {
-      timeUntil
+      timeUntil,
+      currentMod,
+      name,
+      classOf,
     } = this.state;
 
     const minutesUntil = timeUntil / (1000 * 60);
@@ -277,6 +280,14 @@ class Dashboard extends Component {
   }
 }
 
+const dashboardSwiperDotConfig = {
+  width: '$dashboardSwiperDotSize',
+  height: '$dashboardSwiperDotSize',
+  borderRadius: '$dashboardSwiperDotSize / 2',
+  margin: 3,
+  marginBottom: -15
+}
+
 const styles = EStyleSheet.create({
   $dashboardSwiperContainerSize: 230,
   $dashboardSwiperDotSize: 8,
@@ -289,23 +300,14 @@ const styles = EStyleSheet.create({
     height: '$dashboardSwiperContainerSize'
   },
   dashboardSwiperDot: {
+    ...dashboardSwiperDotConfig,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    width: '$dashboardSwiperDotSize',
-    height: '$dashboardSwiperDotSize',
-    borderRadius: '$dashboardSwiperDotSize / 2',
-    margin: 3,
-    marginBottom: -15
   },
   dashboardSwiperActiveDot: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    width: '$dashboardSwiperDotSize',
-    height: '$dashboardSwiperDotSize',
-    borderRadius: '$dashboardSwiperDotSize / 2',
-    margin: 3,
-    marginBottom: -15
+    ...dashboardSwiperDotConfig,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   dashboardUserContainer: {
-    width: Dimensions.get('window').width,
     backgroundColor: 'lightgray'
   },
   dashboardUserProfile: {
@@ -320,15 +322,13 @@ const styles = EStyleSheet.create({
   },
   dashboardUserName: {
     fontFamily: 'RobotoLight',
-    fontSize: 25,
-    textAlign: 'center'
+    fontSize: 25
   },
   dashboardUserClassOf: {
     fontFamily: 'RobotoLight',
     fontSize: 15,
     margin: 5,
-    marginBottom: 10,
-    textAlign: 'center'
+    marginBottom: 10
   },
   dashboardUserSettings: {
     alignItems: 'center',
@@ -347,7 +347,7 @@ const styles = EStyleSheet.create({
     textAlign: 'center'
   },
   dashboardInfo: {
-    width: Dimensions.get('window').width,
+    width: '100%',
     backgroundColor: 'white'
   },
   dashboardInfoText: {

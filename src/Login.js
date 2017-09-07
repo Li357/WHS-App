@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import cheerio from 'react-native-cheerio';
@@ -53,7 +54,7 @@ class Login extends Component {
     const $ = cheerio.load(userPageHTML);
 
     const error = $('.alert.alert-danger').text().trim();
-    if(error.length > 0) {
+    if(error) {
       this.setState({
         error,
         loading: false
@@ -70,7 +71,7 @@ class Login extends Component {
       navigate('Dashboard', {
         name: $('title').text().split('|')[0].trim(),
         classOf: $('.header-title > h6').text(),
-        scheduleJSON: JSON.parse(rawJSON.slice(24, -2))
+        scheduleJSON: rawJSON.slice(24, -2)
       });
     }
   }
@@ -119,7 +120,10 @@ class Login extends Component {
         <Text style={styles._loginText}>Login to WHS</Text>
         <Text style={styles._loginError}>{error}</Text>
         {
-          ['Username', 'Password'].map((credential, index) =>
+          [
+            'Username',
+            'Password'
+          ].map((credential, index) =>
             <TextInput
               key={index}
               onChangeText={value => this.handleInput(credential.toLowerCase(), value)}
@@ -136,7 +140,7 @@ class Login extends Component {
           disabled={!validLogin}
           style={{
             ...styles._loginButton,
-            backgroundColor: loading ? 'lightgray' : validLogin ? '#DC143C' : 'white'
+            backgroundColor: loading ? 'lightgray' : validLogin ? 'rgba(220, 20, 60, 1)' : 'white'
           }}
         >
           {
@@ -161,10 +165,12 @@ const styles = EStyleSheet.create({
   $loginWidth: 236.5,
   $loginMargin: 15,
   $loginImageSize: 125,
+  $loginLoadingGIFSize: 20,
   loginContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white'
   },
   loginLogo: {
     width: '$loginImageSize * 1.2',
@@ -206,8 +212,8 @@ const styles = EStyleSheet.create({
     fontSize: 17
   },
   loginLoadingGIF: {
-    width: 20,
-    height: 20
+    width: '$loginLoadingGIFSize',
+    height: '$loginLoadingGIFSize'
   }
 });
 

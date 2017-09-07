@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
+  AsyncStorage,
   ScrollView,
   Text,
-  AsyncStorage,
   StyleSheet,
   View
 } from 'react-native';
@@ -26,6 +26,7 @@ const hasLoggedIn = async () => {
     return username && password;
   } catch(error) {
     Alert.alert('Something went wrong with getting your login information.');
+    return false;
   }
 }
 const Navigator = StackNavigator({
@@ -74,9 +75,7 @@ class App extends Component {
 
 const styles = StyleSheet.create({
   appContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    flex: 1
   }
 });
 
