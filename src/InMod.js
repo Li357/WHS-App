@@ -26,11 +26,17 @@ const InMod = ({
         {
           value: nextMod,
           title: 'NEXT MOD',
+          textStyle: {
+            fontSize: 60
+          }
         },
-        ...(nextModInfo ? {
+        nextModInfo ? {
           value: nextModInfo,
-          title: 'NEXT MOD ROOM'
-        } : {})
+          title: 'NEXT MOD ROOM',
+          textStyle: {
+            fontSize: 60
+          }
+        } : {}
       ].map(infoMap)
     }
   </View>

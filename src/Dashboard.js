@@ -16,6 +16,8 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import InMod from './InMod.js';
 import PassingPeriod from './PassingPeriod.js';
+import infoMap from './util/infoMap.js';
+import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
 
 const SCHEDULE = (() => {
@@ -41,7 +43,7 @@ const SCHEDULE = (() => {
     timePair.map(time => {
       const [hours, minutes] = time.split(':');
       const lessThan20 = minutes < 20;
-      const subtracted = +minutes + (lessThan20 && 60) - 20 + '';
+      const subtracted = `${+minutes + (lessThan20 && 60) - 20}`;
       return `${hours - lessThan20}:${subtracted.length < 2 ? '0' : ''}${subtracted}`;
     })
   );
@@ -55,11 +57,7 @@ const SCHEDULE = (() => {
 class Dashboard extends Component {
   state = {
     timeUntil: 0,
-    username: '',
-    password: '',
-    name: '',
-    classOf: '',
-    schedule: null
+    endTimeUntil: 0
   }
 
   async componentDidMount() {
@@ -89,6 +87,11 @@ class Dashboard extends Component {
       const classOf = await AsyncStorage.getItem('classOf');
       const schedule = await AsyncStorage.getItem('schedule');
 
+      if([name, classOf, schedule].some(item => item === null)) {
+        Alert.alert('Something went wrong with getting your login information.');
+        this.props.navigation.navigate('Login');
+      }
+
       this.setState({
         username,
         password,
@@ -101,9 +104,11 @@ class Dashboard extends Component {
     }
 
     this.runTimer();
+    this.startEndDayCountdown();
 
     AppState.addEventListener('change', state => {
       if(state === 'active') {
+        clearInterval(this.interval);
         this.runTimer();
       }
     });
@@ -121,31 +126,27 @@ class Dashboard extends Component {
     this.startModCountdown();
   }
 
-  calculateModCountdown = (currentMod) => {
+  calculateModCountdown = currentMod => {
     const now = new Date();
     const wednesday = now.getDay() === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
     if(typeof currentMod === 'number' || currentMod === 'HR') {
-      const endMod = new Date(now.getTime());
-      endMod.setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
+      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
 
       return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
       const nextMod = schedule.filter(([start], index) => {
-        const startMod = new Date(now.getTime());
-        startMod.setHours(...start.split(':'), 0);
+        const startMod = new Date(now.getTime()).setHours(...start.split(':'), 0);
 
         if(index > 0) {
-          const prevEndMod = new Date(now.getTime());
-          prevEndMod.setHours(...schedule[index - 1][1].split(':'), 0);
+          const prevEndMod = new Date(now.getTime()).setHours(...schedule[index - 1][1].split(':'), 0);
 
           return now >= prevEndMod && now < startMod;
         }
       })[0][0].split(':');
 
-      const nextModStart = new Date(now.getTime());
-      nextModStart.setHours(...nextMod, 0);
+      const nextModStart = new Date(now.getTime()).setHours(...nextMod, 0);
 
       return nextModStart - now;
     }
@@ -154,6 +155,7 @@ class Dashboard extends Component {
   startModCountdown = () => {
     this.interval = setInterval(() => {
       const { timeUntil } = this.state;
+
       if(timeUntil > 0) {
         this.setState(prevState => ({
           timeUntil: prevState.timeUntil - 1000
@@ -163,34 +165,50 @@ class Dashboard extends Component {
         const future = new Date();
         future.setMinutes(future.getMinutes() + 1, 0);
         const nextMod = this.getCurrentMod(future);
-        const nextModClass = this.getNextClass(future);
+        const nextModClass = this.getNextClass(future, nextMod);
         this.setState({
           timeUntil: this.calculateModCountdown(nextMod),
           currentMod: nextMod,
           nextMod: nextModClass
         });
-        if(nextMod === 'N/A') {
+        if(nextMod !== 'N/A') {
           this.startModCountdown();
         }
       }
     }, 1000);
   }
 
-  getCurrentMod = (now) => {
+  startEndDayCountdown = () => {
+    this.setState({
+      endTimeUntil: this.getTimeUntilEnd()
+    });
+    this.endDayInterval = setInterval(() => {
+      const { endTimeUntil } = this.state;
+
+      if(endTimeUntil > 0) {
+        this.setState(prevState => ({
+          endTimeUntil: prevState.endTimeUntil - 1000
+        }));
+      } else {
+        clearInterval(this.endDayInterval);
+      }
+    }, 1000);
+  }
+
+  getCurrentMod = now => {
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
-    const wednesday = now.getDay() === 3;
+    const nowDay = now.getDay();
+    const wednesday = nowDay === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-    const [lastStartHours, lastStartMinutes] = schedule.slice(-1)[0][1].split(':');
-    if(nowHours > lastStartHours || nowHours === +lastStartHours && nowMinutes > lastStartMinutes) {
+    if(nowDay > 5 || now - new Date().setHours(...schedule.slice(-1)[0][1].split(':')) >= 0) {
       return 'N/A';
     }
 
     const currentMod = schedule.reduce((current, timePair, index) => {
-      const [[startHours, startMinutes], [endHours, endMinutes]] = timePair.map(time => time.split(':'));
-      return (nowHours === +startHours && nowMinutes >= startMinutes) && (nowHours === +endHours && nowMinutes < endMinutes) ||
-             nowHours >= startHours && nowHours + 1 === +endHours && nowMinutes >= startMinutes && nowMinutes > endMinutes ?
+      const [start, end] = timePair.map(time => time.split(':'));
+      return now - new Date(now.getTime()).setHours(...start) >= 0 && now - new Date().setHours(...end) < 0 ?
                wednesday ? index + 1 : index : current;
     }, -1);
 
@@ -200,16 +218,34 @@ class Dashboard extends Component {
 
   getNextClass = (now, currentMod) => {
     const { schedule } = this.state;
+    const future = new Date(now.getTime());
+    future.setMinutes(future.getMinutes() + 5);
+    const nextMod = currentMod === 'HR' ? 1 :
+                      currentMod === 'PASSING PERIOD' ? this.getCurrentMod(future) :
+                        currentMod + 1 <= 14 ? currentMod + 1 : 'N/A';
 
-    return schedule.schedule.filter(mod => {
-      const mods = [...[...Array(mod.length).keys()].map(key =>
-        key + mod.startMod
-      )];
+    return nextMod !== 'N/A' ?
+      schedule.schedule.filter(mod => {
+        const mods = [...Array(mod.length).keys()].map(key =>
+          key + mod.startMod
+        );
 
-      return mod.day === now.getDay() && (mods.includes(currentMod) || currentMod === 'HR' && mod.startMod === 0);
-    })[0] || {
-      title: 'Open Mod'
-    };
+        return mod.day === now.getDay() && mods.includes(nextMod);
+      })[0] || {
+        title: 'Open Mod',
+        body: ''
+      }
+    :
+      {
+        title: 'N/A',
+        body: ''
+      }
+  }
+
+  getTimeUntilEnd = () => {
+    const now = new Date();
+    const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
+    return new Date().setHours(...schedule.slice(-1)[0][1].split(':')) - now;
   }
 
   handleLogout = async () => {
@@ -231,25 +267,35 @@ class Dashboard extends Component {
     }
   }
 
+  formatTime = milliseconds => {
+    const padNumber = num => (`${num}`.length < 2 ? '0' : '') + num;
+    const getRemaining = num => (num - Math.floor(num)) * 60
+
+    const hours = milliseconds / (1000 * 60 * 60);
+    const minutes = getRemaining(hours);
+    const seconds = Math.floor(getRemaining(minutes));
+    const hoursExist = Math.floor(hours) > 0;
+    return `${hoursExist ? `${Math.floor(hours)}:` : ''}${hoursExist ? padNumber(Math.floor(minutes)) : Math.floor(minutes)}:${padNumber(seconds)}`;
+  }
+
   componentWillUnmount() {
     clearInterval(this.interval);
+    clearInterval(this.endDayInterval);
     AppState.removeEventListener('change');
   }
 
   render() {
     const {
       timeUntil,
+      endTimeUntil,
       currentMod,
       nextMod,
       name,
       classOf,
     } = this.state;
-
-    console.log(typeof nextMod.body);
-
-    const minutesUntil = timeUntil / (1000 * 60);
-    const secondsUntil = Math.floor((minutesUntil - Math.floor(minutesUntil)) * 60) + '';
-    const formattedTimeUntil = `${Math.floor(minutesUntil)}:${secondsUntil.length < 2 ? '0' : ''}${secondsUntil}`;
+    const formattedTimeUntil = this.formatTime(timeUntil);
+    const formattedEndTimeUntil = this.formatTime(endTimeUntil);
+    const today = new Date().getDay();
 
     return (
       <View style={styles._dashboardContainer}>
@@ -294,24 +340,49 @@ class Dashboard extends Component {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={styles._dashboardInfo}
+          contentContainerStyle={styles._dashboardInfoContainer}
         >
           {
-            typeof currentMod === 'number' || currentMod === 'HR' ?
-              <InMod
-                currentMod={currentMod}
-                untilModIsOver={formattedTimeUntil}
-                nextMod={nextMod.title}
-                nextModInfo={nextMod && nextMod.body ? nextMod.body : ''}
-              />
+            currentMod ?
+              (
+                typeof currentMod === 'number' || currentMod === 'HR' && nextMod ?
+                  <InMod
+                    currentMod={currentMod}
+                    untilModIsOver={formattedTimeUntil}
+                    nextMod={nextMod.title}
+                    nextModInfo={nextMod.body}
+                  />
+                :
+                  currentMod === 'PASSING PERIOD' && nextMod ?
+                    <PassingPeriod
+                      untilPassingPeriodIsOver={formattedTimeUntil}
+                      nextMod={nextMod.title}
+                      nextModInfo={nextMod.body}
+                    />
+                  :
+                    <Text style={styles._dashboardInfoText}>
+                      {
+                        today > 4 ?
+                          'Enjoy your weekend!'
+                        :
+                          'You\'re done for the day!'
+                      }
+                    </Text>
+              )
             :
-              currentMod === 'PASSING PERIOD' ?
-                <PassingPeriod
-                  untilPassingPeriodIsOver={formattedTimeUntil}
-                  nextMod={nextMod.title}
-                  nextModInfo={nextMod.body}
-                />
-              :
-                <Text style={styles._dashboardInfoText}>You're done for the day!</Text>
+              <Image
+                source={LoadingGIF}
+                style={styles._dashboardInfoLoadingGIF}
+              />
+          }
+          {
+            currentMod && today < 6 &&
+              [
+                {
+                  value: formattedEndTimeUntil,
+                  title: today === 5 ? 'UNTIL WEEKEND' : 'UNTIL DAY IS OVER'
+                }
+              ].map(infoMap)
           }
         </ScrollView>
       </View>
@@ -331,6 +402,7 @@ const styles = EStyleSheet.create({
   $dashboardSwiperContainerSize: 230,
   $dashboardSwiperDotSize: 8,
   $dashboardUserImageSize: 110,
+  $dashboardInfoLoadingGIFSize: 40,
   dashboardContainer: {
     flex: 1,
     alignItems: 'center'
@@ -387,7 +459,18 @@ const styles = EStyleSheet.create({
   },
   dashboardInfo: {
     width: '100%',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    paddingRight: 20,
+    paddingLeft: 20
+  },
+  dashboardInfoContainer: {
+    alignItems: 'center'
+  },
+  dashboardInfoLoadingGIF: {
+    width: '$dashboardInfoLoadingGIFSize',
+    height: '$dashboardInfoLoadingGIFSize',
+    backgroundColor: 'white',
+    marginTop: 150
   },
   dashboardInfoText: {
     fontFamily: 'BebasNeueBook',

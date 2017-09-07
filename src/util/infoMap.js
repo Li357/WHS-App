@@ -5,13 +5,20 @@ import {
   View
 } from 'react-native';
 
-const infoMap = ({ value, title }, index) => (
+const infoMap = ({
+  value,
+  title,
+  textStyle
+}, index) => (
   <View
     key={index}
     style={styles.dashboardInfoContainer}
   >
     <Text
-      style={styles.dashboardInfoLarge}
+      style={[
+        styles.dashboardInfoLarge,
+        textStyle
+      ]}
     >{value}</Text>
     <Text style={styles.dashboardInfoSmall}>{title}</Text>
   </View>
@@ -24,12 +31,13 @@ const styles = StyleSheet.create({
   dashboardInfoLarge: {
     fontFamily: 'BebasNeueBook',
     fontSize: 85,
-    marginTop: 30
+    marginTop: 20,
+    textAlign: 'center'
   },
   dashboardInfoSmall: {
     fontFamily: 'BebasNeueBook',
     fontSize: 20,
-    marginBottom: 10
+    marginBottom: 20
   }
 });
 
