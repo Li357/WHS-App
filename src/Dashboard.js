@@ -38,10 +38,10 @@ const SCHEDULE = (() => {
 
   const wednesday = regular.slice(1).map(timePair =>
     timePair.map(time => {
-      const split = time.split(':');
-      const lessThan20 = split[1] < 20;
-      const subtracted = +split[1] + (lessThan20 && 60) - 20 + '';
-      return `${split[0] - lessThan20}:${subtracted.length < 2 ? '0' : ''}${subtracted}`;
+      const [hours, minutes] = time.split(':');
+      const lessThan20 = minutes < 20;
+      const subtracted = +minutes + (lessThan20 && 60) - 20 + '';
+      return `${hours - lessThan20}:${subtracted.length < 2 ? '0' : ''}${subtracted}`;
     })
   );
 
@@ -65,9 +65,11 @@ class Dashboard extends Component {
     try {
       const username = await AsyncStorage.getItem('username');
       const password = await AsyncStorage.getItem('password');
-      const storedName = await AsyncStorage.getItem('name');
-      const storedClassOf = await AsyncStorage.getItem('classOf');
-      const storedSchedule = await AsyncStorage.getItem('schedule');
+
+      this.setState({
+        username,
+        password
+      });
 
       const params = this.props.navigation.state.params;
       if(params) {
@@ -77,25 +79,29 @@ class Dashboard extends Component {
           scheduleJSON
         } = params;
 
-        await AsyncStorage.setItem('username', username);
-        await AsyncStorage.setItem('password', password);
+
         await AsyncStorage.setItem('name', name);
         await AsyncStorage.setItem('classOf', classOf);
         await AsyncStorage.setItem('schedule', scheduleJSON);
       }
 
+      const name = await AsyncStorage.getItem('name');
+      const classOf = await AsyncStorage.getItem('classOf');
+      const schedule = await AsyncStorage.getItem('schedule');
+
       this.setState({
         username,
         password,
-        name: storedName,
-        classOf: storedClassOf,
-        schedule: storedSchedule
+        name,
+        classOf,
+        schedule: JSON.parse(schedule)
       });
     } catch(error) {
       Alert.alert('Something went wrong with getting/saving your login information.');
     }
 
-    const currentMod = this.getCurrentMod(new Date());
+    const currentMod = this.getCurrentMod(new Date("2017-09-07T14:45:51.253Z"));
+    console.log(currentMod);
     this.setState({
       timeUntil: this.calculateModCountdown(currentMod),
       currentMod
@@ -110,24 +116,24 @@ class Dashboard extends Component {
 
     if(typeof currentMod === 'number' || currentMod === 'HR') {
       const endMod = new Date(now.getTime());
-      endMod.setHours(...schedule[currentMod !== 'HR' && currentMod - wednesday][1].split(':'));
+      endMod.setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
 
       return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
-      const nextMod = schedule.filter((timePair, index) => {
+      const nextMod = schedule.filter(([start], index) => {
         const startMod = new Date(now.getTime());
-        startMod.setHours(...timePair[0].split(':'));
+        startMod.setHours(...start.split(':'), 0);
 
         if(index > 0) {
           const prevEndMod = new Date(now.getTime());
-          prevEndMod.setHours(...schedule[index - 1][1].split(':'));
+          prevEndMod.setHours(...schedule[index - 1][1].split(':'), 0);
 
-          return prevEndMod <= now < startMod;
+          return now >= prevEndMod && now < startMod;
         }
       })[0][0].split(':');
 
       const nextModStart = new Date(now.getTime());
-      nextModStart.setHours(...nextMod);
+      nextModStart.setHours(...nextMod, 0);
 
       return nextModStart - now;
     }
@@ -143,9 +149,10 @@ class Dashboard extends Component {
       } else {
         clearInterval(this.interval);
         const future = new Date();
+        future.setMinutes(future.getMinutes() + 1, 0);
         const nextMod = this.getCurrentMod(future);
         this.setState({
-          timeUntil: this.calculateModCountdown(nextMod, false),
+          timeUntil: this.calculateModCountdown(nextMod),
           currentMod: nextMod
         });
         this.startModCountdown();
@@ -159,15 +166,15 @@ class Dashboard extends Component {
     const wednesday = now.getDay() === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-    const lastMod = schedule.slice(-1)[0][1].split(':');
-    if(nowHours > lastMod[0] || nowHours === lastMod[0] && nowMinutes > lastMod[1]) {
+    const [lastStartHours, lastStartMinutes] = schedule.slice(-1)[0][1].split(':');
+    if(nowHours > lastStartHours || nowHours === lastStartHours && nowMinutes > lastStartMinutes) {
       return 'N/A';
     }
 
     const currentMod = schedule.reduce((current, timePair, index) => {
-      const splitTimes = timePair.map(time => time.split(':'));
-      return nowHours >= splitTimes[0][0] && nowMinutes >= splitTimes[0][1] &&
-             nowHours <= splitTimes[1][0] && nowMinutes < splitTimes[1][1] ?
+      const [[startHours, startMinutes], [endHours, endMinutes]] = timePair.map(time => time.split(':'));
+      return (nowHours === +startHours && nowMinutes >= startMinutes) && (nowHours === +endHours && nowMinutes < endMinutes) ||
+             nowHours >= startHours && nowHours + 1 === +endHours && nowMinutes >= startMinutes && nowMinutes > endMinutes ?
                wednesday ? index + 1 : index : current;
     }, -1);
 
