@@ -38,7 +38,6 @@ class Login extends Component {
       username,
       password
     } = this.state;
-    const { navigate } = this.props.navigation;
 
     this.setState({
       loading: true
@@ -68,10 +67,29 @@ class Login extends Component {
       }
 
       const rawJSON = $('.page-content + script')[0].children[0].data.trim();
-      navigate('Dashboard', {
-        name: $('title').text().split('|')[0].trim(),
-        classOf: $('.header-title > h6').text(),
-        scheduleJSON: rawJSON.slice(24, -2)
+
+      this.props.navigation.dispatch(
+        {
+            type: 'Navigation/NAVIGATE',
+            routeName: 'GoToANavigator',
+            action: {
+              type: 'Navigation/NAVIGATE',
+              routeName: 'GoToAScreenInANavigator',
+            }
+        }
+       );
+      this.props.navigation.dispatch({
+        type: 'Navigation/NAVIGATE',
+        routeName: 'Drawer',
+        action: {
+          type: 'Navigation/NAVIGATE',
+          routeName: 'Dashboard',
+          params: {
+            name: $('title').text().split('|')[0].trim(),
+            classOf: $('.header-title > h6').text(),
+            scheduleJSON: rawJSON.slice(24, -2)
+          }
+        }
       });
     }
   }

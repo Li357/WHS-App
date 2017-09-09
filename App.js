@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import {
   AsyncStorage,
+  Image,
   ScrollView,
-  Text,
   StatusBar,
   StyleSheet,
-  View
+  View,
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import {
+  DrawerNavigator,
+  DrawerItems,
+  StackNavigator
+} from 'react-navigation';
 import { Font } from 'expo';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -18,6 +22,8 @@ import BebasNeueBook from './assets/fonts/BebasNeue-Book.ttf';
 
 import Login from './src/Login.js';
 import Dashboard from './src/Dashboard.js';
+import Schedule from './src/Schedule.js';
+import HamburgerMenu from './src/HamburgerMenu.js';
 
 const hasLoggedIn = async () => {
   try {
@@ -30,18 +36,28 @@ const hasLoggedIn = async () => {
     return false;
   }
 }
+const Drawer = DrawerNavigator({
+  Dashboard: {
+    screen: Dashboard
+  },
+  /*Schedule: {
+    screen: Schedule
+  }*/
+}, {
+  initialRouteName: 'Dashboard'
+});
 const Navigator = StackNavigator({
   Login: {
     screen: Login
   },
-  Dashboard: {
-    screen: Dashboard
+  Drawer: {
+    screen: Drawer
   }
 }, {
-  initialRouteName: hasLoggedIn() ? 'Dashboard' : 'Login',
-  navigationOptions: {
-    header: null
-  }
+  initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login',
+  navigationOptions: ({ navigation }) => ({
+    header: <HamburgerMenu navigation={navigation} />
+  })
 });
 
 class App extends Component {
