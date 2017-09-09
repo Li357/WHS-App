@@ -9,7 +9,8 @@ import infoMap from './util/infoMap.js';
 const InMod = ({
   currentMod,
   untilModIsOver,
-  nextMod
+  nextMod,
+  nextModInfo
 }) => (
   <View>
     {
@@ -25,7 +26,11 @@ const InMod = ({
         {
           value: nextMod,
           title: 'NEXT MOD',
-        }
+        },
+        ...(nextModInfo ? {
+          value: nextModInfo,
+          title: 'NEXT MOD ROOM'
+        } : {})
       ].map(infoMap)
     }
   </View>

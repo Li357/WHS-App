@@ -3,6 +3,7 @@ import {
   AsyncStorage,
   ScrollView,
   Text,
+  StatusBar,
   StyleSheet,
   View
 } from 'react-native';
@@ -64,6 +65,9 @@ class App extends Component {
 
     return (
       <View style={styles.appContainer}>
+        <StatusBar
+          barStyle="dark-content"
+        />
         {
           fontsLoaded &&
             <Navigator />

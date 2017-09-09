@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   Alert,
+  AppState,
   AsyncStorage,
   Dimensions,
   Image,
@@ -79,7 +80,6 @@ class Dashboard extends Component {
           scheduleJSON
         } = params;
 
-
         await AsyncStorage.setItem('name', name);
         await AsyncStorage.setItem('classOf', classOf);
         await AsyncStorage.setItem('schedule', scheduleJSON);
@@ -100,11 +100,23 @@ class Dashboard extends Component {
       Alert.alert('Something went wrong with getting/saving your login information.');
     }
 
-    const currentMod = this.getCurrentMod(new Date("2017-09-07T14:45:51.253Z"));
-    console.log(currentMod);
+    this.runTimer();
+
+    AppState.addEventListener('change', state => {
+      if(state === 'active') {
+        this.runTimer();
+      }
+    });
+  }
+
+  runTimer = () => {
+    const now = new Date();
+    const currentMod = this.getCurrentMod(now);
+    const nextMod = this.getNextClass(now, currentMod);
     this.setState({
       timeUntil: this.calculateModCountdown(currentMod),
-      currentMod
+      currentMod,
+      nextMod
     });
     this.startModCountdown();
   }
@@ -151,11 +163,15 @@ class Dashboard extends Component {
         const future = new Date();
         future.setMinutes(future.getMinutes() + 1, 0);
         const nextMod = this.getCurrentMod(future);
+        const nextModClass = this.getNextClass(future);
         this.setState({
           timeUntil: this.calculateModCountdown(nextMod),
-          currentMod: nextMod
+          currentMod: nextMod,
+          nextMod: nextModClass
         });
-        this.startModCountdown();
+        if(nextMod === 'N/A') {
+          this.startModCountdown();
+        }
       }
     }, 1000);
   }
@@ -167,7 +183,7 @@ class Dashboard extends Component {
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
     const [lastStartHours, lastStartMinutes] = schedule.slice(-1)[0][1].split(':');
-    if(nowHours > lastStartHours || nowHours === lastStartHours && nowMinutes > lastStartMinutes) {
+    if(nowHours > lastStartHours || nowHours === +lastStartHours && nowMinutes > lastStartMinutes) {
       return 'N/A';
     }
 
@@ -182,8 +198,18 @@ class Dashboard extends Component {
              currentMod === 0 ? 'HR' : currentMod;
   }
 
-  getNextClass = () => {
+  getNextClass = (now, currentMod) => {
+    const { schedule } = this.state;
 
+    return schedule.schedule.filter(mod => {
+      const mods = [...[...Array(mod.length).keys()].map(key =>
+        key + mod.startMod
+      )];
+
+      return mod.day === now.getDay() && (mods.includes(currentMod) || currentMod === 'HR' && mod.startMod === 0);
+    })[0] || {
+      title: 'Open Mod'
+    };
   }
 
   handleLogout = async () => {
@@ -207,15 +233,19 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    AppState.removeEventListener('change');
   }
 
   render() {
     const {
       timeUntil,
       currentMod,
+      nextMod,
       name,
       classOf,
     } = this.state;
+
+    console.log(typeof nextMod.body);
 
     const minutesUntil = timeUntil / (1000 * 60);
     const secondsUntil = Math.floor((minutesUntil - Math.floor(minutesUntil)) * 60) + '';
@@ -270,13 +300,15 @@ class Dashboard extends Component {
               <InMod
                 currentMod={currentMod}
                 untilModIsOver={formattedTimeUntil}
-                nextMod={'Personal Finance'}
+                nextMod={nextMod.title}
+                nextModInfo={nextMod && nextMod.body ? nextMod.body : ''}
               />
             :
               currentMod === 'PASSING PERIOD' ?
                 <PassingPeriod
                   untilPassingPeriodIsOver={formattedTimeUntil}
-                  nextClass={'Personal Finance'}
+                  nextMod={nextMod.title}
+                  nextModInfo={nextMod.body}
                 />
               :
                 <Text style={styles._dashboardInfoText}>You're done for the day!</Text>
