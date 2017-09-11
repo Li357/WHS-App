@@ -38,6 +38,7 @@ class Login extends Component {
       username,
       password
     } = this.state;
+    const { dispatch } = this.props.navigation;
 
     this.setState({
       loading: true
@@ -59,35 +60,55 @@ class Login extends Component {
         loading: false
       });
     } else {
+      const studentOverview = $('.card-header + .card-block');
+      const studentMentorAttrs = [
+        'name',
+        'phone',
+        'email'
+      ];
+      const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
+      const rawJSON = $('.page-content + script')[0].children[0].data.trim();
+
+      const mentors = [...Array(3).keys()].map(key =>
+        children.eq(key).text().trim()
+      );
+
       try {
-        await AsyncStorage.setItem('username', username);
-        await AsyncStorage.setItem('password', password);
+        const values = [
+          username,
+          password,
+          $('title').text().split('|')[0].trim(),
+          $('.header-title > h6').text(),
+          ...mentors,
+          studentOverview.children().eq(13).text().slice(15),
+          rawJSON.slice(24, -2)
+        ];
+
+        [
+          'username',
+          'password',
+          'name',
+          'classOf',
+          'homeroom',
+          'counselor',
+          'dean',
+          'id',
+          'schedule'
+        ].forEach(async (key, index) =>
+          await AsyncStorage.setItem(key, values[index])
+        );
       } catch(error) {
         Alert.alert('Something went wrong with saving your login information.');
       }
 
-      const rawJSON = $('.page-content + script')[0].children[0].data.trim();
-
-      this.props.navigation.dispatch(
-        {
-            type: 'Navigation/NAVIGATE',
-            routeName: 'GoToANavigator',
-            action: {
-              type: 'Navigation/NAVIGATE',
-              routeName: 'GoToAScreenInANavigator',
-            }
-        }
-       );
-      this.props.navigation.dispatch({
+      dispatch({
         type: 'Navigation/NAVIGATE',
         routeName: 'Drawer',
         action: {
           type: 'Navigation/NAVIGATE',
           routeName: 'Dashboard',
           params: {
-            name: $('title').text().split('|')[0].trim(),
-            classOf: $('.header-title > h6').text(),
-            scheduleJSON: rawJSON.slice(24, -2)
+
           }
         }
       });

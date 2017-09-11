@@ -61,57 +61,48 @@ class Dashboard extends Component {
   }
 
   async componentDidMount() {
+    const { navigate } = this.props.navigation;
+
     try {
-      const username = await AsyncStorage.getItem('username');
-      const password = await AsyncStorage.getItem('password');
+      const keys = [
+        'username',
+        'password',
+        'name',
+        'classOf',
+        'homeroom',
+        'counselor',
+        'dean',
+        'id',
+        'schedule'
+      ];
 
-      this.setState({
-        username,
-        password
-      });
-
-      const params = this.props.navigation.state.params;
-      if(params) {
-        const {
-          name,
-          classOf,
-          scheduleJSON
-        } = params;
-
-        await AsyncStorage.setItem('name', name);
-        await AsyncStorage.setItem('classOf', classOf);
-        await AsyncStorage.setItem('schedule', scheduleJSON);
+      for(const key of keys) {
+        const value = await AsyncStorage.getItem(key);
+        if(value === null) {
+          Alert.alert('Something went wrong with getting your login information.');
+          navigate('Login');
+          break;
+        }
+        this.setState({
+          [key]: key === 'schedule' ? JSON.parse(value) : value
+        });
       }
-
-      const name = await AsyncStorage.getItem('name');
-      const classOf = await AsyncStorage.getItem('classOf');
-      const schedule = await AsyncStorage.getItem('schedule');
-
-      if([name, classOf, schedule].some(item => item === null)) {
-        Alert.alert('Something went wrong with getting your login information.');
-        this.props.navigation.navigate('Login');
-      }
-
-      this.setState({
-        username,
-        password,
-        name,
-        classOf,
-        schedule: JSON.parse(schedule)
-      });
     } catch(error) {
       Alert.alert('Something went wrong with getting/saving your login information.');
     }
 
-    this.runTimer();
-    this.startEndDayCountdown();
+    const today = new Date().getDay();
+    if(today < 6 || today !== 0) {
+      this.runTimer();
+      this.startEndDayCountdown();
 
-    AppState.addEventListener('change', state => {
-      if(state === 'active') {
-        clearInterval(this.interval);
-        this.runTimer();
-      }
-    });
+      AppState.addEventListener('change', state => {
+        if(state === 'active') {
+          clearInterval(this.interval);
+          this.runTimer();
+        }
+      });
+    }
   }
 
   runTimer = () => {
@@ -248,25 +239,6 @@ class Dashboard extends Component {
     return new Date().setHours(...schedule.slice(-1)[0][1].split(':')) - now;
   }
 
-  handleLogout = async () => {
-    try {
-      AsyncStorage.multiRemove([
-        'username',
-        'password',
-        'name',
-        'classOf',
-        'schedule'
-      ], (error) => {
-        if(error) {
-          throw error;
-        }
-        this.props.navigation.navigate('Login');
-      });
-    } catch(error) {
-      Alert.alert('Something went wrong logging out.');
-    }
-  }
-
   formatTime = milliseconds => {
     const padNumber = num => (`${num}`.length < 2 ? '0' : '') + num;
     const getRemaining = num => (num - Math.floor(num)) * 60
@@ -292,6 +264,10 @@ class Dashboard extends Component {
       nextMod,
       name,
       classOf,
+      homeroom,
+      counselor,
+      dean,
+      id
     } = this.state;
     const formattedTimeUntil = this.formatTime(timeUntil);
     const formattedEndTimeUntil = this.formatTime(endTimeUntil);
@@ -322,25 +298,39 @@ class Dashboard extends Component {
                 {classOf}
               </Text>
             </View>
-            <View style={styles._dashboardUserSettings}>
-              <TouchableOpacity
-                style={styles._dashboardUserSettingsButton}
-              >
-                <Text style={styles._dashboardUserSettingsText}>Edit Profile</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={this.handleLogout}
-                style={styles._dashboardUserSettingsButton}
-              >
-                <Text style={styles._dashboardUserSettingsText}>Logout</Text>
-              </TouchableOpacity>
+            <View style={styles._dashboardUserInfo}>
+              <View>
+                {
+                  homeroom && counselor && dean &&
+                    [
+                      homeroom,
+                      counselor,
+                      dean
+                    ].map((mentor, index) =>
+                      <View
+                        key={index}
+                        style={styles._dashboardUserInfoCardTextContainer}
+                      >
+                        <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
+                        <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
+                      </View>
+                    )
+                }
+                {
+                  id &&
+                    <View style={styles._dashboardUserInfoCardTextContainer}>
+                      <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
+                      <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
+                    </View>
+                }
+              </View>
             </View>
           </Swiper>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={styles._dashboardInfo}
           contentContainerStyle={styles._dashboardInfoContainer}
+          style={styles._dashboardInfo}
         >
           {
             currentMod ?
@@ -362,7 +352,7 @@ class Dashboard extends Component {
                   :
                     <Text style={styles._dashboardInfoText}>
                       {
-                        today > 4 ?
+                        today > 4 || today === 0 ?
                           'Enjoy your weekend!'
                         :
                           'You\'re done for the day!'
@@ -376,7 +366,7 @@ class Dashboard extends Component {
               />
           }
           {
-            currentMod && today < 6 &&
+            currentMod && (today < 6 && today !== 0) &&
               [
                 {
                   value: formattedEndTimeUntil,
@@ -441,30 +431,34 @@ const styles = EStyleSheet.create({
     margin: 5,
     marginBottom: 10
   },
-  dashboardUserSettings: {
+  dashboardUserInfo: {
     alignItems: 'center',
     justifyContent: 'center',
     height: '$dashboardSwiperContainerSize'
   },
-  dashboardUserSettingsButton: {
-    padding: 10,
-    margin: 5,
-    width: '80%',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)'
+  dashboardUserInfoCardTextContainer: {
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    flexDirection: 'row'
   },
-  dashboardUserSettingsText: {
+  dashboardUserInfoCardTextType: {
+    fontFamily: 'RobotoRegular',
+    paddingRight: 0,
+    padding: 5,
+  },
+  dashboardUserInfoCardText: {
     fontFamily: 'RobotoLight',
-    fontSize: 17,
-    textAlign: 'center'
+    paddingLeft: 0,
+    padding: 5
+  },
+  dashboardInfoContainer: {
+    alignItems: 'center'
   },
   dashboardInfo: {
     width: '100%',
     backgroundColor: 'white',
     paddingRight: 20,
-    paddingLeft: 20
-  },
-  dashboardInfoContainer: {
-    alignItems: 'center'
+    paddingLeft: 20,
   },
   dashboardInfoLoadingGIF: {
     width: '$dashboardInfoLoadingGIFSize',
