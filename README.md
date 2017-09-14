@@ -5,7 +5,7 @@ with [Expo](https://expo.io/)/[CRNA](https://github.com/react-community/create-r
 & [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2017
 Andrew Li, MIT License.
 
-#To Do List
+# To Do List
 
 This is the list of everything I want to get done in the app:
 
