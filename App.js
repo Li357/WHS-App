@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   AsyncStorage,
   Image,
   ScrollView,
@@ -14,14 +15,8 @@ import {
   DrawerNavigator,
   StackNavigator
 } from 'react-navigation';
-import { Font } from 'expo';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
-
-import RobotoRegular from './assets/fonts/Roboto-Regular.ttf';
-import RobotoLight from './assets/fonts/Roboto-Light.ttf';
-import RobotoThin from './assets/fonts/Roboto-Thin.ttf';
-import BebasNeueBook from './assets/fonts/BebasNeue-Book.ttf';
 
 import Login from './src/Login.js';
 import Dashboard from './src/Dashboard.js';
@@ -30,7 +25,7 @@ import HamburgerMenu from './src/HamburgerMenu.js';
 
 class App extends Component {
   state = {
-    fontsLoaded: false
+    navigator: null
   }
 
   hasLoggedIn = async () => {
@@ -97,14 +92,7 @@ class App extends Component {
   });
 
   async componentDidMount() {
-    await Font.loadAsync({
-      RobotoRegular,
-      RobotoLight,
-      RobotoThin,
-      BebasNeueBook
-    });
     this.setState({
-      fontsLoaded: true,
       navigator: StackNavigator({
         Login: {
           screen: Login
@@ -125,15 +113,13 @@ class App extends Component {
   }
 
   render() {
-    const { fontsLoaded } = this.state;
-
     return (
       <View style={styles.appContainer}>
         <StatusBar
           barStyle="dark-content"
         />
         {
-          fontsLoaded && this.state.navigator &&
+          this.state.navigator &&
             <this.state.navigator onNavigationStateChange={null} />
         }
       </View>
@@ -150,12 +136,11 @@ const styles = StyleSheet.create({
   },
   wrapperLogoutButton: {
     padding: 10,
-    marginTop: '120%',
     width: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.04)'
   },
   wrapperLogoutText: {
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     fontSize: 17,
     textAlign: 'center'
   }

@@ -8,5 +8,7 @@
     },
     "orientation": "portrait",
     "sdkVersion": "20.0.0"
-  }
+  },
+  "name": "WHS",
+  "displayName": "WHS"
 }

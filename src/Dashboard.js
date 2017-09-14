@@ -103,9 +103,10 @@ class Dashboard extends Component {
 
       AppState.addEventListener('change', state => {
         clearInterval(this.interval);
+        clearInterval(this.beginDayInterval);
         clearInterval(this.endDayInterval);
         if(state === 'active') {
-          if(this.getCurrentMod(now) === 'BEFORE') {
+          if(this.getCurrentMod(new Date()) === 'BEFORE') {
             this.startBeginDayCountdown();
           } else {
             this.runTimer();
@@ -470,11 +471,11 @@ const styles = EStyleSheet.create({
     marginBottom: 5
   },
   dashboardUserName: {
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     fontSize: 25
   },
   dashboardUserClassOf: {
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     fontSize: 15,
     margin: 5,
     marginBottom: 10
@@ -490,13 +491,13 @@ const styles = EStyleSheet.create({
     flexDirection: 'row'
   },
   dashboardUserInfoCardTextType: {
-    fontFamily: 'RobotoRegular',
+    fontFamily: 'Roboto-Regular',
     fontSize: 17,
     paddingRight: 0,
     padding: 5,
   },
   dashboardUserInfoCardText: {
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     fontSize: 17,
     paddingLeft: 0,
     padding: 5

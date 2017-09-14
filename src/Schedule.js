@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   AsyncStorage,
   Image,
   View
@@ -40,12 +41,8 @@ class Schedule extends Component {
             <Swiper
               horizontal
               index={today > 0 && today < 6 ? today - 1 : 0}
-              dotStyle={{
-                marginBottom: 550
-              }}
-              activeDotStyle={{
-                marginBottom: 550
-              }}
+              dotStyle={styles._scheduleDotStyle}
+              activeDotStyle={styles._scheduleDotStyle}
               containerStyle={styles._scheduleSwiperContainer}
             >
               {
@@ -79,6 +76,9 @@ const styles = EStyleSheet.create({
   scheduleLoadingGIF: {
     width: 40,
     height: 40
+  },
+  scheduleDotStyle: {
+    marginBottom: '100% - 120px'
   }
 });
 

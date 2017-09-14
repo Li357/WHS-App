@@ -218,7 +218,7 @@ const styles = EStyleSheet.create({
   },
   loginText: {
     textAlign: 'center',
-    fontFamily: 'RobotoThin',
+    fontFamily: 'Roboto-Thin',
     fontSize: 40,
     width: '$loginWidth',
     margin: '$loginMargin',
@@ -226,7 +226,7 @@ const styles = EStyleSheet.create({
     backgroundColor: 'white'
   },
   loginError: {
-    fontFamily: 'RobotoThin',
+    fontFamily: 'Roboto-Thin',
     fontSize: 12,
     color: 'red',
     backgroundColor: 'white'
@@ -247,7 +247,7 @@ const styles = EStyleSheet.create({
     justifyContent: 'center'
   },
   loginButtonText: {
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     fontSize: 17
   },
   loginLoadingGIF: {

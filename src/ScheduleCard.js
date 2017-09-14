@@ -94,7 +94,7 @@ const styles = EStyleSheet.create({
     alignItems: 'center'
   },
   scheduleCardDay: {
-    fontFamily: 'RobotoRegular',
+    fontFamily: 'Roboto-Regular',
     fontSize: 30,
     marginTop: 30
   },

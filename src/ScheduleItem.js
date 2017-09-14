@@ -81,7 +81,7 @@ const styles = EStyleSheet.create({
     paddingTop: 29,
     paddingBottom: 29,
     paddingRight: 9,
-    fontFamily: 'RobotoLight',
+    fontFamily: 'Roboto-Light',
     textAlign: 'right'
   },
   scheduleCardItem: {
