@@ -72,7 +72,7 @@ class App extends Component {
     <View style={styles.wrapper}>
       <DrawerItems {...props} />
       <TouchableOpacity
-        onPress={() => this.handleLogout(props.navigation.navigate)}
+        onPressIn={() => this.handleLogout(props.navigation.navigate)}
         style={styles.wrapperLogoutButton}
       >
         <Text style={styles.wrapperLogoutText}>Logout</Text>

@@ -1,5 +1,12 @@
 {
   "expo": {
+    "name": "WHS",
+    "version": "1.0.0",
+    "ios": {
+      "bundleIdentifier": "com.li357.WHS",
+      "icon": "./assets/images/WHS.png"
+    },
+    "orientation": "portrait",
     "sdkVersion": "20.0.0"
   }
 }

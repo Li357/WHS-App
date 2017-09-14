@@ -7,8 +7,32 @@ import {
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import ScheduleItem from './ScheduleItem.js';
+
+/*let getCrossSectioned = ({ schedule }, day) => schedule.filter((scheduleItem, index, array) =>
+  scheduleItem.day === day && index !== array.findIndex(anotherItem =>
+    anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
+  )
+);*/
+
+const days = [
+  'M',
+  'T',
+  'W',
+  'Th',
+  'F'
+]
+
 const ScheduleCard = ({ schedule, day }) => (
   <View style={styles._scheduleCardContainer}>
+    <Text style={styles._scheduleCardDay}>{days[day - 1]}</Text>
+    {/*
+      day === new Date().getDay() &&
+        <View style={styles._schedulePointer}>
+          <View style={styles._schedulePointerCircle} />
+          <View style={styles._schedulePointerLine} />
+        </View>
+    */}
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles._scheduleCardContentContainer}
@@ -19,6 +43,10 @@ const ScheduleCard = ({ schedule, day }) => (
           scheduleItem.day === day
         ).sort((a, b) =>
           a.startMod - b.startMod
+        ).filter((scheduleItem, index, array) =>
+          index === array.findIndex(anotherItem =>
+            anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
+          )
         ).reduce((withOpenMods, scheduleItem, index, array) => {
           const filledMods = array.reduce((filled, scheduleItem) =>
             [
@@ -30,15 +58,15 @@ const ScheduleCard = ({ schedule, day }) => (
               )
             ]
           , []);
-          console.log('Filled:', scheduleItem.day, filledMods, 'Item:', withOpenMods); //Cross sectioned mods conflict with this
 
-          if(!filledMods.includes(scheduleItem.endMod)) {
+          if(!filledMods.includes(scheduleItem.endMod) && scheduleItem.endMod !== 15) {
             return [
               ...withOpenMods,
               scheduleItem,
               {
                 title: 'OPEN MOD',
-                length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod
+                length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod,
+                startMod: scheduleItem.endMod
               }
             ]
           }
@@ -46,29 +74,11 @@ const ScheduleCard = ({ schedule, day }) => (
             ...withOpenMods,
             scheduleItem
           ];
-        }, []).map((scheduleItem, index) =>
-          <View
+        }, []).map((scheduleItem, index) => //IF CROSS SECTIONED ADD WARNING LABEL & ALERT.
+          <ScheduleItem
             key={index}
-            style={styles._scheduleCardWrappedContainer}
-          >
-            <View style={styles._scheduleCardWrappedTextContainer}>
-              <Text style={styles._scheduleCardWrappedText}>{scheduleItem.title}</Text>
-              <Text style={styles._scheduleCardWrappedText}>{scheduleItem.body}</Text>
-            </View>
-            {
-              [...Array(scheduleItem.length).keys()].map(key =>
-                <View
-                  key={key}
-                  style={styles._scheduleCardItemContainer}
-                >
-                  <Text style={styles._scheduleCardItemMod}>{scheduleItem.startMod === 0 ? 'HR' : scheduleItem.startMod + key}</Text>
-                  <View
-                    style={styles._scheduleCardItem}
-                  />
-                </View>
-              )
-            }
-          </View>
+            scheduleItem={scheduleItem}
+          />
         )
       }
     </ScrollView>
@@ -77,54 +87,46 @@ const ScheduleCard = ({ schedule, day }) => (
 
 const styles = EStyleSheet.create({
   $scheduleCardSize: '65%',
+  $schedulePointerCircleSize: 12,
+  $schedulePointerLineSize: 2,
   scheduleCardContainer: {
     flex: 1,
     alignItems: 'center'
+  },
+  scheduleCardDay: {
+    fontFamily: 'RobotoRegular',
+    fontSize: 30,
+    marginTop: 30
+  },
+  schedulePointer: {
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    position: 'absolute',
+    top: 200,
+    left: 40,
+    zIndex: 2,
+  },
+  schedulePointerCircle: {
+    width: '$schedulePointerCircleSize',
+    height: '$schedulePointerCircleSize',
+    borderRadius: '$schedulePointerCircleSize / 2',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+  },
+  schedulePointerLine: {
+    width: 275,
+    height: '$schedulePointerLineSize',
+    marginTop: 5,
+    marginBottom: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)'
   },
   scheduleCardContentContainer: {
     alignItems: 'center'
   },
   scheduleCard: {
     width: '$scheduleCardSize',
-    marginTop: 100,
+    marginTop: 60,
     margin: 10
-  },
-  scheduleCardWrappedContainer: {
-    width: '100%',
-    borderColor: 'white',
-    borderWidth: 1
-  },
-  scheduleCardWrappedTextContainer: {
-    position: 'absolute',
-    zIndex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    top: 0,
-    left: 30,
-    right: 0,
-    bottom: 0
-  },
-  scheduleCardWrappedText: {
-    fontFamily: 'BebasNeueBook',
-    fontSize: 17,
-  },
-  scheduleCardItemContainer: {
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    flexDirection: 'row'
-  },
-  scheduleCardItemMod: {
-    width: '13%',
-    paddingTop: 29,
-    paddingBottom: 29,
-    paddingRight: 12,
-    fontFamily: 'RobotoLight',
-    textAlign: 'right'
-  },
-  scheduleCardItem: {
-    width: '87%',
-    height: 75,
-    backgroundColor: 'lightgray'
   }
 });
 

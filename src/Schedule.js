@@ -35,26 +35,35 @@ class Schedule extends Component {
 
     return (
       <View style={styles._scheduleContainer}>
-        <Swiper
-          horizontal
-          index={today > 0 && today < 6 ? today - 1 : 0}
-          containerStyle={styles._scheduleSwiperContainer}
-        >
-          {
-            schedule ?
-              [...Array(5).keys()].map(key =>
-                <ScheduleCard
-                  key={key}
-                  schedule={schedule}
-                  day={key + 1}
-                />
-              )
-            :
-              <Image
-                source={LoadingGIF}
-              />
-          }
-        </Swiper>
+        {
+          schedule ?
+            <Swiper
+              horizontal
+              index={today > 0 && today < 6 ? today - 1 : 0}
+              dotStyle={{
+                marginBottom: 550
+              }}
+              activeDotStyle={{
+                marginBottom: 550
+              }}
+              containerStyle={styles._scheduleSwiperContainer}
+            >
+              {
+                [...Array(5).keys()].map(key =>
+                  <ScheduleCard
+                    key={key}
+                    schedule={schedule}
+                    day={key + 1}
+                  />
+                )
+              }
+            </Swiper>
+          :
+            <Image
+              source={LoadingGIF}
+              style={styles._scheduleLoadingGIF}
+            />
+        }
       </View>
     );
   }
@@ -63,7 +72,13 @@ class Schedule extends Component {
 const styles = EStyleSheet.create({
   scheduleContainer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'white'
+  },
+  scheduleLoadingGIF: {
+    width: 40,
+    height: 40
   }
 });
 

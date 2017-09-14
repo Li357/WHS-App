@@ -91,15 +91,26 @@ class Dashboard extends Component {
       Alert.alert('Something went wrong with getting/saving your login information.');
     }
 
-    const today = new Date().getDay();
+    const now = new Date();
+    const today = now.getDay();
     if(today < 6 || today !== 0) {
-      this.runTimer();
-      this.startEndDayCountdown();
+      if(this.getCurrentMod(now) === 'BEFORE') {
+        this.startBeginDayCountdown();
+      } else {
+        this.runTimer();
+        this.startEndDayCountdown();
+      }
 
       AppState.addEventListener('change', state => {
+        clearInterval(this.interval);
+        clearInterval(this.endDayInterval);
         if(state === 'active') {
-          clearInterval(this.interval);
-          this.runTimer();
+          if(this.getCurrentMod(now) === 'BEFORE') {
+            this.startBeginDayCountdown();
+          } else {
+            this.runTimer();
+            this.startEndDayCountdown();
+          }
         }
       });
     }
@@ -186,6 +197,26 @@ class Dashboard extends Component {
     }, 1000);
   }
 
+  startBeginDayCountdown = () => {
+    this.setState({
+      beginTimeUntil: this.getTimeUntilBegin(),
+      currentMod: 'BEFORE'
+    });
+    this.beginDayInterval = setInterval(() => {
+      const { beginTimeUntil } = this.state;
+
+      if(beginTimeUntil > 0) {
+        this.setState(prevState => ({
+          beginTimeUntil: prevState.beginTimeUntil - 1000
+        }));
+      } else {
+        clearInterval(this.beginDayInterval);
+        this.runTimer();
+        this.startEndDayCountdown();
+      }
+    }, 1000);
+  }
+
   getCurrentMod = now => {
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
@@ -193,13 +224,19 @@ class Dashboard extends Component {
     const wednesday = nowDay === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-    if(nowDay > 5 || now - new Date().setHours(...schedule.slice(-1)[0][1].split(':')) >= 0) {
+    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
+    const first = new Date().setHours(...schedule[0][0].split(':'), 0);
+    if(nowDay > 5 || now - afterEnd >= 0) {
       return 'N/A';
+    }
+
+    if(now < first) {
+      return 'BEFORE';
     }
 
     const currentMod = schedule.reduce((current, timePair, index) => {
       const [start, end] = timePair.map(time => time.split(':'));
-      return now - new Date(now.getTime()).setHours(...start) >= 0 && now - new Date().setHours(...end) < 0 ?
+      return now - new Date(now.getTime()).setHours(...start, 0) >= 0 && now - new Date().setHours(...end, 0) < 0 ?
                wednesday ? index + 1 : index : current;
     }, -1);
 
@@ -210,7 +247,7 @@ class Dashboard extends Component {
   getNextClass = (now, currentMod) => {
     const { schedule } = this.state;
     const future = new Date(now.getTime());
-    future.setMinutes(future.getMinutes() + 5);
+    future.setMinutes(future.getMinutes() + 5, 0);
     const nextMod = currentMod === 'HR' ? 1 :
                       currentMod === 'PASSING PERIOD' ? this.getCurrentMod(future) :
                         currentMod + 1 <= 14 ? currentMod + 1 : 'N/A';
@@ -236,23 +273,32 @@ class Dashboard extends Component {
   getTimeUntilEnd = () => {
     const now = new Date();
     const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
-    return new Date().setHours(...schedule.slice(-1)[0][1].split(':')) - now;
+    return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - now;
+  }
+
+  getTimeUntilBegin = () => {
+    const now = new Date();
+    const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
+    return new Date().setHours(...schedule[0][0].split(':'), 0) - now;
   }
 
   formatTime = milliseconds => {
-    const padNumber = num => (`${num}`.length < 2 ? '0' : '') + num;
-    const getRemaining = num => (num - Math.floor(num)) * 60
+    const pad = num => ('00' + num ).slice(-2);
 
-    const hours = milliseconds / (1000 * 60 * 60);
-    const minutes = getRemaining(hours);
-    const seconds = Math.floor(getRemaining(minutes));
-    const hoursExist = Math.floor(hours) > 0;
-    return `${hoursExist ? `${Math.floor(hours)}:` : ''}${hoursExist ? padNumber(Math.floor(minutes)) : Math.floor(minutes)}:${padNumber(seconds)}`;
+    const ms = milliseconds % 1000;
+    milliseconds = (milliseconds - ms) / 1000;
+    const seconds = milliseconds % 60;
+    milliseconds = (milliseconds - seconds) / 60;
+    const minutes = milliseconds % 60;
+    const hours = (milliseconds - minutes) / 60;
+
+    return `${hours === 0 ? `${minutes}` : `${hours}:${pad(minutes)}`}:${pad(seconds)}`
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
     clearInterval(this.endDayInterval);
+    clearInterval(this.beginDayInterval);
     AppState.removeEventListener('change');
   }
 
@@ -260,6 +306,7 @@ class Dashboard extends Component {
     const {
       timeUntil,
       endTimeUntil,
+      beginTimeUntil,
       currentMod,
       nextMod,
       name,
@@ -270,7 +317,6 @@ class Dashboard extends Component {
       id
     } = this.state;
     const formattedTimeUntil = this.formatTime(timeUntil);
-    const formattedEndTimeUntil = this.formatTime(endTimeUntil);
     const today = new Date().getDay();
 
     return (
@@ -335,7 +381,7 @@ class Dashboard extends Component {
           {
             currentMod ?
               (
-                typeof currentMod === 'number' || currentMod === 'HR' && nextMod ?
+                (typeof currentMod === 'number' || currentMod === 'HR') && nextMod ?
                   <InMod
                     currentMod={currentMod}
                     untilModIsOver={formattedTimeUntil}
@@ -350,14 +396,15 @@ class Dashboard extends Component {
                       nextModInfo={nextMod.body}
                     />
                   :
-                    <Text style={styles._dashboardInfoText}>
-                      {
-                        today > 4 || today === 0 ?
-                          'Enjoy your weekend!'
-                        :
-                          'You\'re done for the day!'
-                      }
-                    </Text>
+                    currentMod !== 'BEFORE' &&
+                      <Text style={styles._dashboardInfoText}>
+                        {
+                          today > 4 || today === 0 ?
+                            'Enjoy your weekend!'
+                          :
+                            'You\'re done for the day!'
+                        }
+                      </Text>
               )
             :
               <Image
@@ -366,11 +413,12 @@ class Dashboard extends Component {
               />
           }
           {
-            currentMod && (today < 6 && today !== 0) &&
+            today < 6 && today !== 0 && currentMod && currentMod !== 'N/A' &&
               [
                 {
-                  value: formattedEndTimeUntil,
-                  title: today === 5 ? 'UNTIL WEEKEND' : 'UNTIL DAY IS OVER'
+                  value: this.formatTime(currentMod === 'BEFORE' ? beginTimeUntil : endTimeUntil),
+                  title: currentMod === 'BEFORE' ?
+                           'UNTIL SCHOOL STARTS' : today === 5 ? 'UNTIL WEEKEND' : 'UNTIL DAY IS OVER'
                 }
               ].map(infoMap)
           }
@@ -443,11 +491,13 @@ const styles = EStyleSheet.create({
   },
   dashboardUserInfoCardTextType: {
     fontFamily: 'RobotoRegular',
+    fontSize: 17,
     paddingRight: 0,
     padding: 5,
   },
   dashboardUserInfoCardText: {
     fontFamily: 'RobotoLight',
+    fontSize: 17,
     paddingLeft: 0,
     padding: 5
   },
