@@ -4,6 +4,7 @@ import {
   Animated,
   AsyncStorage,
   Image,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -98,7 +99,7 @@ class Login extends Component {
           await AsyncStorage.setItem(key, values[index])
         );
       } catch(error) {
-        Alert.alert('Something went wrong with saving your login information.');
+        Alert.alert('Error', 'Something went wrong with saving your login information.');
       }
 
       dispatch({
@@ -165,6 +166,7 @@ class Login extends Component {
           ].map((credential, index) =>
             <TextInput
               key={index}
+              underlineColorAndroid="rgba(0, 0, 0, 0)"
               onChangeText={value => this.handleInput(credential.toLowerCase(), value)}
               value={this.state[credential.toLowerCase()]}
               autoCorrect={false}
@@ -223,7 +225,7 @@ const styles = EStyleSheet.create({
     width: '$loginWidth',
     margin: '$loginMargin',
     marginBottom: '$loginMargin * 0.6',
-    backgroundColor: 'white'
+    backgroundColor: 'rgba(0, 0, 0, 0)'
   },
   loginError: {
     fontFamily: 'Roboto-Thin',
@@ -233,16 +235,16 @@ const styles = EStyleSheet.create({
   },
   loginInput: {
     margin: '$loginMargin * 0.8',
-    paddingBottom: '$loginMargin * 0.6',
     width: '$loginWidth',
-    height: 30,
+    height: 47,
+    fontSize: 18,
     borderBottomColor: 'gray',
-    borderBottomWidth: 0.5
+    borderBottomWidth: 0.9
   },
   loginButton: {
     margin: '$loginMargin * 2',
     width: '$loginWidth',
-    height: 35,
+    height: 45,
     alignItems: 'center',
     justifyContent: 'center'
   },

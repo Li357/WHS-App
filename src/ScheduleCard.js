@@ -9,11 +9,11 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import ScheduleItem from './ScheduleItem.js';
 
-/*let getCrossSectioned = ({ schedule }, day) => schedule.filter((scheduleItem, index, array) =>
+const getCrossSectioned = ({ schedule }, day) => schedule.filter((scheduleItem, index, array) =>
   scheduleItem.day === day && index !== array.findIndex(anotherItem =>
     anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
   )
-);*/
+);
 
 const days = [
   'M',
@@ -26,13 +26,6 @@ const days = [
 const ScheduleCard = ({ schedule, day }) => (
   <View style={styles._scheduleCardContainer}>
     <Text style={styles._scheduleCardDay}>{days[day - 1]}</Text>
-    {/*
-      day === new Date().getDay() &&
-        <View style={styles._schedulePointer}>
-          <View style={styles._schedulePointerCircle} />
-          <View style={styles._schedulePointerLine} />
-        </View>
-    */}
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles._scheduleCardContentContainer}
@@ -74,10 +67,11 @@ const ScheduleCard = ({ schedule, day }) => (
             ...withOpenMods,
             scheduleItem
           ];
-        }, []).map((scheduleItem, index) => //IF CROSS SECTIONED ADD WARNING LABEL & ALERT.
+        }, []).map((scheduleItem, index) =>
           <ScheduleItem
             key={index}
             scheduleItem={scheduleItem}
+            crossSectionedMods={getCrossSectioned(schedule, day)}
           />
         )
       }

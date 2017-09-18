@@ -9,6 +9,7 @@ import {
 import Swiper from 'react-native-swiper';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import HamburgerMenu from './HamburgerMenu.js';
 import ScheduleCard from './ScheduleCard.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
@@ -24,18 +25,17 @@ class Schedule extends Component {
         schedule: JSON.parse(schedule)
       });
     } catch(error) {
-      Alert.alert('Something went wrong getting your schedule.');
+      Alert.alert('Error', 'Something went wrong getting your schedule.');
     }
   }
 
   render() {
-    const {
-      schedule
-    } = this.state;
+    const { schedule } = this.state;
     const today = new Date().getDay();
 
     return (
       <View style={styles._scheduleContainer}>
+        <HamburgerMenu navigation={this.props.navigation} />
         {
           schedule ?
             <Swiper

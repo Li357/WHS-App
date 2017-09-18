@@ -14,6 +14,7 @@ import {
 import Swiper from 'react-native-swiper';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import HamburgerMenu from './HamburgerMenu.js';
 import InMod from './InMod.js';
 import PassingPeriod from './PassingPeriod.js';
 import infoMap from './util/infoMap.js';
@@ -79,7 +80,7 @@ class Dashboard extends Component {
       for(const key of keys) {
         const value = await AsyncStorage.getItem(key);
         if(value === null) {
-          Alert.alert('Something went wrong with getting your login information.');
+          Alert.alert('Error', 'Something went wrong with getting your login information.');
           navigate('Login');
           break;
         }
@@ -88,7 +89,7 @@ class Dashboard extends Component {
         });
       }
     } catch(error) {
-      Alert.alert('Something went wrong with getting/saving your login information.');
+      Alert.alert('Error', 'Something went wrong with getting/saving your login information.');
     }
 
     const now = new Date();
@@ -227,7 +228,7 @@ class Dashboard extends Component {
 
     const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
     const first = new Date().setHours(...schedule[0][0].split(':'), 0);
-    if(nowDay > 5 || now - afterEnd >= 0) {
+    if(nowDay > 5 || nowDay === 0 || now - afterEnd >= 0) {
       return 'N/A';
     }
 
@@ -322,6 +323,7 @@ class Dashboard extends Component {
 
     return (
       <View style={styles._dashboardContainer}>
+        <HamburgerMenu navigation={this.props.navigation} />
         <View style={styles._dashboardSwiperContainer}>
           <Swiper
             horizontal

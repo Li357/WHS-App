@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Alert,
   AsyncStorage,
+  Dimensions,
   Image,
   ScrollView,
   StatusBar,
@@ -23,6 +24,18 @@ import Dashboard from './src/Dashboard.js';
 import Schedule from './src/Schedule.js';
 import HamburgerMenu from './src/HamburgerMenu.js';
 
+const DrawerWrapper = ({ onLogout, ...props }) => (
+  <View style={styles.wrapper}>
+    <DrawerItems {...props} />
+    <TouchableOpacity
+      onPress={onLogout}
+      style={styles.wrapperLogoutButton}
+    >
+      <Text style={styles.wrapperLogoutText}>Logout</Text>
+    </TouchableOpacity>
+  </View>
+);
+
 class App extends Component {
   state = {
     navigator: null
@@ -35,7 +48,7 @@ class App extends Component {
 
       return username && password;
     } catch(error) {
-      Alert.alert('Something went wrong with getting your login information.');
+      Alert.alert('Error', 'Something went wrong with getting your login information.');
       return false;
     }
   }
@@ -59,21 +72,9 @@ class App extends Component {
         navigate('Login');
       });
     } catch(error) {
-      Alert.alert('Something went wrong logging out.');
+      Alert.alert('Error', 'Something went wrong logging out.');
     }
   }
-
-  DrawerWrapper = props => (
-    <View style={styles.wrapper}>
-      <DrawerItems {...props} />
-      <TouchableOpacity
-        onPressIn={() => this.handleLogout(props.navigation.navigate)}
-        style={styles.wrapperLogoutButton}
-      >
-        <Text style={styles.wrapperLogoutText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   Drawer = DrawerNavigator({
     Dashboard: {
@@ -84,7 +85,10 @@ class App extends Component {
     }
   }, {
     initialRouteName: 'Dashboard',
-    contentComponent: this.DrawerWrapper,
+    contentComponent: props => <DrawerWrapper
+      onLogout={() => this.handleLogout(props.navigation.navigate)}
+      {...props}
+    />,
     contentOptions: {
       activeTintColor: 'black',
       inactiveTintColor: 'rgba(0, 0, 0, 0.5)'
@@ -98,10 +102,7 @@ class App extends Component {
           screen: Login
         },
         Drawer: {
-          screen: this.Drawer,
-          navigationOptions: ({ navigation }) => ({
-            header: <HamburgerMenu navigation={navigation} />,
-          }),
+          screen: this.Drawer
         }
       }, {
         initialRouteName: await this.hasLoggedIn() ? 'Drawer' : 'Login',
@@ -132,9 +133,10 @@ const styles = StyleSheet.create({
     flex: 1
   },
   wrapper: {
-    marginTop: 75,
+    marginTop: 20
   },
   wrapperLogoutButton: {
+    marginTop: Dimensions.get('window').height - 250,
     padding: 10,
     width: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.04)'

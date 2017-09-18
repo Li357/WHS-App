@@ -10,17 +10,19 @@ const infoMap = ({
   title,
   textStyle
 }, index) => (
-  <View
-    key={index}
-    style={styles.dashboardInfoContainer}
-  >
-    <Text
-      style={[
-        styles.dashboardInfoLarge,
-        textStyle
-      ]}
-    >{value}</Text>
-    <Text style={styles.dashboardInfoSmall}>{title}</Text>
+  <View key={index}>
+    {
+      value && title &&
+        <View style={styles.dashboardInfoContainer}>
+          <Text
+            style={[
+              styles.dashboardInfoLarge,
+              textStyle
+            ]}
+          >{value}</Text>
+          <Text style={styles.dashboardInfoSmall}>{title}</Text>
+        </View>
+    }
   </View>
 );
 

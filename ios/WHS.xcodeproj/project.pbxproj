@@ -38,7 +38,7 @@
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		70AB28DDFD174DDDA5FEE5C8 /* Roboto Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB55DAF860BB4B18B9FB3324 /* Roboto Regular.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
-		FB0C11C3C749494F8F562F8C /* BebasNeueBook.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F2D98E2B38347B5B183615F /* BebasNeueBook.ttf */; };
+		D42B47B563E64038B723A904 /* BebasNeueBook.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B0EF013461B44CFCB89670CF /* BebasNeueBook.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -271,7 +271,6 @@
 		00E356EE1AD99517003FC87E /* WHSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WHSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* WHSTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WHSTests.m; sourceTree = "<group>"; };
-		0F2D98E2B38347B5B183615F /* BebasNeueBook.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BebasNeueBook.ttf; path = ../assets/fonts/BebasNeueBook.ttf; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* WHS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WHS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -288,6 +287,7 @@
 		61EA8FA7B80C405C953A3505 /* Roboto Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto Thin.ttf"; path = "../assets/fonts/Roboto Thin.ttf"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		B0EF013461B44CFCB89670CF /* BebasNeueBook.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BebasNeueBook.ttf; path = ../assets/fonts/BebasNeueBook.ttf; sourceTree = "<group>"; };
 		CB55DAF860BB4B18B9FB3324 /* Roboto Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto Regular.ttf"; path = "../assets/fonts/Roboto Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -455,10 +455,10 @@
 		198915813D4945DDB5456AB7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0F2D98E2B38347B5B183615F /* BebasNeueBook.ttf */,
 				5C248F51C20845C6A4E8FCF8 /* Roboto Light.ttf */,
 				CB55DAF860BB4B18B9FB3324 /* Roboto Regular.ttf */,
 				61EA8FA7B80C405C953A3505 /* Roboto Thin.ttf */,
+				B0EF013461B44CFCB89670CF /* BebasNeueBook.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -920,10 +920,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				FB0C11C3C749494F8F562F8C /* BebasNeueBook.ttf in Resources */,
 				42A690B5B0CF4A39A9F93D0A /* Roboto Light.ttf in Resources */,
 				70AB28DDFD174DDDA5FEE5C8 /* Roboto Regular.ttf in Resources */,
 				11C78F54D78E48AEB2190A5E /* Roboto Thin.ttf in Resources */,
+				D42B47B563E64038B723A904 /* BebasNeueBook.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

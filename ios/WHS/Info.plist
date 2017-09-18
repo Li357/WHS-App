@@ -36,13 +36,13 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>BebasNeueBook.ttf</string>
 		<string>Roboto Light.ttf</string>
 		<string>Roboto Regular.ttf</string>
 		<string>Roboto Thin.ttf</string>
+		<string>BebasNeueBook.ttf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
