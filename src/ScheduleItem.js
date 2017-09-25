@@ -110,7 +110,8 @@ const styles = EStyleSheet.create({
   scheduleCardWrappedContainer: {
     width: '100%',
     borderColor: 'gray',
-    borderWidth: 1
+    borderWidth: 1,
+    backgroundColor: 'transparent'
   },
   scheduleCardWrappedTextContainer: {
     position: 'absolute',

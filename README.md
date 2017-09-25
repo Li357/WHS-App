@@ -11,6 +11,7 @@ timers have a roughly 20 second discrepancy (as of 9/16/17).
 # Known Bugs
 
 - The launch image on plus devices (i.e. iPhone 7 Plus) is stretched
+- react-native-blur does not work correctly on Android
 
 # To Do List
 
@@ -25,9 +26,8 @@ This is the list of everything I want to get done in the app:
 - [x] Handle cross-sectioned mods
 - [ ] Handle late-start and holidays/breaks
 - [ ] Handle end of the school year & summer
-- [ ] Upload profile photo
+- [x] Upload profile photo
 - [ ] Auto-refresh on student details/schedule
-- [ ] Teacher schedule viewing
 
 Note that auto-refreshing will follow these rules:
 
@@ -44,10 +44,11 @@ that you sign out if your credentials have changed.
 Bug wise:
 
 - [x] Fix the hamburger menu problem with state and double clicking
-- [ ] Update from react-native-swiper to an Android-compatible library
+- [x] Update from react-native-swiper to an Android-compatible library
+- [ ] Wait for update on react-native-blur so that the BlurView is rendered with Image, not after
 
 Here are some app-OS goals:
 
 - [x] iOS Version
-- [ ] Android Version
+- [x] Android Version
 - [ ] Desktop Version (Possible)

@@ -64,7 +64,8 @@ class App extends Component {
         'counselor',
         'dean',
         'id',
-        'schedule'
+        'schedule',
+        'profilePhoto'
       ], (error) => {
         if(error) {
           throw error;
@@ -92,7 +93,8 @@ class App extends Component {
     contentOptions: {
       activeTintColor: 'black',
       inactiveTintColor: 'rgba(0, 0, 0, 0.5)'
-    }
+    },
+    gesturesEnabled: false
   });
 
   async componentDidMount() {

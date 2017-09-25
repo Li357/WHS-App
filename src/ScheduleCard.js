@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import {
+  Dimensions,
+  Platform,
   ScrollView,
   Text,
   View
@@ -76,6 +78,12 @@ const ScheduleCard = ({ schedule, day }) => (
         )
       }
     </ScrollView>
+    {
+      Platform.OS === 'android' &&
+        <View style={{
+          height: 10
+        }} />
+    }
   </View>
 );
 
@@ -85,41 +93,30 @@ const styles = EStyleSheet.create({
   $schedulePointerLineSize: 2,
   scheduleCardContainer: {
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
   scheduleCardDay: {
     fontFamily: 'Roboto-Regular',
-    fontSize: 30,
-    marginTop: 30
-  },
-  schedulePointer: {
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    position: 'absolute',
-    top: 200,
-    left: 40,
-    zIndex: 2,
-  },
-  schedulePointerCircle: {
-    width: '$schedulePointerCircleSize',
-    height: '$schedulePointerCircleSize',
-    borderRadius: '$schedulePointerCircleSize / 2',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)'
-  },
-  schedulePointerLine: {
-    width: 275,
-    height: '$schedulePointerLineSize',
-    marginTop: 5,
-    marginBottom: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+    ...(Platform.OS === 'ios' ? {
+      fontSize: 30,
+      marginTop: 30
+    } : {
+      fontSize: 50,
+      marginTop: 50
+    })
   },
   scheduleCardContentContainer: {
     alignItems: 'center'
   },
   scheduleCard: {
     width: '$scheduleCardSize',
-    marginTop: 60,
+    ...(Platform.OS === 'ios' ? {
+      marginTop: 60
+    } : {
+      marginTop: 40
+    }),
     margin: 10
   }
 });

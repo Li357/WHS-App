@@ -1,11 +1,11 @@
 [
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/redbox_item_frame.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/layout/redbox_item_frame.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/layout/redbox_item_frame.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/fps_view.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/layout/fps_view.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/layout/fps_view.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/abc_action_bar_up_container.xml",
@@ -33,7 +33,7 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/redbox_item_title.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/layout/redbox_item_title.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/layout/redbox_item_title.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/abc_screen_content_include.xml",
@@ -53,11 +53,11 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/dev_loading_view.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/layout/dev_loading_view.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/layout/dev_loading_view.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/redbox_view.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/layout/redbox_view.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/layout/redbox_view.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_layout.xml",
@@ -86,6 +86,10 @@
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_radio.xml",
         "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/layout/abc_list_menu_item_radio.xml"
+    },
+    {
+        "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/list_item.xml",
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/WHS/react-native-image-picker/unspecified/res/layout/list_item.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_checkbox.xml",

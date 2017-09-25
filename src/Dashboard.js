@@ -8,57 +8,29 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
+  findNodeHandle
 } from 'react-native';
 
-import Swiper from 'react-native-swiper';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import Carousel from 'react-native-looped-carousel';
+import PhotoUpload from 'react-native-photo-upload';
+import { BlurView } from 'react-native-blur';
 
 import HamburgerMenu from './HamburgerMenu.js';
 import InMod from './InMod.js';
 import PassingPeriod from './PassingPeriod.js';
+import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
 
-const SCHEDULE = (() => {
-  const regular = [
-    ['8:00', '8:15'],
-    ['8:20', '9:00'],
-    ['9:05', '9:40'],
-    ['9:45', '10:20'],
-    ['10:25', '10:40'],
-    ['10:45', '11:00'],
-    ['11:05', '11:22'],
-    ['11:27', '11:44'],
-    ['11:49', '12:06'],
-    ['12:11', '12:28'],
-    ['12:33', '12:50'],
-    ['12:55', '13:10'],
-    ['13:15', '13:50'],
-    ['13:55', '14:30'],
-    ['14:35', '15:10']
-  ];
-
-  const wednesday = regular.slice(1).map(timePair =>
-    timePair.map(time => {
-      const [hours, minutes] = time.split(':');
-      const lessThan20 = minutes < 20;
-      const subtracted = `${+minutes + (lessThan20 && 60) - 20}`;
-      return `${hours - lessThan20}:${subtracted.length < 2 ? '0' : ''}${subtracted}`;
-    })
-  );
-
-  return {
-    regular,
-    wednesday
-  }
-})();
-
 class Dashboard extends Component {
   state = {
     timeUntil: 0,
-    endTimeUntil: 0
+    endTimeUntil: 0,
+    loadingProfileImage: true,
+    bgRef: null
   }
 
   async componentDidMount() {
@@ -88,6 +60,17 @@ class Dashboard extends Component {
           [key]: key === 'schedule' ? JSON.parse(value) : value
         });
       }
+
+      const profilePhoto = await AsyncStorage.getItem('profilePhoto');
+      if(profilePhoto) {
+        this.setState({
+          profilePhoto
+        });
+      }
+
+      this.setState({
+        loadingProfileImage: false
+      });
     } catch(error) {
       Alert.alert('Error', 'Something went wrong with getting/saving your login information.');
     }
@@ -294,7 +277,24 @@ class Dashboard extends Component {
     const minutes = milliseconds % 60;
     const hours = (milliseconds - minutes) / 60;
 
-    return `${hours === 0 ? `${minutes}` : `${hours}:${pad(minutes)}`}:${pad(seconds)}`
+    return `${hours === 0 ? `${minutes}` : `${hours}:${pad(minutes)}`}:${pad(seconds)}`;
+  }
+
+  uploadProfilePhoto = async newPhoto => {
+    try {
+      await AsyncStorage.setItem('profilePhoto', newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser');
+      this.setState({
+        profilePhoto: newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser'
+      });
+    } catch(error) {
+      Alert.alert('Error', 'Something went wrong saving your profile picture.');
+    }
+  }
+
+  onBackgroundImageLoad = () => {
+    this.setState({
+      bgRef: findNodeHandle(this.bgImage)
+    });
   }
 
   componentWillUnmount() {
@@ -316,26 +316,69 @@ class Dashboard extends Component {
       homeroom,
       counselor,
       dean,
-      id
+      id,
+      profilePhoto,
+      loadingProfileImage,
+      bgRef
     } = this.state;
     const formattedTimeUntil = this.formatTime(timeUntil);
     const today = new Date().getDay();
+
+    console.log(this.bgImage);
+
+    const profileImage = !loadingProfileImage ? profilePhoto && profilePhoto !== 'BlankUser' ? {
+      uri: profilePhoto
+    } : BlankUser : LoadingGIF;
+    const backgroundImage = !loadingProfileImage && profilePhoto && profilePhoto !== 'BlankUser' && {
+      uri: profilePhoto
+    };
 
     return (
       <View style={styles._dashboardContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         <View style={styles._dashboardSwiperContainer}>
-          <Swiper
-            horizontal
-            dot={<View style={styles._dashboardSwiperDot} />}
-            activeDot={<View style={styles._dashboardSwiperActiveDot} />}
-            containerStyle={styles._dashboardUserContainer}
+          {
+            backgroundImage &&
+              <View>
+                <Image
+                  ref={img => this.bgImage = img}
+                  source={backgroundImage}
+                  onLayout={this.onBackgroundImageLoad}
+                  style={styles.dashboardUserImageBlur}
+                />
+                <BlurView
+                  viewRef={bgRef}
+                  blurType="light"
+                  blurAmount={10}
+                  style={styles.dashboardUserImageBlur}
+                />
+              </View>
+          }
+          <Carousel
+            autoplay={false}
+            bullets
+            bulletStyle={styles._dashboardSwiperDot}
+            chosenBulletStyle={styles._dashboardSwiperActiveDot}
+            style={styles._dashboardSwiperContainer}
           >
             <View style={styles._dashboardUserProfile}>
-              <Image
-                source={BlankUser}
-                style={styles._dashboardUserImage}
-              />
+              <PhotoUpload
+                resetPhoto={BlankUser}
+                onReset={this.uploadProfilePhoto}
+                onPhotoSelect={this.uploadProfilePhoto}
+              >
+                <Image
+                  source={profileImage}
+                  style={[
+                    styles._dashboardUserImage,
+                    loadingProfileImage ? {
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20
+                    } : {}
+                  ]}
+                />
+              </PhotoUpload>
               <Text
                 style={styles._dashboardUserName}
               >
@@ -374,7 +417,7 @@ class Dashboard extends Component {
                 }
               </View>
             </View>
-          </Swiper>
+          </Carousel>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -432,11 +475,11 @@ class Dashboard extends Component {
 }
 
 const dashboardSwiperDotConfig = {
+  margin: 4,
+  marginTop: 20,
+  borderWidth: 0,
   width: '$dashboardSwiperDotSize',
-  height: '$dashboardSwiperDotSize',
-  borderRadius: '$dashboardSwiperDotSize / 2',
-  margin: 3,
-  marginBottom: -15
+  height: '$dashboardSwiperDotSize'
 }
 
 const styles = EStyleSheet.create({
@@ -449,7 +492,9 @@ const styles = EStyleSheet.create({
     alignItems: 'center'
   },
   dashboardSwiperContainer: {
-    height: '$dashboardSwiperContainerSize'
+    width: '100%',
+    height: '$dashboardSwiperContainerSize',
+    backgroundColor: 'transparent'
   },
   dashboardSwiperDot: {
     ...dashboardSwiperDotConfig,
@@ -459,11 +504,15 @@ const styles = EStyleSheet.create({
     ...dashboardSwiperDotConfig,
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
-  dashboardUserContainer: {
-    backgroundColor: 'lightgray'
-  },
   dashboardUserProfile: {
-    alignItems: 'center'
+    alignItems: 'center',
+    width: Dimensions.get('window').width,
+    height: '$dashboardSwiperContainerSize'
+  },
+  dashboardUserImageBlur: {
+    position: 'absolute',
+    width: '100%',
+    height: '$dashboardSwiperContainerSize'
   },
   dashboardUserImage: {
     width: '$dashboardUserImageSize',
@@ -480,11 +529,12 @@ const styles = EStyleSheet.create({
     fontFamily: 'Roboto-Light',
     fontSize: 15,
     margin: 5,
-    marginBottom: 10
+    marginBottom: 30
   },
   dashboardUserInfo: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: Dimensions.get('window').width,
     height: '$dashboardSwiperContainerSize'
   },
   dashboardUserInfoCardTextContainer: {

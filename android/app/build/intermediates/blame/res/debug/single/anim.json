@@ -13,7 +13,7 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/catalyst_push_up_out.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/catalyst_push_up_out.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/catalyst_push_up_out.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/abc_fade_in.xml",
@@ -21,7 +21,7 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/slide_up.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/slide_up.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/slide_up.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/abc_popup_exit.xml",
@@ -29,11 +29,11 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/catalyst_push_up_in.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/catalyst_push_up_in.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/catalyst_push_up_in.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/fade_in.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/fade_in.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/fade_in.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/abc_grow_fade_in_from_bottom.xml",
@@ -41,7 +41,7 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/slide_down.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/slide_down.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/slide_down.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/abc_fade_out.xml",
@@ -53,7 +53,7 @@
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/fade_out.xml",
-        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.47.2/res/anim/fade_out.xml"
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.48.4/res/anim/fade_out.xml"
     },
     {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/anim/abc_slide_in_bottom.xml",
