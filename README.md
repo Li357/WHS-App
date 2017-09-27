@@ -10,7 +10,6 @@ timers have a roughly 20 second discrepancy (as of 9/16/17).
 
 # Known Bugs
 
-- The launch image on plus devices (i.e. iPhone 7 Plus) is stretched
 - react-native-blur does not work correctly on Android
 
 # To Do List
@@ -29,6 +28,7 @@ This is the list of everything I want to get done in the app:
 - [x] Upload profile photo
 - [ ] Auto-refresh on student details/schedule
 - [ ] Redux rewrite for better performance
+- [ ] Finish Android startup screens & icons
 
 Note that auto-refreshing will follow these rules:
 

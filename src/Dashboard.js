@@ -386,7 +386,7 @@ class Dashboard extends Component {
               </Text>
             </View>
             <View style={styles._dashboardUserInfo}>
-              <View>
+              <View style={styles._dashboardUserInfoContainer}>
                 {
                   homeroom && counselor && dean &&
                     [
@@ -533,6 +533,9 @@ const styles = EStyleSheet.create({
     width: Dimensions.get('window').width,
     height: '$dashboardSwiperContainerSize'
   },
+  dashboardUserInfoContainer: {
+    paddingTop: 12
+  },
   dashboardUserInfoCardTextContainer: {
     flexWrap: 'wrap',
     alignItems: 'flex-start',
@@ -542,7 +545,7 @@ const styles = EStyleSheet.create({
     fontFamily: 'Roboto-Regular',
     fontSize: 17,
     paddingRight: 0,
-    padding: 5,
+    padding: 5
   },
   dashboardUserInfoCardText: {
     fontFamily: 'Roboto-Light',
