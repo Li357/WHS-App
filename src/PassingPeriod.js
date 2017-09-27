@@ -8,6 +8,7 @@ import infoMap from './util/infoMap.js';
 
 const PassingPeriod = ({
   untilPassingPeriodIsOver,
+  nextModNumber,
   nextMod,
   nextModInfo
 }) => (
@@ -17,6 +18,10 @@ const PassingPeriod = ({
         {
           value: untilPassingPeriodIsOver,
           title: 'UNTIL PASSING PERIOD IS OVER'
+        },
+        {
+          value: nextModNumber,
+          title: 'NEXT MOD #'
         },
         {
           value: nextMod,

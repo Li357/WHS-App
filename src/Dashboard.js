@@ -56,21 +56,21 @@ class Dashboard extends Component {
           navigate('Login');
           break;
         }
+        if(key === 'username') {
+          const profilePhoto = await AsyncStorage.getItem(`${value.toLowerCase()}:profilePhoto`);
+          if(profilePhoto) {
+            this.setState({
+              profilePhoto
+            });
+          }
+          this.setState({
+            loadingProfileImage: false
+          });
+        }
         this.setState({
           [key]: key === 'schedule' ? JSON.parse(value) : value
         });
       }
-
-      const profilePhoto = await AsyncStorage.getItem('profilePhoto');
-      if(profilePhoto) {
-        this.setState({
-          profilePhoto
-        });
-      }
-
-      this.setState({
-        loadingProfileImage: false
-      });
     } catch(error) {
       Alert.alert('Error', 'Something went wrong with getting/saving your login information.');
     }
@@ -282,7 +282,7 @@ class Dashboard extends Component {
 
   uploadProfilePhoto = async newPhoto => {
     try {
-      await AsyncStorage.setItem('profilePhoto', newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser');
+      await AsyncStorage.setItem(`${this.state.username.toLowerCase()}:profilePhoto`, newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser');
       this.setState({
         profilePhoto: newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser'
       });
@@ -322,9 +322,11 @@ class Dashboard extends Component {
       bgRef
     } = this.state;
     const formattedTimeUntil = this.formatTime(timeUntil);
-    const today = new Date().getDay();
+    const now = new Date();
+    const today = now.getDay();
 
-    console.log(this.bgImage);
+    now.setMinutes(now.getMinutes() + 5);
+    const nextModPassingPeriod = this.getCurrentMod(now);
 
     const profileImage = !loadingProfileImage ? profilePhoto && profilePhoto !== 'BlankUser' ? {
       uri: profilePhoto
@@ -369,14 +371,7 @@ class Dashboard extends Component {
               >
                 <Image
                   source={profileImage}
-                  style={[
-                    styles._dashboardUserImage,
-                    loadingProfileImage ? {
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20
-                    } : {}
-                  ]}
+                  style={styles._dashboardUserImage}
                 />
               </PhotoUpload>
               <Text
@@ -429,7 +424,7 @@ class Dashboard extends Component {
               (
                 (typeof currentMod === 'number' || currentMod === 'HR') && nextMod ?
                   <InMod
-                    currentMod={currentMod}
+                    currentModNumber={currentMod}
                     untilModIsOver={formattedTimeUntil}
                     nextMod={nextMod.title}
                     nextModInfo={nextMod.body}
@@ -438,6 +433,7 @@ class Dashboard extends Component {
                   currentMod === 'PASSING PERIOD' && nextMod ?
                     <PassingPeriod
                       untilPassingPeriodIsOver={formattedTimeUntil}
+                      nextModNumber={nextModPassingPeriod}
                       nextMod={nextMod.title}
                       nextModInfo={nextMod.body}
                     />

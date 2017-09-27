@@ -11,7 +11,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import ScheduleItem from './ScheduleItem.js';
 
-const getCrossSectioned = ({ schedule }, day) => schedule.filter((scheduleItem, index, array) =>
+const getCrossSectioned = (schedule, day) => schedule.filter((scheduleItem, index, array) =>
   scheduleItem.day === day && index !== array.findIndex(anotherItem =>
     anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
   )
@@ -23,58 +23,69 @@ const days = [
   'W',
   'Th',
   'F'
-]
+];
 
-const ScheduleCard = ({ schedule, day }) => (
+const ScheduleCard = ({ schedule, day, table, tableTitle }) => (
   <View style={styles._scheduleCardContainer}>
-    <Text style={styles._scheduleCardDay}>{days[day - 1]}</Text>
+    <Text style={styles._scheduleCardDay}>
+      {
+        !table ?
+          days[day - 1]
+        :
+          tableTitle
+      }
+    </Text>
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles._scheduleCardContentContainer}
       style={styles._scheduleCard}
     >
       {
-        schedule.schedule.filter(scheduleItem =>
-          scheduleItem.day === day
-        ).sort((a, b) =>
-          a.startMod - b.startMod
-        ).filter((scheduleItem, index, array) =>
-          index === array.findIndex(anotherItem =>
-            anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
-          )
-        ).reduce((withOpenMods, scheduleItem, index, array) => {
-          const filledMods = array.reduce((filled, scheduleItem) =>
-            [
-              ...filled,
-              ...[
-                ...Array(scheduleItem.length).keys()
-              ].map(key =>
-                key + scheduleItem.startMod
-              )
-            ]
-          , []);
+        (!table ?
+          schedule.filter(scheduleItem =>
+            scheduleItem.day === day
+          ).sort((a, b) =>
+            a.startMod - b.startMod
+          ).filter((scheduleItem, index, array) =>
+            index === array.findIndex(anotherItem =>
+              anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
+            )
+          ).reduce((withOpenMods, scheduleItem, index, array) => {
+            const filledMods = array.reduce((filled, scheduleItem) =>
+              [
+                ...filled,
+                ...[
+                  ...Array(scheduleItem.length).keys()
+                ].map(key =>
+                  key + scheduleItem.startMod
+                )
+              ]
+            , []);
 
-          if(!filledMods.includes(scheduleItem.endMod) && scheduleItem.endMod !== 15) {
+            if(!filledMods.includes(scheduleItem.endMod) && scheduleItem.endMod !== 15) {
+              return [
+                ...withOpenMods,
+                scheduleItem,
+                {
+                  title: 'OPEN MOD',
+                  length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod,
+                  startMod: scheduleItem.endMod
+                }
+              ]
+            }
             return [
               ...withOpenMods,
-              scheduleItem,
-              {
-                title: 'OPEN MOD',
-                length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod,
-                startMod: scheduleItem.endMod
-              }
-            ]
-          }
-          return [
-            ...withOpenMods,
-            scheduleItem
-          ];
-        }, []).map((scheduleItem, index) =>
+              scheduleItem
+            ];
+          }, [])
+        :
+          schedule
+        ).map((scheduleItem, index) => (
           <ScheduleItem
             key={index}
             scheduleItem={scheduleItem}
             crossSectionedMods={getCrossSectioned(schedule, day)}
-          />
+          />)
         )
       }
     </ScrollView>

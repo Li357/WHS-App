@@ -64,8 +64,7 @@ class App extends Component {
         'counselor',
         'dean',
         'id',
-        'schedule',
-        'profilePhoto'
+        'schedule'
       ], (error) => {
         if(error) {
           throw error;

@@ -7,7 +7,7 @@ import {
 import infoMap from './util/infoMap.js';
 
 const InMod = ({
-  currentMod,
+  currentModNumber,
   untilModIsOver,
   nextMod,
   nextModInfo
@@ -16,8 +16,8 @@ const InMod = ({
     {
       [
         {
-          value: currentMod,
-          title: 'CURRENT MOD'
+          value: currentModNumber,
+          title: 'CURRENT MOD #'
         },
         {
           value: untilModIsOver,

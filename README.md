@@ -28,6 +28,7 @@ This is the list of everything I want to get done in the app:
 - [ ] Handle end of the school year & summer
 - [x] Upload profile photo
 - [ ] Auto-refresh on student details/schedule
+- [ ] Redux rewrite for better performance
 
 Note that auto-refreshing will follow these rules:
 
@@ -50,5 +51,4 @@ Bug wise:
 Here are some app-OS goals:
 
 - [x] iOS Version
-- [x] Android Version
-- [ ] Desktop Version (Possible)
+- [x] Android Version (Some bugs!)

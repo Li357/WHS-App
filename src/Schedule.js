@@ -13,7 +13,6 @@ import Carousel from 'react-native-looped-carousel';
 
 import HamburgerMenu from './HamburgerMenu.js';
 import ScheduleCard from './ScheduleCard.js';
-import ScheduleTable from './ScheduleTable.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import SCHEDULE from './util/schedule.js';
 
@@ -26,11 +25,18 @@ class Schedule extends Component {
     try {
       const schedule = await AsyncStorage.getItem('schedule');
       this.setState({
-        schedule: JSON.parse(schedule)
+        schedule: JSON.parse(schedule).schedule
       });
     } catch(error) {
       Alert.alert('Error', 'Something went wrong getting your schedule.');
     }
+  }
+
+  formatTableTimes = timePair => {
+    return timePair.map(time => {
+      const splitTime = time.split(':');
+      return `${+splitTime[0] !== 12 ? +splitTime[0] % 12 : 12}:${splitTime[1]}`;
+    }).join(' - ');
   }
 
   render() {
@@ -59,9 +65,15 @@ class Schedule extends Component {
                       day={key + 1}
                     />
                   :
-                    <ScheduleTable
+                    <ScheduleCard
                       key={key}
-                      schedule={SCHEDULE[key === 5 ? 'regular' : 'wednesday']}
+                      schedule={SCHEDULE[key === 5 ? 'regular' : 'wednesday'].map((timePair, index) => ({
+                        title: this.formatTableTimes(timePair),
+                        length: 1,
+                        startMod: index + (key !== 5)
+                      }))}
+                      table
+                      tableTitle={key === 5 ? 'Regular' : 'Wednesday'}
                     />
                 )
               }
