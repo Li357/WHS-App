@@ -25,7 +25,11 @@
     "react-native-looped-carousel": "^0.1.7",
     "react-native-photo-upload": "^1.1.0",
     "react-native-settings-list": "^1.7.1",
-    "react-navigation": "^1.0.0-beta.11"
+    "react-navigation": "^1.0.0-beta.11",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
   },
   "rnpm": {
     "assets": [

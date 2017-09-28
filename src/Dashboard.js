@@ -12,6 +12,8 @@ import {
   findNodeHandle
 } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Carousel from 'react-native-looped-carousel';
 import PhotoUpload from 'react-native-photo-upload';
@@ -33,48 +35,7 @@ class Dashboard extends Component {
     bgRef: null
   }
 
-  async componentDidMount() {
-    const { navigate } = this.props.navigation;
-
-    try {
-      const keys = [
-        'username',
-        'password',
-        'name',
-        'classOf',
-        'homeroom',
-        'counselor',
-        'dean',
-        'id',
-        'schedule'
-      ];
-
-      for(const key of keys) {
-        const value = await AsyncStorage.getItem(key);
-        if(value === null) {
-          Alert.alert('Error', 'Something went wrong with getting your login information.');
-          navigate('Login');
-          break;
-        }
-        if(key === 'username') {
-          const profilePhoto = await AsyncStorage.getItem(`${value.toLowerCase()}:profilePhoto`);
-          if(profilePhoto) {
-            this.setState({
-              profilePhoto
-            });
-          }
-          this.setState({
-            loadingProfileImage: false
-          });
-        }
-        this.setState({
-          [key]: key === 'schedule' ? JSON.parse(value) : value
-        });
-      }
-    } catch(error) {
-      Alert.alert('Error', 'Something went wrong with getting/saving your login information.');
-    }
-
+  componentDidMount() {
     const now = new Date();
     const today = now.getDay();
     if(today < 6 || today !== 0) {
@@ -230,7 +191,7 @@ class Dashboard extends Component {
   }
 
   getNextClass = (now, currentMod) => {
-    const { schedule } = this.state;
+    const { schedule } = this.props;
     const future = new Date(now.getTime());
     future.setMinutes(future.getMinutes() + 5, 0);
     const nextMod = currentMod === 'HR' ? 1 :
@@ -238,7 +199,7 @@ class Dashboard extends Component {
                         currentMod + 1 <= 14 ? currentMod + 1 : 'N/A';
 
     return nextMod !== 'N/A' ?
-      schedule.schedule.filter(mod => {
+      schedule.filter(mod => {
         const mods = [...Array(mod.length).keys()].map(key =>
           key + mod.startMod
         );
@@ -311,16 +272,20 @@ class Dashboard extends Component {
       beginTimeUntil,
       currentMod,
       nextMod,
+      profilePhoto,
+      loadingProfileImage,
+      bgRef
+    } = this.state;
+
+    const {
       name,
       classOf,
       homeroom,
       counselor,
       dean,
-      id,
-      profilePhoto,
-      loadingProfileImage,
-      bgRef
-    } = this.state;
+      id
+    } = this.props;
+
     const formattedTimeUntil = this.formatTime(timeUntil);
     const now = new Date();
     const today = now.getDay();
@@ -576,4 +541,22 @@ const styles = EStyleSheet.create({
   }
 });
 
-export default Dashboard;
+const mapStateToProps = ({
+  name,
+  classOf,
+  homeroom,
+  counselor,
+  dean,
+  id,
+  schedule
+}) => ({
+  name,
+  classOf,
+  homeroom,
+  counselor,
+  dean,
+  id,
+  schedule
+});
+
+export default connect(mapStateToProps)(Dashboard);

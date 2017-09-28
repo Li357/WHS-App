@@ -17,12 +17,22 @@ import {
   StackNavigator
 } from 'react-navigation';
 
+import { Provider } from 'react-redux';
+import {
+  applyMiddleware,
+  createStore
+} from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import { createLogger } from 'redux-logger';
+import { fetchUserInfo } from './src/actions/actionCreators';
+import whsApp from './src/reducers/reducer.js';
+
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import Login from './src/Login.js';
 import Dashboard from './src/Dashboard.js';
 import Schedule from './src/Schedule.js';
-import HamburgerMenu from './src/HamburgerMenu.js';
+import Settings from './src/Settings.js';
 
 const DrawerWrapper = ({ onLogout, ...props }) => (
   <View style={styles.wrapper}>
@@ -34,6 +44,15 @@ const DrawerWrapper = ({ onLogout, ...props }) => (
       <Text style={styles.wrapperLogoutText}>Logout</Text>
     </TouchableOpacity>
   </View>
+);
+
+const loggerMiddleware = createLogger();
+const store = createStore(
+  whsApp,
+  applyMiddleware(
+    thunkMiddleware,
+    loggerMiddleware
+  )
 );
 
 class App extends Component {
@@ -82,6 +101,9 @@ class App extends Component {
     },
     Schedule: {
       screen: Schedule
+    },
+    Settings: {
+      screen: Settings
     }
   }, {
     initialRouteName: 'Dashboard',
@@ -116,15 +138,17 @@ class App extends Component {
 
   render() {
     return (
-      <View style={styles.appContainer}>
-        <StatusBar
-          barStyle="dark-content"
-        />
-        {
-          this.state.navigator &&
-            <this.state.navigator onNavigationStateChange={null} />
-        }
-      </View>
+      <Provider store={store}>
+        <View style={styles.appContainer}>
+          <StatusBar
+            barStyle="dark-content"
+          />
+          {
+            this.state.navigator &&
+              <this.state.navigator onNavigationStateChange={null} />
+          }
+        </View>
+      </Provider>
     );
   }
 }

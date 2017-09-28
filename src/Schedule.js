@@ -8,6 +8,8 @@ import {
   View
 } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Carousel from 'react-native-looped-carousel';
 
@@ -17,21 +19,6 @@ import LoadingGIF from '../assets/images/loading.gif';
 import SCHEDULE from './util/schedule.js';
 
 class Schedule extends Component {
-  state = {
-    schedule: null
-  }
-
-  async componentDidMount() {
-    try {
-      const schedule = await AsyncStorage.getItem('schedule');
-      this.setState({
-        schedule: JSON.parse(schedule).schedule
-      });
-    } catch(error) {
-      Alert.alert('Error', 'Something went wrong getting your schedule.');
-    }
-  }
-
   formatTableTimes = timePair => {
     return timePair.map(time => {
       const splitTime = time.split(':');
@@ -40,7 +27,7 @@ class Schedule extends Component {
   }
 
   render() {
-    const { schedule } = this.state;
+    const { schedule } = this.props;
     const today = new Date().getDay();
 
     return (
@@ -130,4 +117,8 @@ const styles = EStyleSheet.create({
   }
 });
 
-export default Schedule;
+const mapStateToProps = ({ schedule }) => ({
+  schedule
+});
+
+export default connect(mapStateToProps)(Schedule);

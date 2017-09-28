@@ -11,10 +11,13 @@ import {
   View
 } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import cheerio from 'react-native-cheerio';
 
+import { fetchUserInfo } from './actions/actionCreators.js';
 import WHS from '../assets/images/WHS.png';
 import LoadingGIF from '../assets/images/loading.gif';
 
@@ -24,7 +27,6 @@ class Login extends Component {
     password: '',
     top: new Animated.Value(100),
     opacity: new Animated.Value(0),
-    error: '',
     loading: false
   }
 
@@ -39,78 +41,30 @@ class Login extends Component {
       username,
       password
     } = this.state;
-    const { dispatch } = this.props.navigation;
+
+    const {
+      dispatch,
+      error,
+      navigation
+    } = this.props;
 
     this.setState({
       loading: true
     });
 
-    const userPage = await fetch(
-      `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
-      {
-        method: 'POST'
-      }
-    );
-    const userPageHTML = await userPage.text();
-    const $ = cheerio.load(userPageHTML);
+    await dispatch(fetchUserInfo(username, password));
 
-    const error = $('.alert.alert-danger').text().trim();
-    if(error) {
-      this.setState({
-        error,
-        loading: false
-      });
-    } else {
-      const studentOverview = $('.card-header + .card-block');
-      const studentMentorAttrs = [
-        'name',
-        'phone',
-        'email'
-      ];
-      const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
-      const rawJSON = $('.page-content + script')[0].children[0].data.trim();
+    this.setState({
+      loading: false
+    });
 
-      const mentors = [...Array(3).keys()].map(key =>
-        children.eq(key).text().trim()
-      );
-
-      try {
-        const values = [
-          username,
-          password,
-          $('title').text().split('|')[0].trim(),
-          $('.header-title > h6').text(),
-          ...mentors,
-          studentOverview.children().eq(13).text().slice(15),
-          rawJSON.slice(24, -2)
-        ];
-
-        [
-          'username',
-          'password',
-          'name',
-          'classOf',
-          'homeroom',
-          'counselor',
-          'dean',
-          'id',
-          'schedule'
-        ].forEach(async (key, index) =>
-          await AsyncStorage.setItem(key, values[index])
-        );
-      } catch(error) {
-        Alert.alert('Error', 'Something went wrong with saving your login information.');
-      }
-
-      dispatch({
+    if(!error) {
+      navigation.dispatch({
         type: 'Navigation/NAVIGATE',
         routeName: 'Drawer',
         action: {
           type: 'Navigation/NAVIGATE',
-          routeName: 'Dashboard',
-          params: {
-
-          }
+          routeName: 'Dashboard'
         }
       });
     }
@@ -141,9 +95,10 @@ class Login extends Component {
       password,
       top,
       opacity,
-      error,
       loading
     } = this.state;
+
+    const { error } = this.props;
 
     const validLogin = /^[A-Z]+\d{3}$/ig.test(username) && /^[A-Z]{3}\d{2}[A-Z]{3}$/ig.test(password);
 
@@ -258,4 +213,10 @@ const styles = EStyleSheet.create({
   }
 });
 
-export default Login;
+const mapStateToProps = ({ error }) => ({
+  error
+});
+
+export default connect(
+  mapStateToProps
+)(Login);
