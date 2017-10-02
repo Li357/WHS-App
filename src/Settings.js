@@ -4,13 +4,17 @@ import {
   View
 } from 'react-native';
 
+import EStyleSheet from 'react-native-extended-stylesheet';
 import SettingsList from 'react-native-settings-list';
 
-const Settings = () => (
-  <View style={{backgroundColor:'white',flex:1}}>
-    <View style={{flex:1, marginTop:50}}>
+import HamburgerMenu from './HamburgerMenu.js';
+
+const Settings = ({ navigation }) => (
+  <View style={styles._settingsContainer}>
+    <HamburgerMenu navigation={navigation} />
+    <View style={styles._settingsLists}>
       <SettingsList>
-        <SettingsList.Header headerText='First Grouping' headerStyle={{color:'gray'}}/>
+        <SettingsList.Header headerText='General' headerStyle={styles._headerStyle} />
         <SettingsList.Item
           itemWidth={50}
           title='Icon Example'
@@ -21,19 +25,24 @@ const Settings = () => (
           switchState={true}
           hasSwitch={true}
           title='Switch Example'/>
-        <SettingsList.Item
-          title='Different Colors Example'
-          backgroundColor='#D1D1D1'
-          titleStyle={{color:'blue'}}
-          arrowStyle={{tintColor:'blue'}}
-          onPress={() => Alert.alert('Different Colors Example Pressed')}/>
-        <SettingsList.Header headerText='Different Grouping' headerStyle={{color:'white', marginTop:50}}/>
-        <SettingsList.Item titleInfo='Some Information' hasNavArrow={false} title='Information Example'/>
-        <SettingsList.Item title='Settings 1'/>
-        <SettingsList.Item title='Settings 2'/>
       </SettingsList>
     </View>
   </View>
 );
+
+const styles = EStyleSheet.create({
+  settingsContainer: {
+    backgroundColor: 'white',
+    flex: 1
+  },
+  settingsLists: {
+    flex: 1,
+    marginTop: 80
+  },
+  headerStyle: {
+    color: 'lightgray',
+    marginLeft: 10
+  }
+});
 
 export default Settings;

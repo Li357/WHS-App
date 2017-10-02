@@ -4,6 +4,7 @@ import {
   Animated,
   AsyncStorage,
   Image,
+  Keyboard,
   Platform,
   Text,
   TextInput,
@@ -44,7 +45,6 @@ class Login extends Component {
 
     const {
       dispatch,
-      error,
       navigation
     } = this.props;
 
@@ -58,7 +58,9 @@ class Login extends Component {
       loading: false
     });
 
-    if(!error) {
+    if(!this.props.error) {
+      Keyboard.dismiss();
+
       navigation.dispatch({
         type: 'Navigation/NAVIGATE',
         routeName: 'Drawer',
@@ -133,10 +135,10 @@ class Login extends Component {
         }
         <TouchableOpacity
           onPress={this.handleLogin}
-          disabled={!validLogin}
+          disabled={!validLogin && !loading}
           style={{
             ...styles._loginButton,
-            backgroundColor: loading ? 'lightgray' : validLogin ? 'rgba(220, 20, 60, 1)' : 'white'
+            backgroundColor: loading ? 'lightgray' : validLogin ? 'rgba(220, 20, 60, 1)' : 'lightgray'
           }}
         >
           {
@@ -213,8 +215,12 @@ const styles = EStyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ error }) => ({
-  error
+const mapStateToProps = ({
+  error,
+  username
+}) => ({
+  error,
+  username
 });
 
 export default connect(

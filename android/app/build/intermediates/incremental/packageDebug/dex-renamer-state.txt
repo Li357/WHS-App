@@ -1,4 +1,4 @@
-#Sun Sep 24 22:26:49 CDT 2017
+#Sun Oct 01 19:30:21 CDT 2017
 base.0=/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main
 renamed.0=classes.dex
 file.0=/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex

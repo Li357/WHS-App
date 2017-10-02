@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import {
-  Alert,
   AppState,
-  AsyncStorage,
   Dimensions,
   Image,
+	Platform,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
   findNodeHandle
 } from 'react-native';
 
 import { connect } from 'react-redux';
+import { saveProfilePhoto } from './actions/actionCreators.js';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Carousel from 'react-native-looped-carousel';
@@ -31,7 +30,7 @@ class Dashboard extends Component {
   state = {
     timeUntil: 0,
     endTimeUntil: 0,
-    loadingProfileImage: true,
+    beginTimeUntil: 0,
     bgRef: null
   }
 
@@ -164,8 +163,6 @@ class Dashboard extends Component {
   }
 
   getCurrentMod = now => {
-    const nowHours = now.getHours();
-    const nowMinutes = now.getMinutes();
     const nowDay = now.getDay();
     const wednesday = nowDay === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
@@ -213,7 +210,7 @@ class Dashboard extends Component {
       {
         title: 'N/A',
         body: ''
-      }
+      };
   }
 
   getTimeUntilEnd = () => {
@@ -229,27 +226,26 @@ class Dashboard extends Component {
   }
 
   formatTime = milliseconds => {
-    const pad = num => ('00' + num ).slice(-2);
+    const pad = num => `00${num}`.slice(-2);
 
-    const ms = milliseconds % 1000;
-    milliseconds = (milliseconds - ms) / 1000;
-    const seconds = milliseconds % 60;
-    milliseconds = (milliseconds - seconds) / 60;
-    const minutes = milliseconds % 60;
-    const hours = (milliseconds - minutes) / 60;
+    let millis = milliseconds;
+    const ms = millis % 1000;
+    millis = (millis - ms) / 1000;
+    const seconds = millis % 60;
+    millis = (millis - seconds) / 60;
+    const minutes = millis % 60;
+    const hours = (millis - minutes) / 60;
 
     return `${hours === 0 ? `${minutes}` : `${hours}:${pad(minutes)}`}:${pad(seconds)}`;
   }
 
   uploadProfilePhoto = async newPhoto => {
-    try {
-      await AsyncStorage.setItem(`${this.state.username.toLowerCase()}:profilePhoto`, newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser');
-      this.setState({
-        profilePhoto: newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser'
-      });
-    } catch(error) {
-      Alert.alert('Error', 'Something went wrong saving your profile picture.');
-    }
+    const {
+      dispatch,
+      username
+    } = this.props;
+
+    await dispatch(saveProfilePhoto(username, newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser'));
   }
 
   onBackgroundImageLoad = () => {
@@ -272,8 +268,6 @@ class Dashboard extends Component {
       beginTimeUntil,
       currentMod,
       nextMod,
-      profilePhoto,
-      loadingProfileImage,
       bgRef
     } = this.state;
 
@@ -283,7 +277,8 @@ class Dashboard extends Component {
       homeroom,
       counselor,
       dean,
-      id
+      id,
+      profilePhoto
     } = this.props;
 
     const formattedTimeUntil = this.formatTime(timeUntil);
@@ -293,22 +288,22 @@ class Dashboard extends Component {
     now.setMinutes(now.getMinutes() + 5);
     const nextModPassingPeriod = this.getCurrentMod(now);
 
-    const profileImage = !loadingProfileImage ? profilePhoto && profilePhoto !== 'BlankUser' ? {
-      uri: profilePhoto
-    } : BlankUser : LoadingGIF;
-    const backgroundImage = !loadingProfileImage && profilePhoto && profilePhoto !== 'BlankUser' && {
+    const backgroundImage = profilePhoto && profilePhoto !== 'BlankUser' && {
       uri: profilePhoto
     };
+    const profileImage = backgroundImage || BlankUser;
 
     return (
       <View style={styles._dashboardContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         <View style={styles._dashboardSwiperContainer}>
           {
-            backgroundImage &&
+            Platform.OS === 'ios' && backgroundImage && profileImage &&
               <View>
-                <Image
-                  ref={img => this.bgImage = img}
+								<Image
+                  ref={img => {
+                    this.bgImage = img
+                  }}
                   source={backgroundImage}
                   onLayout={this.onBackgroundImageLoad}
                   style={styles.dashboardUserImageBlur}
@@ -319,7 +314,7 @@ class Dashboard extends Component {
                   blurAmount={10}
                   style={styles.dashboardUserImageBlur}
                 />
-              </View>
+	             </View>
           }
           <Carousel
             autoplay={false}
@@ -339,14 +334,10 @@ class Dashboard extends Component {
                   style={styles._dashboardUserImage}
                 />
               </PhotoUpload>
-              <Text
-                style={styles._dashboardUserName}
-              >
+              <Text style={styles._dashboardUserName}>
                 {name}
               </Text>
-              <Text
-                style={styles._dashboardUserClassOf}
-              >
+              <Text style={styles._dashboardUserClassOf}>
                 {classOf}
               </Text>
             </View>
@@ -441,7 +432,7 @@ const dashboardSwiperDotConfig = {
   borderWidth: 0,
   width: '$dashboardSwiperDotSize',
   height: '$dashboardSwiperDotSize'
-}
+};
 
 const styles = EStyleSheet.create({
   $dashboardSwiperContainerSize: 230,
@@ -542,21 +533,25 @@ const styles = EStyleSheet.create({
 });
 
 const mapStateToProps = ({
+  username,
   name,
   classOf,
   homeroom,
   counselor,
   dean,
   id,
-  schedule
+  schedule,
+  profilePhoto
 }) => ({
+  username,
   name,
   classOf,
   homeroom,
   counselor,
   dean,
   id,
-  schedule
+  schedule,
+  profilePhoto
 });
 
 export default connect(mapStateToProps)(Dashboard);

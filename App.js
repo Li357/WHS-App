@@ -4,6 +4,7 @@ import {
   AsyncStorage,
   Dimensions,
   Image,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -20,11 +21,19 @@ import {
 import { Provider } from 'react-redux';
 import {
   applyMiddleware,
-  createStore
+  createStore,
+  compose
 } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
-import { fetchUserInfo } from './src/actions/actionCreators';
+import {
+  persistStore,
+  autoRehydrate
+} from 'redux-persist';
+import {
+  fetchUserInfo,
+  setProfilePhoto
+} from './src/actions/actionCreators';
 import whsApp from './src/reducers/reducer.js';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -33,6 +42,19 @@ import Login from './src/Login.js';
 import Dashboard from './src/Dashboard.js';
 import Schedule from './src/Schedule.js';
 import Settings from './src/Settings.js';
+import LoadingGIF from './assets/images/loading.gif';
+
+const store = createStore(
+  whsApp,
+  undefined,
+  compose(
+    applyMiddleware(
+      thunkMiddleware,
+      createLogger()
+    ),
+    autoRehydrate()
+  )
+);
 
 const DrawerWrapper = ({ onLogout, ...props }) => (
   <View style={styles.wrapper}>
@@ -46,122 +68,123 @@ const DrawerWrapper = ({ onLogout, ...props }) => (
   </View>
 );
 
-const loggerMiddleware = createLogger();
-const store = createStore(
-  whsApp,
-  applyMiddleware(
-    thunkMiddleware,
-    loggerMiddleware
-  )
-);
 
 class App extends Component {
   state = {
-    navigator: null
+    loading: true
   }
 
-  hasLoggedIn = async () => {
-    try {
-      const username = await AsyncStorage.getItem('username');
-      const password = await AsyncStorage.getItem('password');
-
-      return username && password;
-    } catch(error) {
-      Alert.alert('Error', 'Something went wrong with getting your login information.');
-      return false;
-    }
+  hasLoggedIn = () => {
+    const {
+      username,
+      password,
+      error
+    } = store.getState();
+    return `${username}${password}`.length > 2 && !error;
   }
 
-  handleLogout = async navigate => {
-    try {
-      AsyncStorage.multiRemove([
-        'username',
-        'password',
-        'name',
-        'classOf',
-        'homeroom',
-        'counselor',
-        'dean',
-        'id',
-        'schedule'
-      ], (error) => {
-        if(error) {
-          throw error;
-        }
-        navigate('Login');
+  handleLogout = navigate => {
+    //this.persistor.purge();
+    store.dispatch({type: 'LOG_OUT'});
+    navigate('Login');
+  }
+
+  componentWillMount() {
+    this.persistor = persistStore(store, {
+      storage: AsyncStorage,
+      blacklist: ['profilePhoto']
+    }, async () => {
+      try {
+        const profilePhoto = await AsyncStorage.getItem(`${store.getState().username}:profilePhoto`);
+        store.dispatch(setProfilePhoto(profilePhoto ? profilePhoto : 'BlankUser'));
+      } catch(error) {
+        Alert.alert('Error', `An error occurred: ${error}`);
+      }
+
+      this.setState({
+        loading: false
       });
-    } catch(error) {
-      Alert.alert('Error', 'Something went wrong logging out.');
-    }
-  }
-
-  Drawer = DrawerNavigator({
-    Dashboard: {
-      screen: Dashboard
-    },
-    Schedule: {
-      screen: Schedule
-    },
-    Settings: {
-      screen: Settings
-    }
-  }, {
-    initialRouteName: 'Dashboard',
-    contentComponent: props => <DrawerWrapper
-      onLogout={() => this.handleLogout(props.navigation.navigate)}
-      {...props}
-    />,
-    contentOptions: {
-      activeTintColor: 'black',
-      inactiveTintColor: 'rgba(0, 0, 0, 0.5)'
-    },
-    gesturesEnabled: false
-  });
-
-  async componentDidMount() {
-    this.setState({
-      navigator: StackNavigator({
-        Login: {
-          screen: Login
-        },
-        Drawer: {
-          screen: this.Drawer
-        }
-      }, {
-        initialRouteName: await this.hasLoggedIn() ? 'Drawer' : 'Login',
-        navigationOptions: {
-          header: null
-        }
-      })
     });
   }
 
   render() {
+    if(!this.state.loading) {
+      const Drawer = DrawerNavigator({
+        Dashboard: {
+          screen: Dashboard
+        },
+        Schedule: {
+          screen: Schedule
+        },
+        Settings: {
+          screen: Settings
+        }
+      }, {
+        initialRouteName: 'Dashboard',
+        contentComponent: props => <DrawerWrapper
+          onLogout={() => this.handleLogout(props.navigation.navigate)}
+          {...props}
+        />,
+        contentOptions: {
+          activeTintColor: 'black',
+          inactiveTintColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      });
+
+      const Navigator = StackNavigator({
+        Login: {
+          screen: Login
+        },
+        Drawer: {
+          screen: Drawer
+        }
+      }, {
+        initialRouteName: this.hasLoggedIn() ? 'Drawer' : 'Login',
+        navigationOptions: {
+          header: null,
+          gesturesEnabled: false
+        }
+      });
+
+      return (
+        <Provider store={store}>
+          <View style={styles.appContainer}>
+            <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
+            <Navigator onNavigationStateChange={null} />
+          </View>
+        </Provider>
+      );
+    }
+
     return (
-      <Provider store={store}>
-        <View style={styles.appContainer}>
-          <StatusBar
-            barStyle="dark-content"
-          />
-          {
-            this.state.navigator &&
-              <this.state.navigator onNavigationStateChange={null} />
-          }
-        </View>
-      </Provider>
+      <View style={styles._loadingAppContainer}>
+        <Image
+          style={styles._loadingGIF}
+          source={LoadingGIF}
+        />
+      </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   appContainer: {
     flex: 1
+  },
+  loadingAppContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  loadingGIF: {
+    width: 40,
+    height: 40
   },
   wrapper: {
     marginTop: 20
   },
   wrapperLogoutButton: {
-    marginTop: Dimensions.get('window').height - 250,
+    marginTop: '100% - 275px',
     padding: 10,
     width: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.04)'

@@ -29,7 +29,7 @@ const SCHEDULE = (() => {
   return {
     regular,
     wednesday
-  }
+  };
 })();
 
 export default SCHEDULE;

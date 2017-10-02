@@ -1,23 +1,22 @@
 import {
   SET_CREDENTIALS,
-  REQUEST_USER_INFO,
   RECEIVE_USER_INFO,
-  SET_PROFILE_PHOTO
+  SET_PROFILE_PHOTO,
+  LOG_OUT
 } from '../actions/actions.js';
 
 const whsApp = (state = {
-  username: '',
-  password: '',
+  username: ' ',
+  password: ' ',
   error: '',
-  name: '',
-  classOf: '',
-  homeroom: '',
-  counselor: '',
-  dean: '',
-  id: '',
-  schedule: {},
-  profilePhoto: '',
-  isFetching: false
+  name: ' ',
+  classOf: ' ',
+  homeroom: ' ',
+  counselor: ' ',
+  dean: ' ',
+  id: ' ',
+  schedule: [],
+  profilePhoto: 'BlankUser'
 }, {
   type,
   username,
@@ -44,15 +43,9 @@ const whsApp = (state = {
         ...state,
         profilePhoto
       };
-    case REQUEST_USER_INFO:
-      return {
-        ...state,
-        isFetching: true
-      };
     case RECEIVE_USER_INFO:
       return {
         ...state,
-        isFetching: false,
         error,
         ...(!error ? {
           name,
@@ -64,6 +57,8 @@ const whsApp = (state = {
           schedule
         } : {})
       };
+    case LOG_OUT:
+      return whsApp(undefined, {});
     default:
       return state;
   }

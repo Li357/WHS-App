@@ -293,7 +293,7 @@
     <item name="android:windowExitAnimation">@anim/catalyst_push_up_out</item>
   </style>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+        <item name="colorAccent">#dc143c</item>
     </style>
     <style name="Base.AlertDialog.AppCompat" parent="android:Widget">
         <item name="android:layout">@layout/abc_alert_dialog_material</item>

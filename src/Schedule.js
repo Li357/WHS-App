@@ -4,6 +4,7 @@ import {
   AsyncStorage,
   Dimensions,
   Image,
+  InteractionManager,
   Platform,
   View
 } from 'react-native';
@@ -15,10 +16,14 @@ import Carousel from 'react-native-looped-carousel';
 
 import HamburgerMenu from './HamburgerMenu.js';
 import ScheduleCard from './ScheduleCard.js';
-import LoadingGIF from '../assets/images/loading.gif';
 import SCHEDULE from './util/schedule.js';
+import LoadingGIF from '../assets/images/loading.gif';
 
 class Schedule extends Component {
+  state = {
+    loading: true
+  }
+
   formatTableTimes = timePair => {
     return timePair.map(time => {
       const splitTime = time.split(':');
@@ -26,7 +31,16 @@ class Schedule extends Component {
     }).join(' - ');
   }
 
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({
+        loading: false
+      });
+    });
+  }
+
   render() {
+    const { loading } = this.state;
     const { schedule } = this.props;
     const today = new Date().getDay();
 
@@ -34,8 +48,10 @@ class Schedule extends Component {
       <View style={styles._scheduleContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         {
-          schedule ?
+          !loading ?
             <Carousel
+              width={Dimensions.get('window').width}
+              height={Dimensions.get('window').height}
               style={styles._scheduleSwiperContainer}
               currentPage={today > 0 && today < 6 ? today - 1 : 0}
               autoplay={false}
@@ -68,7 +84,7 @@ class Schedule extends Component {
           :
             <Image
               source={LoadingGIF}
-              style={styles._scheduleLoadingGIF}
+              style={styles._loadingGIF}
             />
         }
       </View>
@@ -98,6 +114,10 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white'
+  },
+  loadingGIF: {
+    width: 40,
+    height: 40
   },
   scheduleSwiperContainer: {
     width: Dimensions.get('window').width,

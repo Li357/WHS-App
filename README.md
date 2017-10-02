@@ -27,7 +27,7 @@ This is the list of everything I want to get done in the app:
 - [ ] Handle end of the school year & summer
 - [x] Upload profile photo
 - [ ] Auto-refresh on student details/schedule
-- [ ] Redux rewrite for better performance
+- [x] Redux rewrite for better performance
 - [ ] Finish Android startup screens & icons
 
 Note that auto-refreshing will follow these rules:
@@ -47,6 +47,7 @@ Bug wise:
 - [x] Fix the hamburger menu problem with state and double clicking
 - [x] Update from react-native-swiper to an Android-compatible library
 - [ ] Wait for update on react-native-blur so that the BlurView is rendered with Image, not after
+- [ ] Components apparently don't unmount when navigating. Will have to workaround no lifecycle hooks
 
 Here are some app-OS goals:
 
