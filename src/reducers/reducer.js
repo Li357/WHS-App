@@ -16,7 +16,7 @@ const whsApp = (state = {
   dean: ' ',
   id: ' ',
   schedule: [],
-  profilePhoto: 'BlankUser'
+  profilePhoto: ' '
 }, {
   type,
   username,

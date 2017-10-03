@@ -24,15 +24,15 @@ import {
   createStore,
   compose
 } from 'redux';
-import thunkMiddleware from 'redux-thunk';
+import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import {
   persistStore,
   autoRehydrate
 } from 'redux-persist';
 import {
-  fetchUserInfo,
-  setProfilePhoto
+  setProfilePhoto,
+  logOut
 } from './src/actions/actionCreators';
 import whsApp from './src/reducers/reducer.js';
 
@@ -46,13 +46,12 @@ import LoadingGIF from './assets/images/loading.gif';
 
 const store = createStore(
   whsApp,
-  undefined,
   compose(
+    autoRehydrate(),
     applyMiddleware(
-      thunkMiddleware,
+      thunk,
       createLogger()
-    ),
-    autoRehydrate()
+    )
   )
 );
 
@@ -84,8 +83,7 @@ class App extends Component {
   }
 
   handleLogout = navigate => {
-    //this.persistor.purge();
-    store.dispatch({type: 'LOG_OUT'});
+    store.dispatch(logOut());
     navigate('Login');
   }
 
@@ -94,11 +92,20 @@ class App extends Component {
       storage: AsyncStorage,
       blacklist: ['profilePhoto']
     }, async () => {
-      try {
-        const profilePhoto = await AsyncStorage.getItem(`${store.getState().username}:profilePhoto`);
-        store.dispatch(setProfilePhoto(profilePhoto ? profilePhoto : 'BlankUser'));
-      } catch(error) {
-        Alert.alert('Error', `An error occurred: ${error}`);
+      if(this.hasLoggedIn()) {
+        const {
+          username,
+          id
+        } = store.getState();
+
+        try {
+          const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
+          store.dispatch(setProfilePhoto(profilePhoto ?
+            profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
+          ));
+        } catch(error) {
+          Alert.alert('Error', `An error occurred: ${error}`);
+        }
       }
 
       this.setState({

@@ -48,7 +48,7 @@ class Schedule extends Component {
       <View style={styles._scheduleContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         {
-          !loading ?
+          !loading && schedule ?
             <Carousel
               width={Dimensions.get('window').width}
               height={Dimensions.get('window').height}

@@ -24,7 +24,6 @@ import PassingPeriod from './PassingPeriod.js';
 import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
-import BlankUser from '../assets/images/blank-user.png';
 
 class Dashboard extends Component {
   state = {
@@ -242,10 +241,13 @@ class Dashboard extends Component {
   uploadProfilePhoto = async newPhoto => {
     const {
       dispatch,
-      username
+      username,
+      id
     } = this.props;
 
-    await dispatch(saveProfilePhoto(username, newPhoto ? `data:image/jpeg;base64,${newPhoto}` : 'BlankUser'));
+    await dispatch(saveProfilePhoto(username, newPhoto ?
+      `data:image/jpeg;base64,${newPhoto}` : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
+    ));
   }
 
   onBackgroundImageLoad = () => {
@@ -288,88 +290,92 @@ class Dashboard extends Component {
     now.setMinutes(now.getMinutes() + 5);
     const nextModPassingPeriod = this.getCurrentMod(now);
 
-    const backgroundImage = profilePhoto && profilePhoto !== 'BlankUser' && {
+    const schoolPictureURL = `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`;
+    const backgroundImage = profilePhoto && {
       uri: profilePhoto
     };
-    const profileImage = backgroundImage || BlankUser;
+    const profileImage = backgroundImage || schoolPictureURL;
 
     return (
       <View style={styles._dashboardContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
-        <View style={styles._dashboardSwiperContainer}>
-          {
-            Platform.OS === 'ios' && backgroundImage && profileImage &&
-              <View>
-								<Image
-                  ref={img => {
-                    this.bgImage = img
-                  }}
-                  source={backgroundImage}
-                  onLayout={this.onBackgroundImageLoad}
-                  style={styles.dashboardUserImageBlur}
-                />
-                <BlurView
-                  viewRef={bgRef}
-                  blurType="light"
-                  blurAmount={10}
-                  style={styles.dashboardUserImageBlur}
-                />
-	             </View>
-          }
-          <Carousel
-            autoplay={false}
-            bullets
-            bulletStyle={styles._dashboardSwiperDot}
-            chosenBulletStyle={styles._dashboardSwiperActiveDot}
-            style={styles._dashboardSwiperContainer}
-          >
-            <View style={styles._dashboardUserProfile}>
-              <PhotoUpload
-                resetPhoto={BlankUser}
-                onReset={this.uploadProfilePhoto}
-                onPhotoSelect={this.uploadProfilePhoto}
+        {
+          name && classOf && homeroom && profilePhoto.length > 1 &&
+            <View style={styles._dashboardSwiperContainer}>
+              {
+                Platform.OS === 'ios' && backgroundImage && profileImage &&
+                  <View>
+    								<Image
+                      ref={img => {
+                        this.bgImage = img
+                      }}
+                      source={backgroundImage}
+                      onLayout={this.onBackgroundImageLoad}
+                      style={styles.dashboardUserImageBlur}
+                    />
+                    <BlurView
+                      viewRef={bgRef}
+                      blurType="light"
+                      blurAmount={10}
+                      style={styles.dashboardUserImageBlur}
+                    />
+    	             </View>
+              }
+              <Carousel
+                autoplay={false}
+                bullets
+                bulletStyle={styles._dashboardSwiperDot}
+                chosenBulletStyle={styles._dashboardSwiperActiveDot}
+                style={styles._dashboardSwiperContainer}
               >
-                <Image
-                  source={profileImage}
-                  style={styles._dashboardUserImage}
-                />
-              </PhotoUpload>
-              <Text style={styles._dashboardUserName}>
-                {name}
-              </Text>
-              <Text style={styles._dashboardUserClassOf}>
-                {classOf}
-              </Text>
+                <View style={styles._dashboardUserProfile}>
+                  <PhotoUpload
+                    resetPhoto={schoolPictureURL}
+                    onReset={this.uploadProfilePhoto}
+                    onPhotoSelect={this.uploadProfilePhoto}
+                  >
+                    <Image
+                      source={profileImage}
+                      style={styles._dashboardUserImage}
+                    />
+                  </PhotoUpload>
+                  <Text style={styles._dashboardUserName}>
+                    {name}
+                  </Text>
+                  <Text style={styles._dashboardUserClassOf}>
+                    {classOf}
+                  </Text>
+                </View>
+                <View style={styles._dashboardUserInfo}>
+                  <View style={styles._dashboardUserInfoContainer}>
+                    {
+                      homeroom && counselor && dean &&
+                        [
+                          homeroom,
+                          counselor,
+                          dean
+                        ].map((mentor, index) =>
+                          <View
+                            key={index}
+                            style={styles._dashboardUserInfoCardTextContainer}
+                          >
+                            <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
+                            <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
+                          </View>
+                        )
+                    }
+                    {
+                      id &&
+                        <View style={styles._dashboardUserInfoCardTextContainer}>
+                          <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
+                          <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
+                        </View>
+                    }
+                  </View>
+                </View>
+              </Carousel>
             </View>
-            <View style={styles._dashboardUserInfo}>
-              <View style={styles._dashboardUserInfoContainer}>
-                {
-                  homeroom && counselor && dean &&
-                    [
-                      homeroom,
-                      counselor,
-                      dean
-                    ].map((mentor, index) =>
-                      <View
-                        key={index}
-                        style={styles._dashboardUserInfoCardTextContainer}
-                      >
-                        <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
-                        <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
-                      </View>
-                    )
-                }
-                {
-                  id &&
-                    <View style={styles._dashboardUserInfoCardTextContainer}>
-                      <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
-                      <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
-                    </View>
-                }
-              </View>
-            </View>
-          </Carousel>
-        </View>
+        }
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles._dashboardInfoContainer}

@@ -14,9 +14,8 @@ import {
 
 import { connect } from 'react-redux';
 
-import EStyleSheet from 'react-native-extended-stylesheet';
-
 import cheerio from 'react-native-cheerio';
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { fetchUserInfo } from './actions/actionCreators.js';
 import WHS from '../assets/images/WHS.png';
