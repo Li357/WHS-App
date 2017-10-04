@@ -67,7 +67,6 @@ const DrawerWrapper = ({ onLogout, ...props }) => (
   </View>
 );
 
-
 class App extends Component {
   state = {
     loading: true

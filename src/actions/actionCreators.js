@@ -51,6 +51,12 @@ const saveProfilePhoto = (username, profilePhoto) => async dispatch => {
 const fetchUserInfo = (username, password) => async dispatch => {
   dispatch(setCredentials(username, password));
   try {
+    await fetch( //This is needed to clear the current user
+      `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
+      {
+        method: 'POST'
+      }
+    );
     const user = await fetch(
       `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
       {
