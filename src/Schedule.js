@@ -34,13 +34,38 @@ class Schedule extends Component {
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       this.setState({
-        loading: false
+        cards: [...Array(7).keys()].map(key =>
+          key < 5 ?
+            <ScheduleCard
+              key={key}
+              schedule={schedule}
+              day={key + 1}
+            />
+          :
+            <ScheduleCard
+              key={key}
+              schedule={SCHEDULE[key === 5 ? 'regular' : 'wednesday'].map((timePair, index) => ({
+                title: this.formatTableTimes(timePair),
+                length: 1,
+                startMod: index + (key !== 5)
+              }))}
+              table
+              tableTitle={key === 5 ? 'Regular' : 'Wednesday'}
+            />
+        )
+      }, () => {
+        this.setState({
+          loading: false
+        });
       });
     });
   }
 
   render() {
-    const { loading } = this.state;
+    const {
+      loading,
+      cards
+    } = this.state;
     const { schedule } = this.props;
     const today = new Date().getDay();
 
@@ -59,27 +84,7 @@ class Schedule extends Component {
               bulletStyle={styles._scheduleDotStyle}
               chosenBulletStyle={styles._scheduleActiveDotStyle}
             >
-              {
-                [...Array(7).keys()].map(key =>
-                  key < 5 ?
-                    <ScheduleCard
-                      key={key}
-                      schedule={schedule}
-                      day={key + 1}
-                    />
-                  :
-                    <ScheduleCard
-                      key={key}
-                      schedule={SCHEDULE[key === 5 ? 'regular' : 'wednesday'].map((timePair, index) => ({
-                        title: this.formatTableTimes(timePair),
-                        length: 1,
-                        startMod: index + (key !== 5)
-                      }))}
-                      table
-                      tableTitle={key === 5 ? 'Regular' : 'Wednesday'}
-                    />
-                )
-              }
+              {cards}
             </Carousel>
           :
             <Image

@@ -179,6 +179,7 @@ const styles = EStyleSheet.create({
     fontFamily: 'Roboto-Thin',
     fontSize: 40,
     width: '$loginWidth',
+    height: 53,
     margin: '$loginMargin',
     marginBottom: '$loginMargin * 0.6',
     backgroundColor: 'rgba(0, 0, 0, 0)'

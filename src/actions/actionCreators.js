@@ -73,16 +73,15 @@ const fetchUserInfo = (username, password) => async dispatch => {
       const studentOverview = $('.card-header + .card-block');
       const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
       const rawJSON = $('.page-content + script')[0].children[0].data.trim();
-      const mentors = [...Array(3).keys()].map(key =>
-        children.eq(key).text().trim()
-      );
       const id = studentOverview.children().eq(13).text().slice(15);
       const schedule = JSON.parse(rawJSON.slice(24, -2)).schedule;
 
       const values = [
         $('title').text().split('|')[0].trim(),
         $('.header-title > h6').text(),
-        ...mentors,
+        children.eq(0).text().trim(), //Fixes weird bug on Android
+        children.eq(1).text().trim(),
+        children.eq(2).text().trim(),
         id,
         schedule
       ];
