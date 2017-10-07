@@ -30,6 +30,7 @@
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-extended-stylesheet": "^0.6.0",
     "react-native-looped-carousel": "^0.1.7",
+    "react-native-permissions": "^1.0.1",
     "react-native-photo-upload": "^1.1.0",
     "react-native-settings-list": "^1.7.1",
     "react-navigation": "^1.0.0-beta.11",

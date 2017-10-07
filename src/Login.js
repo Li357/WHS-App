@@ -51,7 +51,7 @@ class Login extends Component {
       loading: true
     });
 
-    await dispatch(fetchUserInfo(username, password));
+    await dispatch(fetchUserInfo(`${username[0].toUpperCase()}${username.slice(1)}`, password));
 
     this.setState({
       loading: false

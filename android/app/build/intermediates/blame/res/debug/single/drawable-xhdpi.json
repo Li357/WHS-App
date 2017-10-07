@@ -132,6 +132,10 @@
         "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/drawable-xhdpi/abc_ic_commit_search_api_mtrl_alpha.png"
     },
     {
+        "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/drawable-xhdpi/screen.png",
+        "source": "/Users/li357/Desktop/iOS/WHS/android/app/src/main/res/drawable-xhdpi/screen.png"
+    },
+    {
         "merged": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/res/merged/debug/drawable-xhdpi/abc_ic_menu_share_mtrl_alpha.png",
         "source": "/Users/li357/Desktop/iOS/WHS/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/drawable-xhdpi/abc_ic_menu_share_mtrl_alpha.png"
     },
