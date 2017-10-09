@@ -25,6 +25,8 @@ import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
+const DEVIATION = 16 * 1000; //TODO: The school deviates by about 16 seconds from the phone time
+
 class Dashboard extends Component {
   state = {
     timeUntil: 0,
@@ -34,7 +36,7 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const today = now.getDay();
     if(today < 6 || today !== 0) {
       if(this.getCurrentMod(now) === 'BEFORE') {
@@ -49,7 +51,7 @@ class Dashboard extends Component {
         clearInterval(this.beginDayInterval);
         clearInterval(this.endDayInterval);
         if(state === 'active') {
-          if(this.getCurrentMod(new Date()) === 'BEFORE') {
+          if(this.getCurrentMod(new Date(new Date() - DEVIATION)) === 'BEFORE') {
             this.startBeginDayCountdown();
           } else {
             this.runTimer();
@@ -61,7 +63,7 @@ class Dashboard extends Component {
   }
 
   runTimer = () => {
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const currentMod = this.getCurrentMod(now);
     const nextMod = this.getNextClass(now, currentMod);
     this.setState({
@@ -73,26 +75,26 @@ class Dashboard extends Component {
   }
 
   calculateModCountdown = currentMod => {
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const wednesday = now.getDay() === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
     if(typeof currentMod === 'number' || currentMod === 'HR') {
-      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
+      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0) - DEVIATION;
 
       return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
       const nextMod = schedule.filter(([start], index) => {
-        const startMod = new Date(now.getTime()).setHours(...start.split(':'), 0);
+        const startMod = new Date(now.getTime()).setHours(...start.split(':'), 0) - DEVIATION;
 
         if(index > 0) {
-          const prevEndMod = new Date(now.getTime()).setHours(...schedule[index - 1][1].split(':'), 0);
+          const prevEndMod = new Date(now.getTime()).setHours(...schedule[index - 1][1].split(':'), 0) - DEVIATION;
 
           return now >= prevEndMod && now < startMod;
         }
       })[0][0].split(':');
 
-      const nextModStart = new Date(now.getTime()).setHours(...nextMod, 0);
+      const nextModStart = new Date(now.getTime()).setHours(...nextMod, 0) - DEVIATION;
 
       return nextModStart - now;
     }
@@ -108,7 +110,7 @@ class Dashboard extends Component {
         }));
       } else {
         clearInterval(this.interval);
-        const future = new Date();
+        const future = new Date(new Date() - DEVIATION);
         future.setMinutes(future.getMinutes() + 1, 0);
         const nextMod = this.getCurrentMod(future);
         const nextModClass = this.getNextClass(future, nextMod);
@@ -166,8 +168,8 @@ class Dashboard extends Component {
     const wednesday = nowDay === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
-    const first = new Date().setHours(...schedule[0][0].split(':'), 0);
+    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - DEVIATION;
+    const first = new Date().setHours(...schedule[0][0].split(':'), 0) - DEVIATION;
     if(nowDay > 5 || nowDay === 0 || now - afterEnd >= 0) {
       return 'N/A';
     }
@@ -178,7 +180,7 @@ class Dashboard extends Component {
 
     const currentMod = schedule.reduce((current, timePair, index) => {
       const [start, end] = timePair.map(time => time.split(':'));
-      return now - new Date(now.getTime()).setHours(...start, 0) >= 0 && now - new Date().setHours(...end, 0) < 0 ?
+      return now - new Date(now.getTime()).setHours(...start, 0) - DEVIATION >= 0 && now - (new Date().setHours(...end, 0) - DEVIATION) < 0 ?
                wednesday ? index + 1 : index : current;
     }, -1);
 
@@ -188,8 +190,8 @@ class Dashboard extends Component {
 
   getNextClass = (now, currentMod) => {
     const { schedule } = this.props;
-    const future = new Date(now.getTime());
-    future.setMinutes(future.getMinutes() + 5, 0);
+    const future = new Date(now.getTime() - DEVIATION);
+    future.setMinutes(future.getMinutes() + 6, 0);
     const nextMod = currentMod === 'HR' ? 1 :
                       currentMod === 'PASSING PERIOD' ? this.getCurrentMod(future) :
                         currentMod + 1 <= 14 ? currentMod + 1 : 'N/A';
@@ -213,15 +215,15 @@ class Dashboard extends Component {
   }
 
   getTimeUntilEnd = () => {
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
-    return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - now;
+    return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - DEVIATION - now;
   }
 
   getTimeUntilBegin = () => {
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
-    return new Date().setHours(...schedule[0][0].split(':'), 0) - now;
+    return new Date().setHours(...schedule[0][0].split(':'), 0) - DEVIATION - now;
   }
 
   formatTime = milliseconds => {
@@ -284,10 +286,10 @@ class Dashboard extends Component {
     } = this.props;
 
     const formattedTimeUntil = this.formatTime(timeUntil);
-    const now = new Date();
+    const now = new Date(new Date() - DEVIATION);
     const today = now.getDay();
 
-    now.setMinutes(now.getMinutes() + 5);
+    now.setMinutes(now.getMinutes() + 6);
     const nextModPassingPeriod = this.getCurrentMod(now);
 
     const schoolPictureURL = `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`;
