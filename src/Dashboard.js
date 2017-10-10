@@ -25,7 +25,7 @@ import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
-const DEVIATION = 16 * 1000; //TODO: The school deviates by about 16 seconds from the phone time
+const DEVIATION = 24 * 1000; //TODO: The school deviates by about 24 seconds from the phone time
 
 class Dashboard extends Component {
   state = {
@@ -80,21 +80,21 @@ class Dashboard extends Component {
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
     if(typeof currentMod === 'number' || currentMod === 'HR') {
-      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0) - DEVIATION;
+      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
 
       return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
       const nextMod = schedule.filter(([start], index) => {
-        const startMod = new Date(now.getTime()).setHours(...start.split(':'), 0) - DEVIATION;
+        const startMod = new Date(now.getTime()).setHours(...start.split(':'), 0);
 
         if(index > 0) {
-          const prevEndMod = new Date(now.getTime()).setHours(...schedule[index - 1][1].split(':'), 0) - DEVIATION;
+          const prevEndMod = new Date(now.getTime()).setHours(...schedule[index - 1][1].split(':'), 0);
 
           return now >= prevEndMod && now < startMod;
         }
       })[0][0].split(':');
 
-      const nextModStart = new Date(now.getTime()).setHours(...nextMod, 0) - DEVIATION;
+      const nextModStart = new Date(now.getTime()).setHours(...nextMod, 0);
 
       return nextModStart - now;
     }
@@ -168,8 +168,8 @@ class Dashboard extends Component {
     const wednesday = nowDay === 3;
     const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
 
-    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - DEVIATION;
-    const first = new Date().setHours(...schedule[0][0].split(':'), 0) - DEVIATION;
+    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
+    const first = new Date().setHours(...schedule[0][0].split(':'), 0);
     if(nowDay > 5 || nowDay === 0 || now - afterEnd >= 0) {
       return 'N/A';
     }
@@ -180,7 +180,7 @@ class Dashboard extends Component {
 
     const currentMod = schedule.reduce((current, timePair, index) => {
       const [start, end] = timePair.map(time => time.split(':'));
-      return now - new Date(now.getTime()).setHours(...start, 0) - DEVIATION >= 0 && now - (new Date().setHours(...end, 0) - DEVIATION) < 0 ?
+      return now - new Date(now.getTime()).setHours(...start, 0) >= 0 && now - new Date().setHours(...end, 0) < 0 ?
                wednesday ? index + 1 : index : current;
     }, -1);
 
@@ -217,13 +217,13 @@ class Dashboard extends Component {
   getTimeUntilEnd = () => {
     const now = new Date(new Date() - DEVIATION);
     const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
-    return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - DEVIATION - now;
+    return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - now;
   }
 
   getTimeUntilBegin = () => {
     const now = new Date(new Date() - DEVIATION);
     const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
-    return new Date().setHours(...schedule[0][0].split(':'), 0) - DEVIATION - now;
+    return new Date().setHours(...schedule[0][0].split(':'), 0) - now;
   }
 
   formatTime = milliseconds => {
