@@ -22,7 +22,7 @@ const alertCrossSectioned = currentCrossSectionedMods => {
     `You are cross sectioned for this mod with:
 
     - ${currentCrossSectionedMods.map(({ title, body, length, startMod }) =>
-      `${title} in ${body} for mod(s) ${[...Array(length).keys()].map(key => key + startMod).join(', ')}`
+      `${title} in ${body} for mod(s) ${Array.from(new Array(length), (x, i) => i).map(key => key + startMod).join(', ')}`
     ).join('\n - ')}`
   );
 }
@@ -43,7 +43,7 @@ const ScheduleItem = ({ scheduleItem, crossSectionedMods }) => (
         }
       </View>
       {
-        [...Array(scheduleItem.length).keys()].map(key =>
+        Array.from(new Array(scheduleItem.length), (_, i) => i).map(key =>
           (
             isHalfMod = scheduleItem.startMod + key >= 4 && scheduleItem.startMod + key <= 11,
             <View
@@ -134,7 +134,7 @@ const styles = EStyleSheet.create({
     height: 75
   },
   scheduleModWarningContainer: {
-    width: '7%'
+    width: '7.75%'
   },
   scheduleModWarning: {
     width: 12,
@@ -143,7 +143,7 @@ const styles = EStyleSheet.create({
     marginLeft: 2.5
   },
   scheduleCardItemMod: {
-    width: '14%',
+    width: '15%',
     paddingTop: 29,
     paddingBottom: 29,
     paddingRight: 8,
@@ -151,7 +151,7 @@ const styles = EStyleSheet.create({
     textAlign: 'right'
   },
   scheduleCardItem: {
-    width: '86%',
+    width: '85%',
     height: 75,
     backgroundColor: 'lightgray'
   }

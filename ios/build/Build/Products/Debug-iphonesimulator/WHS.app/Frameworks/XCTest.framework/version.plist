@@ -5,14 +5,14 @@
 	<key>BuildAliasOf</key>
 	<string>XCTest</string>
 	<key>BuildVersion</key>
-	<string>5</string>
+	<string>1</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>11753</string>
+	<string>13201</string>
 	<key>ProjectName</key>
 	<string>XCTest_Sim</string>
 	<key>SourceVersion</key>
-	<string>11753000000000000</string>
+	<string>13201000000000000</string>
 </dict>
 </plist>

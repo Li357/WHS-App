@@ -25,7 +25,7 @@ import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
-const DEVIATION = 24 * 1000; //TODO: The school deviates by about 24 seconds from the phone time
+const DEVIATION = 24 * 1000;
 
 class Dashboard extends Component {
   state = {
@@ -198,7 +198,7 @@ class Dashboard extends Component {
 
     return nextMod !== 'N/A' ?
       schedule.filter(mod => {
-        const mods = [...Array(mod.length).keys()].map(key =>
+        const mods = Array.from(new Array(mod.length), (_, i) => i).map(key =>
           key + mod.startMod
         );
 
@@ -443,7 +443,7 @@ const dashboardSwiperDotConfig = {
 };
 
 const styles = EStyleSheet.create({
-  $dashboardSwiperContainerSize: 230,
+  $dashboardSwiperContainerSize: Dimensions.get('window').height === 812 ? 250 : 230, //Handles iPhone X
   $dashboardSwiperDotSize: 8,
   $dashboardUserImageSize: 110,
   $dashboardInfoLoadingGIFSize: 40,

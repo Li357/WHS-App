@@ -60,7 +60,7 @@ class Schedule extends Component {
               chosenBulletStyle={styles._scheduleActiveDotStyle}
             >
               {
-                [...Array(7).keys()].map(key =>
+                Array.from(new Array(7), (_, i) => i).map(key =>
                   key < 5 ?
                     <ScheduleCard
                       key={key}

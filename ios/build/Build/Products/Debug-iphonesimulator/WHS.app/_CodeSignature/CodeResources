@@ -72,6 +72,10 @@
 		<data>
 		erFrI0QX+TEsALVPxYnXP9bFK08=
 		</data>
+		<key>Assets.car</key>
+		<data>
+		3wDGm1KSGBbu70PD87um+oOdTss=
+		</data>
 		<key>BebasNeueBook.ttf</key>
 		<data>
 		FuPiu0mvgWL6qkYDOW48PvpXVBU=
@@ -271,15 +275,31 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		L2TsowbIYn3iJreyijU9uP9uafs=
+		Wwnyxq9wgXSUZgsJH9nNhVUzXeE=
+		</data>
+		<key>LaunchImage-1100-2436h@3x.png</key>
+		<data>
+		tJ6oCSqL6tjYF+Gvbu1fC4rEBoY=
 		</data>
 		<key>LaunchImage-568h@2x.png</key>
 		<data>
 		ZAGsakrSVLLpMEGiuEWj73PY6HM=
 		</data>
+		<key>LaunchImage-700-568h@2x.png</key>
+		<data>
+		ZAGsakrSVLLpMEGiuEWj73PY6HM=
+		</data>
+		<key>LaunchImage-700@2x.png</key>
+		<data>
+		odybE7PFnhp6Er3rMF1BxjCZ7y4=
+		</data>
 		<key>LaunchImage-800-667h@2x.png</key>
 		<data>
 		BB1sVVz+FnzA4GzuviXmQBuMhow=
+		</data>
+		<key>LaunchImage-800-Portrait-736h@3x.png</key>
+		<data>
+		QZioVuUpSkzPxk0ukfKgKruCEn4=
 		</data>
 		<key>LaunchImage.png</key>
 		<data>
@@ -299,7 +319,7 @@
 		</data>
 		<key>PlugIns/WHSTests.xctest/WHSTests</key>
 		<data>
-		SZ6syPmXCF51ZWtSU9wyFZrqcHo=
+		zYEvElQrvWqXLhVJiDUGHh4J8q0=
 		</data>
 		<key>PlugIns/WHSTests.xctest/_CodeSignature/CodeResources</key>
 		<data>
@@ -505,6 +525,17 @@
 			<key>hash2</key>
 			<data>
 			UgCATm1I5OUUsn2AToxWt09zjqeXWNj1a0xNmKVRYhk=
+			</data>
+		</dict>
+		<key>Assets.car</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			3wDGm1KSGBbu70PD87um+oOdTss=
+			</data>
+			<key>hash2</key>
+			<data>
+			tWdOEicKabNFkKttZvJ7dm9ec4xirDyyXv8FraSXDWk=
 			</data>
 		</dict>
 		<key>BebasNeueBook.ttf</key>
@@ -1042,6 +1073,17 @@
 			pdgABt46mNG+DAW8NzprEAuv+un0qUW4r4xQcIHJA0M=
 			</data>
 		</dict>
+		<key>LaunchImage-1100-2436h@3x.png</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			tJ6oCSqL6tjYF+Gvbu1fC4rEBoY=
+			</data>
+			<key>hash2</key>
+			<data>
+			J0INGJ0Ol/89ugOsRzsj/mAtFwZO/liJgAYIkpX73mg=
+			</data>
+		</dict>
 		<key>LaunchImage-568h@2x.png</key>
 		<dict>
 			<key>hash</key>
@@ -1053,6 +1095,28 @@
 			+x6Z3OnPHeLF4sdD3fwmGqBa0KXs07WqI/FPM1I34MM=
 			</data>
 		</dict>
+		<key>LaunchImage-700-568h@2x.png</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			ZAGsakrSVLLpMEGiuEWj73PY6HM=
+			</data>
+			<key>hash2</key>
+			<data>
+			+x6Z3OnPHeLF4sdD3fwmGqBa0KXs07WqI/FPM1I34MM=
+			</data>
+		</dict>
+		<key>LaunchImage-700@2x.png</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			odybE7PFnhp6Er3rMF1BxjCZ7y4=
+			</data>
+			<key>hash2</key>
+			<data>
+			wrBurrrm+2qv7JGz+zGFpqF07Jc/6naDhtOYtwFZwz0=
+			</data>
+		</dict>
 		<key>LaunchImage-800-667h@2x.png</key>
 		<dict>
 			<key>hash</key>
@@ -1062,6 +1126,17 @@
 			<key>hash2</key>
 			<data>
 			XO9R5OBZuFuKUaiYax6bGZ5QJDMyEvgqMyvYHvS1Ye0=
+			</data>
+		</dict>
+		<key>LaunchImage-800-Portrait-736h@3x.png</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			QZioVuUpSkzPxk0ukfKgKruCEn4=
+			</data>
+			<key>hash2</key>
+			<data>
+			ccKxTRno83qbB/9bSAwGCJ35oT4+dj16rnumRjCSYHs=
 			</data>
 		</dict>
 		<key>LaunchImage.png</key>
@@ -1101,11 +1176,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			SZ6syPmXCF51ZWtSU9wyFZrqcHo=
+			zYEvElQrvWqXLhVJiDUGHh4J8q0=
 			</data>
 			<key>hash2</key>
 			<data>
-			acjFd0UJ/2GP9wAnYvwsLEHDUUirPvM4TcWNv0k1+3U=
+			VjTua2tNtcn5DC+IcBFMAtkPwr0atvqcbLq0PDxEUrI=
 			</data>
 		</dict>
 		<key>PlugIns/WHSTests.xctest/_CodeSignature/CodeResources</key>
@@ -1171,6 +1246,11 @@
 			<key>weight</key>
 			<real>1100</real>
 		</dict>
+		<key>^Base\.lproj/</key>
+		<dict>
+			<key>weight</key>
+			<real>1010</real>
+		</dict>
 		<key>^version.plist$</key>
 		<true/>
 	</dict>
@@ -1215,6 +1295,11 @@
 			<true/>
 			<key>weight</key>
 			<real>1100</real>
+		</dict>
+		<key>^Base\.lproj/</key>
+		<dict>
+			<key>weight</key>
+			<real>1010</real>
 		</dict>
 		<key>^Info\.plist$</key>
 		<dict>

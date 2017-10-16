@@ -38,6 +38,8 @@ import whsApp from './src/reducers/reducer.js';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import codePush from 'react-native-code-push';
+
 import Login from './src/Login.js';
 import Dashboard from './src/Dashboard.js';
 import Schedule from './src/Schedule.js';
@@ -204,4 +206,4 @@ const styles = EStyleSheet.create({
 
 EStyleSheet.build();
 
-export default App;
+export default codePush(App);

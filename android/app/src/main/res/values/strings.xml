@@ -1,3 +1,4 @@
 <resources>
+    <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey">H9ypq19b1No7nZrO9rLmBUjKfUsJ95f9f46b-cacb-49cf-a21f-e9638e57a422</string>
     <string name="app_name">WHS</string>
 </resources>

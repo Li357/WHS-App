@@ -55,9 +55,7 @@ const ScheduleCard = ({ schedule, day, table, tableTitle, onLoad }) => (
               const filledMods = array.reduce((filled, scheduleItem) =>
                 [
                   ...filled,
-                  ...[
-                    ...Array(scheduleItem.length).keys()
-                  ].map(key =>
+                  ...Array.from(new Array(scheduleItem.length), (_, i) => i).map(key =>
                     key + scheduleItem.startMod
                   )
                 ]

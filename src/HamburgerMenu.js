@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Dimensions,
   Image,
   TouchableOpacity,
 } from 'react-native';
@@ -25,7 +26,7 @@ const styles = EStyleSheet.create({
   hamburger: {
     position: 'absolute',
     zIndex: 1,
-    top: 25,
+    top: Dimensions.get('window').height === 812 ? 40 : 25, //Handles iPhone X
     left: 15,
     backgroundColor: 'transparent'
   },

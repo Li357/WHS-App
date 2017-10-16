@@ -5,6 +5,7 @@ import {
   AsyncStorage,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Platform,
   Text,
   TextInput,
@@ -104,56 +105,68 @@ class Login extends Component {
     const validLogin = /^[A-Z]+\d{3}$/ig.test(username) && /^[A-Z]{3}\d{2}[A-Z]{3}$/ig.test(password);
 
     return (
-      <Animated.View style={{
-        ...styles._loginContainer,
-        opacity
-      }}>
-        <Animated.View style={{ height: top }} />
-        <Image
-          source={WHS}
-          style={styles._loginLogo}
-        />
-        <Text style={styles._loginText}>Login to WHS</Text>
-        <Text style={styles._loginError}>{error}</Text>
+      <KeyboardAvoidingView
+        style={styles._loginContainer}
         {
-          [
-            'Username',
-            'Password'
-          ].map((credential, index) =>
-            <TextInput
-              key={index}
-              underlineColorAndroid="rgba(0, 0, 0, 0)"
-              onChangeText={value => this.handleInput(credential.toLowerCase(), value)}
-              value={this.state[credential.toLowerCase()]}
-              autoCorrect={false}
-              placeholder={`  ${credential}`}
-              secureTextEntry={credential === 'Password'}
-              style={styles._loginInput}
-            />
-          )
+          ...Platform.select({
+            ios: {
+              behavior: 'position',
+              keyboardVerticalOffset: -80
+            }
+          })
         }
-        <TouchableOpacity
-          onPress={this.handleLogin}
-          disabled={!validLogin && !loading}
-          style={{
-            ...styles._loginButton,
-            backgroundColor: loading ? 'lightgray' : validLogin ? 'rgba(220, 20, 60, 1)' : 'lightgray'
-          }}
-        >
+      >
+        <Animated.View style={{
+          ...styles._loginContainer,
+          opacity
+        }}>
+          <Animated.View style={{ height: top }} />
+          <Image
+            source={WHS}
+            style={styles._loginLogo}
+          />
+          <Text style={styles._loginText}>Login to WHS</Text>
+          <Text style={styles._loginError}>{error}</Text>
           {
-            loading ?
-              <Image
-                source={LoadingGIF}
-                style={styles._loginLoadingGIF}
+            [
+              'Username',
+              'Password'
+            ].map((credential, index) =>
+              <TextInput
+                key={index}
+                underlineColorAndroid="rgba(0, 0, 0, 0)"
+                onChangeText={value => this.handleInput(credential.toLowerCase(), value)}
+                value={this.state[credential.toLowerCase()]}
+                autoCorrect={false}
+                placeholder={`  ${credential}`}
+                secureTextEntry={credential === 'Password'}
+                style={styles._loginInput}
               />
-            :
-              <Text style={{
-                ...styles._loginButtonText,
-                color: validLogin ? 'white' : 'gray',
-              }}>Login</Text>
+            )
           }
-        </TouchableOpacity>
-      </Animated.View>
+          <TouchableOpacity
+            onPress={this.handleLogin}
+            disabled={!validLogin && !loading}
+            style={{
+              ...styles._loginButton,
+              backgroundColor: loading ? 'lightgray' : validLogin ? 'rgba(220, 20, 60, 1)' : 'lightgray'
+            }}
+          >
+            {
+              loading ?
+                <Image
+                  source={LoadingGIF}
+                  style={styles._loginLoadingGIF}
+                />
+              :
+                <Text style={{
+                  ...styles._loginButtonText,
+                  color: validLogin ? 'white' : 'gray',
+                }}>Login</Text>
+            }
+          </TouchableOpacity>
+        </Animated.View>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -172,7 +185,8 @@ const styles = EStyleSheet.create({
   loginLogo: {
     width: '$loginImageSize * 1.2',
     height: '$loginImageSize',
-    margin: '$loginMargin * 0.6'
+    margin: '$loginMargin * 0.6',
+    marginTop: 40
   },
   loginText: {
     textAlign: 'center',
