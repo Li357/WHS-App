@@ -10,26 +10,15 @@ import {
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import {
+  alertCrossSectioned,
+  getCurrentCrossSectioned
+} from './util/crossSection.js';
 import Warning from '../assets/images/warning.png';
 
 let isHalfMod;
 let currentCrossSectionedMods;
 let content;
-
-const alertCrossSectioned = currentCrossSectionedMods => {
-  Alert.alert(
-    'Schedule',
-    `You are cross sectioned for this mod with:
-
-    - ${currentCrossSectionedMods.map(({ title, body, length, startMod }) =>
-      `${title} in ${body} for mod(s) ${Array.from(new Array(length), (x, i) => i).map(key => key + startMod).join(', ')}`
-    ).join('\n - ')}`
-  );
-}
-
-const getCurrentCrossSectioned = ({ startMod }, crossSectionedMods) => crossSectionedMods.filter(item =>
-  item.startMod === startMod
-);
 
 const ScheduleItem = ({ scheduleItem, crossSectionedMods }) => (
   currentCrossSectionedMods = getCurrentCrossSectioned(scheduleItem, crossSectionedMods),

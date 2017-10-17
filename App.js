@@ -105,7 +105,13 @@ class App extends Component {
             profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
           ));
         } catch(error) {
-          Alert.alert('Error', `An error occurred: ${error}`);
+          Alert.alert(
+            'Error',
+            `An error occurred: ${error}`,
+            [
+              { text: 'OK' }
+            ]
+          );
         }
       }
 

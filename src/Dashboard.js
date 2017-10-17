@@ -25,13 +25,14 @@ import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
-const DEVIATION = 24 * 1000;
+const DEVIATION = (new Date().getDay() !== 3 ? 17 : 22) * 1000;
 
 class Dashboard extends Component {
   state = {
     timeUntil: 0,
     endTimeUntil: 0,
     beginTimeUntil: 0,
+    crossSectionedMods: null,
     bgRef: null
   }
 
@@ -44,6 +45,7 @@ class Dashboard extends Component {
       } else {
         this.runTimer();
         this.startEndDayCountdown();
+        this.calculateCrossSectionMods();
       }
 
       AppState.addEventListener('change', state => {
@@ -60,6 +62,19 @@ class Dashboard extends Component {
         }
       });
     }
+  }
+
+  calculateCrossSectionMods = () => {
+    const { schedule } = this.props;
+    const today = new Date().getDay();
+
+    this.setState({
+      crossSectionedMods: schedule.filter((scheduleItem, index, array) =>
+        scheduleItem.day === today && index !== array.findIndex(anotherItem =>
+          anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
+        )
+      )
+    });
   }
 
   runTimer = () => {
@@ -117,8 +132,9 @@ class Dashboard extends Component {
         this.setState({
           timeUntil: this.calculateModCountdown(nextMod),
           currentMod: nextMod,
-          nextMod: nextModClass
+          nextMod: nextModClass,
         });
+        this.calculateCrossSectionMods();
         if(nextMod !== 'N/A') {
           this.startModCountdown();
         }
@@ -272,6 +288,7 @@ class Dashboard extends Component {
       beginTimeUntil,
       currentMod,
       nextMod,
+      crossSectionedMods,
       bgRef
     } = this.state;
 
@@ -392,6 +409,7 @@ class Dashboard extends Component {
                     untilModIsOver={formattedTimeUntil}
                     nextMod={nextMod.title}
                     nextModInfo={nextMod.body}
+                    crossSection={crossSectionedMods}
                   />
                 :
                   currentMod === 'PASSING PERIOD' && nextMod ?
@@ -400,6 +418,7 @@ class Dashboard extends Component {
                       nextModNumber={nextModPassingPeriod}
                       nextMod={nextMod.title}
                       nextModInfo={nextMod.body}
+                      crossSection={crossSectionedMods}
                     />
                   :
                     currentMod !== 'BEFORE' &&

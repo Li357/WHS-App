@@ -44,7 +44,13 @@ const saveProfilePhoto = (username, profilePhoto) => async dispatch => {
   try {
     await AsyncStorage.setItem(`${username}:profilePhoto`, profilePhoto);
   } catch(error) {
-    Alert.alert('Error', `An error occurred: ${error}`)
+    Alert.alert(
+      'Error',
+      `An error occurred: ${error}`,
+      [
+        { text: 'OK' }
+      ]
+    );
   }
 };
 
@@ -92,7 +98,13 @@ const fetchUserInfo = (username, password) => async dispatch => {
       dispatch(setProfilePhoto(profilePhoto ? profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`));
     }
   } catch(error) {
-    Alert.alert('Error', `An error occurred: ${error}`);
+    Alert.alert(
+      'Error',
+      `An error occurred: ${error}`,
+      [
+        { text: 'OK' }
+      ]
+    );
   }
 };
 

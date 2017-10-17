@@ -4,14 +4,20 @@ import {
   View
 } from 'react-native';
 
+import {
+  alertCrossSectioned,
+  getCurrentCrossSectioned
+} from './util/crossSection.js';
 import infoMap from './util/infoMap.js';
 
 const PassingPeriod = ({
   untilPassingPeriodIsOver,
   nextModNumber,
   nextMod,
-  nextModInfo
+  nextModInfo,
+  crossSection
 }) => (
+  currentCrossSectioned = getCurrentCrossSectioned({ startMod: nextModNumber }, crossSection),
   <View>
     {
       [
@@ -28,7 +34,9 @@ const PassingPeriod = ({
           title: 'NEXT MOD',
           textStyle: {
             fontSize: 60
-          }
+          },
+          crossSection: currentCrossSectioned,
+          crossSectionOnPress: () => alertCrossSectioned(currentCrossSectioned)
         },
         nextModInfo ? {
           value: nextModInfo,

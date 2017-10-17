@@ -7,7 +7,11 @@ import {
 } from 'react-native';
 
 import { connect } from 'react-redux';
-import { setProfilePhoto } from './actions/actionCreators.js';
+import {
+  fetchUserInfo,
+  logOut,
+  setProfilePhoto
+} from './actions/actionCreators.js';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 import SettingsList from 'react-native-settings-list';
@@ -31,7 +35,13 @@ const handleClearStorage = (dispatch, id) => {
         );
       });
     } catch(error) {
-      Alert.alert('Error', `An error occurred: ${error}`);
+      Alert.alert(
+        'Error',
+        `An error occurred: ${error}`,
+        [
+          { text: 'OK' }
+        ]
+      );
     }
   }
 
@@ -51,11 +61,65 @@ const handleClearStorage = (dispatch, id) => {
   );
 }
 
-const Settings = ({ navigation, dispatch, id }) => (
+const handleRefresh = async (dispatch, username, password, error, navigation) => {
+  try {
+    await dispatch(fetchUserInfo(username, password));
+
+    const logout = () => {
+      dispatch(logOut());
+      navigate('Login');
+    }
+
+    if(error.trim()) {
+      Alert.alert(
+        'Error',
+        'An error occurred while manually refreshing. Your username and/or password may have changed. Please log out then back in with your new login.',
+        [
+          {
+            text: 'OK',
+            onPress: logout
+          }
+        ]
+      );
+    } else {
+      Alert.alert(
+        'Notice',
+        'Your schedule and information has successfully been refreshed.',
+        [
+          {
+            text: 'OK'
+          }
+        ]
+      );
+    }
+  } catch(error) {
+    Alert.alert(
+      'Error',
+      `An error occurred: ${error}`,
+      [
+        { text: 'OK' }
+      ]
+    );
+  }
+}
+
+const Settings = ({
+  navigation,
+  dispatch,
+  username,
+  password,
+  id,
+  error
+}) => (
   <View style={styles._settingsContainer}>
     <HamburgerMenu navigation={navigation} />
     <View style={styles._settingsLists}>
       <SettingsList borderColor='#c8c7cc'>
+        <SettingsList.Item
+          hasNavArrow={false}
+          title="Manual Refresh"
+          onPress={() => handleRefresh(dispatch, username, password, error, navigation)}
+        />
         <SettingsList.Item
           hasNavArrow={false}
           title="Clear Storage"
@@ -82,8 +146,16 @@ const styles = EStyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ id }) => ({
-  id
+const mapStateToProps = ({
+  username,
+  password,
+  id,
+  error
+}) => ({
+  username,
+  password,
+  id,
+  error
 });
 
 export default connect(mapStateToProps)(Settings);

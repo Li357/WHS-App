@@ -30,6 +30,12 @@ This is the list of everything I want to get done in the app:
 - [x] Redux rewrite for better performance
 - [ ] Finish Android startup screens & icons
 
+Currently pending (definitely implemented soon):
+
+- [ ] Querying of school calendar to get days off, auto-refresh
+- [ ] Adding notification system of next class at mod end
+- [x] Add cross-section warning on dashboard
+
 Note that auto-refreshing will follow these rules:
 
 - Names will not be auto-refreshed
