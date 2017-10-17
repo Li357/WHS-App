@@ -5,9 +5,6 @@ with [Expo](https://expo.io/)/[CRNA](https://github.com/react-community/create-r
 & [React Native](https://facebook.github.io/react-native/) by Andrew Li. This has
 been ejected. © 2017 Andrew Li, MIT License.
 
-Note: The school clock is roughly 18 - 22 seconds behind your phone time. The mod
-timers have a roughly 20 second discrepancy (as of 9/16/17).
-
 # Known Bugs
 
 - react-native-blur does not work correctly on Android
@@ -58,4 +55,4 @@ Bug wise:
 Here are some app-OS goals:
 
 - [x] iOS Version
-- [x] Android Version (Some bugs!)
+- [x] Android Version
