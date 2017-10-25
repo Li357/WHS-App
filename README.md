@@ -7,7 +7,7 @@ been ejected. © 2017 Andrew Li, MIT License.
 
 # Known Bugs
 
-- react-native-blur does not work correctly on Android
+- react-native-blur does not work correctly on Android. Not using on Android currently
 
 # To Do List
 
@@ -20,37 +20,33 @@ This is the list of everything I want to get done in the app:
 - [x] Mod & day timers
 - [x] Schedule viewer
 - [x] Handle cross-sectioned mods
-- [ ] Handle late-start and holidays/breaks
-- [ ] Handle end of the school year & summer
+- [ ] Handle late-start/early dismissals
+- [x] Handle holidays/breaks
+- [x] Handle end of the school year & summer
 - [x] Upload profile photo
-- [ ] Auto-refresh on student details/schedule
+- [x] Auto-refresh on student details/schedule
 - [x] Redux rewrite for better performance
-- [ ] Finish Android startup screens & icons
+- [x] Finish Android startup screens & icons
+- [ ] Notification system for mod ends
 
 Currently pending (definitely implemented soon):
 
-- [ ] Querying of school calendar to get days off, auto-refresh
+- [x] Querying of school calendar to get days off, auto-refresh
 - [ ] Adding notification system of next class at mod end
 - [x] Add cross-section warning on dashboard
 
-Note that auto-refreshing will follow these rules:
-
-- Names will not be auto-refreshed
-- IDs will not be auto-refreshed
-- Graduation Year will be auto-refreshed every year
-- Mentors will be auto-refreshed every year (Homeroom will need a manual refresh)
-- Schedule is auto-refreshed every semester
+Auto-refresh depends on the fact *the school calendar updates for the next year by the end of the year!*
 
 If your username or password changes, you will still be able to see your information.
 This is because all your information is stored when you first sign in. It's recommended
-that you sign out if your credentials have changed.
+that you sign out if your credentials have changed. Auto-refresh will not work if your
+credentials change.
 
 Bug wise:
 
 - [x] Fix the hamburger menu problem with state and double clicking
 - [x] Update from react-native-swiper to an Android-compatible library
 - [ ] Wait for update on react-native-blur so that the BlurView is rendered with Image, not after
-- [ ] Components apparently don't unmount when navigating. Will have to workaround no lifecycle hooks
 
 Here are some app-OS goals:
 

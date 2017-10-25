@@ -126,7 +126,10 @@ class Login extends Component {
             style={styles._loginLogo}
           />
           <Text style={styles._loginText}>Login to WHS</Text>
-          <Text style={styles._loginError}>{error}</Text>
+          {
+            error.trim().length > 1 &&
+              <Text style={styles._loginError}>{error}</Text>
+          }
           {
             [
               'Username',

@@ -32,14 +32,26 @@ class Dashboard extends Component {
     timeUntil: 0,
     endTimeUntil: 0,
     beginTimeUntil: 0,
+    isBreak: false,
+    isSummer: false,
     crossSectionedMods: null,
     bgRef: null
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const now = new Date(new Date() - DEVIATION);
     const today = now.getDay();
-    if(today < 6 || today !== 0) {
+
+    await this.calculateBreak(); //wait until state is set (is getting batched)
+
+    const {
+      isBreak,
+      isSummer
+    } = this.state;
+
+    console.log(isSummer);
+
+    if(today < 6 && today !== 0 && !isBreak && !isSummer) {
       if(this.getCurrentMod(now) === 'BEFORE') {
         this.startBeginDayCountdown();
       } else {
@@ -47,8 +59,13 @@ class Dashboard extends Component {
         this.startEndDayCountdown();
         this.calculateCrossSectionMods();
       }
+    }
 
-      AppState.addEventListener('change', state => {
+    AppState.addEventListener('change', async state => {
+      await this.calculateBreak();
+
+      const newToday = new Date().getDay();
+      if(newToday < 6 && newToday !== 0 && !this.state.isBreak && !this.state.isSummer) {
         clearInterval(this.interval);
         clearInterval(this.beginDayInterval);
         clearInterval(this.endDayInterval);
@@ -58,10 +75,34 @@ class Dashboard extends Component {
           } else {
             this.runTimer();
             this.startEndDayCountdown();
+            this.calculateCrossSectionMods();
           }
         }
-      });
-    }
+      }
+    });
+  }
+
+  calculateBreak = () => {
+    const {
+      dates,
+      lastSummerStart
+    } = this.props;
+    const now = new Date();
+
+    this.setState({
+      isBreak: !!dates.find(({
+        first,
+        second,
+        last,
+        day,
+        month,
+        year
+      }) =>
+        !first && !last && !second &&
+        month === now.getMonth() + 1 && day === now.getDate() && year === now.getFullYear()
+      ),
+      isSummer: now >= lastSummerStart && now <= dates.find(date => date.first)[0]
+    });
   }
 
   calculateCrossSectionMods = () => {
@@ -288,6 +329,8 @@ class Dashboard extends Component {
       beginTimeUntil,
       currentMod,
       nextMod,
+      isBreak,
+      isSummer,
       crossSectionedMods,
       bgRef
     } = this.state;
@@ -403,7 +446,7 @@ class Dashboard extends Component {
           {
             currentMod ?
               (
-                (typeof currentMod === 'number' || currentMod === 'HR') && nextMod ?
+                (typeof currentMod === 'number' || currentMod === 'HR') && nextMod && crossSectionedMods ?
                   <InMod
                     currentModNumber={currentMod}
                     untilModIsOver={formattedTimeUntil}
@@ -412,12 +455,12 @@ class Dashboard extends Component {
                     crossSection={crossSectionedMods}
                   />
                 :
-                  currentMod === 'PASSING PERIOD' && nextMod ?
+                  currentMod === 'PASSING PERIOD' && nextMod && crossSectionedMods ?
                     <PassingPeriod
                       untilPassingPeriodIsOver={formattedTimeUntil}
                       nextModNumber={nextModPassingPeriod}
                       nextMod={nextMod.title}
-                      nextModInfo={nextMod.body}
+                      nextModInfo={nextMod.body}qw
                       crossSection={crossSectionedMods}
                     />
                   :
@@ -432,10 +475,15 @@ class Dashboard extends Component {
                       </Text>
               )
             :
-              <Image
-                source={LoadingGIF}
-                style={styles._dashboardInfoLoadingGIF}
-              />
+              (
+                today < 6 && today !== 0 && !isBreak && !isSummer ?
+                  <Image
+                    source={LoadingGIF}
+                    style={styles._dashboardInfoLoadingGIF}
+                  />
+                :
+                  <Text style={styles._dashboardInfoText}>{`Enjoy your ${isBreak || isSummer ? isSummer ? 'summer' : 'break' : 'weekend'}!`}</Text>
+              )
           }
           {
             today < 6 && today !== 0 && currentMod && currentMod !== 'N/A' &&
@@ -568,7 +616,9 @@ const mapStateToProps = ({
   dean,
   id,
   schedule,
-  profilePhoto
+  profilePhoto,
+  dates,
+  lastSummerStart
 }) => ({
   username,
   name,
@@ -578,7 +628,9 @@ const mapStateToProps = ({
   dean,
   id,
   schedule,
-  profilePhoto
+  profilePhoto,
+  dates,
+  lastSummerStart
 });
 
 export default connect(mapStateToProps)(Dashboard);

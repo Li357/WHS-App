@@ -2,6 +2,9 @@ import {
   SET_CREDENTIALS,
   RECEIVE_USER_INFO,
   SET_PROFILE_PHOTO,
+  RECEIVE_DATES,
+  SET_REFRESHED,
+  SET_LAST_SUMMER,
   LOG_OUT
 } from '../actions/actions.js';
 
@@ -16,7 +19,11 @@ const whsApp = (state = {
   dean: ' ',
   id: ' ',
   schedule: [],
-  profilePhoto: ' '
+  profilePhoto: ' ',
+  dates: [],
+  refreshedOne: false,
+  refreshedTwo: false,
+  lastSummerStart: null
 }, {
   type,
   username,
@@ -29,7 +36,11 @@ const whsApp = (state = {
   dean,
   id,
   schedule,
-  profilePhoto
+  profilePhoto,
+  dates,
+  semester,
+  refreshed,
+  lastSummerStart
 }) => {
   switch(type) {
     case SET_CREDENTIALS:
@@ -57,6 +68,21 @@ const whsApp = (state = {
           schedule
         } : {})
       };
+    case RECEIVE_DATES:
+      return {
+        ...state,
+        dates
+      };
+    case SET_REFRESHED:
+      return {
+        ...state,
+        [`refreshed${semester[0].toUpperCase()}${semester.slice(1)}`]: refreshed
+      };
+    case SET_LAST_SUMMER:
+      return {
+        ...state,
+        lastSummerStart
+      }
     case LOG_OUT:
       return whsApp(undefined, {});
     default:

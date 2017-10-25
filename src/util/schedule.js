@@ -26,6 +26,12 @@ const SCHEDULE = (() => {
     })
   );
 
+  /*const oneOClock = regular.map(timePair =>
+    timePair.map(time => {
+
+    })
+  );*/
+
   return {
     regular,
     wednesday

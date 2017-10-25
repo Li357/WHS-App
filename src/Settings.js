@@ -63,7 +63,7 @@ const handleClearStorage = (dispatch, id) => {
 
 const handleRefresh = async (dispatch, username, password, error, navigation) => {
   try {
-    await dispatch(fetchUserInfo(username, password));
+    await dispatch(fetchUserInfo(username, password, true));
 
     const logout = () => {
       dispatch(logOut());
@@ -73,7 +73,7 @@ const handleRefresh = async (dispatch, username, password, error, navigation) =>
     if(error.trim()) {
       Alert.alert(
         'Error',
-        'An error occurred while manually refreshing. Your username and/or password may have changed. Please log out then back in with your new login.',
+        'An error occurred while logging in. Your username and/or password may have changed. Please try again.',
         [
           {
             text: 'OK',

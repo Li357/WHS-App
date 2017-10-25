@@ -31,7 +31,11 @@ import {
   autoRehydrate
 } from 'redux-persist';
 import {
+  fetchDates,
+  fetchUserInfo,
   setProfilePhoto,
+  setRefreshed,
+  setLastSummer,
   logOut
 } from './src/actions/actionCreators';
 import whsApp from './src/reducers/reducer.js';
@@ -93,10 +97,18 @@ class App extends Component {
       storage: AsyncStorage,
       blacklist: ['profilePhoto']
     }, async () => {
+      const { dates } = store.getState();
+      if(dates.length === 0) { //Fetch dates on app first load
+        await store.dispatch(fetchDates());
+      }
+
       if(this.hasLoggedIn()) {
         const {
           username,
-          id
+          password,
+          id,
+          refreshedOne,
+          refreshedTwo
         } = store.getState();
 
         try {
@@ -104,6 +116,34 @@ class App extends Component {
           store.dispatch(setProfilePhoto(profilePhoto ?
             profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
           ));
+
+          const now = new Date();
+          const refreshTimes = dates.filter(date => date.first || date.second);
+          const [semesterTwo, semesterOne] = refreshTimes.map(({
+            year,
+            month,
+            day
+          }) => new Date(year, month - 1, day));
+          const {
+            year,
+            month,
+            day
+          } = dates.filter(date => date.last)[0];
+
+          if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
+            await store.dispatch(setRefreshed('one', true));
+            await store.dispatch(fetchUserInfo(username, password, true));
+          } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
+            await store.dispatch(setRefreshed('two', true));
+            await store.dispatch(fetchUserInfo(username, password, true));
+          } else if(
+            +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()) //if after last day
+          ) {
+            await store.dispatch(setRefreshed('one', false));
+            await store.dispatch(setRefreshed('two', false));
+            await store.dispatch(setLastSummer(+new Date(year, month - 1, day)));
+            await store.dispatch(fetchDates(true)); //fetch dates after last day
+          }
         } catch(error) {
           Alert.alert(
             'Error',
