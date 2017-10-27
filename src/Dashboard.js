@@ -25,7 +25,7 @@ import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
-const DEVIATION = (new Date().getDay() !== 3 ? 17 : 22) * 1000;
+const DEVIATION = (new Date().getDay() !== 3 ? 14 : 22) * 1000;
 
 class Dashboard extends Component {
   state = {
@@ -49,16 +49,14 @@ class Dashboard extends Component {
       isSummer
     } = this.state;
 
-    console.log(isSummer);
-
     if(today < 6 && today !== 0 && !isBreak && !isSummer) {
       if(this.getCurrentMod(now) === 'BEFORE') {
         this.startBeginDayCountdown();
       } else {
         this.runTimer();
         this.startEndDayCountdown();
-        this.calculateCrossSectionMods();
       }
+      this.calculateCrossSectionMods();
     }
 
     AppState.addEventListener('change', async state => {
@@ -75,8 +73,8 @@ class Dashboard extends Component {
           } else {
             this.runTimer();
             this.startEndDayCountdown();
-            this.calculateCrossSectionMods();
           }
+          this.calculateCrossSectionMods();
         }
       }
     });
@@ -101,7 +99,7 @@ class Dashboard extends Component {
         !first && !last && !second &&
         month === now.getMonth() + 1 && day === now.getDate() && year === now.getFullYear()
       ),
-      isSummer: now >= lastSummerStart && now <= dates.find(date => date.first)[0]
+      isSummer: now >= lastSummerStart && now <= dates.filter(date => date.first)[0]
     });
   }
 
@@ -301,12 +299,10 @@ class Dashboard extends Component {
     const {
       dispatch,
       username,
-      id
+      schoolPicture
     } = this.props;
 
-    await dispatch(saveProfilePhoto(username, newPhoto ?
-      `data:image/jpeg;base64,${newPhoto}` : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
-    ));
+    await dispatch(saveProfilePhoto(username, newPhoto ? `data:image/jpeg;base64,${newPhoto}` : schoolPicture));
   }
 
   onBackgroundImageLoad = () => {
@@ -342,7 +338,8 @@ class Dashboard extends Component {
       counselor,
       dean,
       id,
-      profilePhoto
+      profilePhoto,
+      schoolPicture
     } = this.props;
 
     const formattedTimeUntil = this.formatTime(timeUntil);
@@ -352,11 +349,9 @@ class Dashboard extends Component {
     now.setMinutes(now.getMinutes() + 6);
     const nextModPassingPeriod = this.getCurrentMod(now);
 
-    const schoolPictureURL = `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`;
-    const backgroundImage = profilePhoto && {
+    const profileImage = {
       uri: profilePhoto
-    };
-    const profileImage = backgroundImage || schoolPictureURL;
+    } || schoolPicture;
 
     return (
       <View style={styles._dashboardContainer}>
@@ -365,13 +360,13 @@ class Dashboard extends Component {
           name && classOf && homeroom && profilePhoto.length > 1 &&
             <View style={styles._dashboardSwiperContainer}>
               {
-                Platform.OS === 'ios' && backgroundImage && profileImage &&
+                Platform.OS === 'ios' && profileImage &&
                   <View>
     								<Image
                       ref={img => {
                         this.bgImage = img
                       }}
-                      source={backgroundImage}
+                      source={profileImage}
                       onLayout={this.onBackgroundImageLoad}
                       style={styles.dashboardUserImageBlur}
                     />
@@ -392,7 +387,7 @@ class Dashboard extends Component {
               >
                 <View style={styles._dashboardUserProfile}>
                   <PhotoUpload
-                    resetPhoto={schoolPictureURL}
+                    resetPhoto={schoolPicture}
                     onReset={this.uploadProfilePhoto}
                     onPhotoSelect={this.uploadProfilePhoto}
                   >
@@ -617,6 +612,7 @@ const mapStateToProps = ({
   id,
   schedule,
   profilePhoto,
+  schoolPicture,
   dates,
   lastSummerStart
 }) => ({
@@ -629,6 +625,7 @@ const mapStateToProps = ({
   id,
   schedule,
   profilePhoto,
+  schoolPicture,
   dates,
   lastSummerStart
 });

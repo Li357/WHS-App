@@ -9,6 +9,7 @@ import {
   SET_CREDENTIALS,
   RECEIVE_USER_INFO,
   SET_PROFILE_PHOTO,
+  SET_SCHOOL_PICTURE,
   RECEIVE_DATES,
   SET_REFRESHED,
   SET_LAST_SUMMER,
@@ -21,7 +22,7 @@ const setCredentials = (username, password) => ({
   password
 });
 
-const receiveUserInfo = (error, name, classOf, homeroom, counselor, dean, id, schedule) => ({
+const receiveUserInfo = (error, name, classOf, homeroom, counselor, dean, id, schedule, schoolPicture) => ({
   type: RECEIVE_USER_INFO,
   error,
   name,
@@ -30,7 +31,8 @@ const receiveUserInfo = (error, name, classOf, homeroom, counselor, dean, id, sc
   counselor,
   dean,
   id,
-  schedule
+  schedule,
+  schoolPicture
 });
 
 const setProfilePhoto = profilePhoto => ({
@@ -45,6 +47,11 @@ const receiveDates = dates => ({
 
 const logOut = () => ({
   type: LOG_OUT
+});
+
+const setSchoolPicture = schoolPicture => ({
+  type: SET_SCHOOL_PICTURE,
+  schoolPicture
 });
 
 const setRefreshed = (semester, refreshed) => ({
@@ -73,7 +80,7 @@ const saveProfilePhoto = (username, profilePhoto) => async dispatch => {
   }
 };
 
-const fetchUserInfo = (username, password, refresh) => async dispatch => {
+const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async dispatch => {
   try {
     dispatch(setCredentials(username, password));
     await fetch( //This is needed to clear the current user
@@ -118,6 +125,7 @@ const fetchUserInfo = (username, password, refresh) => async dispatch => {
       const rawJSON = $('.page-content + script')[0].children[0].data.trim();
       const id = studentOverview.children().eq(13).text().slice(15);
       const schedule = JSON.parse(rawJSON.slice(24, -2)).schedule;
+      const studentPicture = $('.profile-picture')[0].attribs.style.slice(22, -2);
 
       const values = [
         name,
@@ -126,18 +134,19 @@ const fetchUserInfo = (username, password, refresh) => async dispatch => {
         children.eq(1).text().trim(),
         children.eq(2).text().trim(),
         id,
-        schedule
+        schedule,
+        studentPicture
       ];
 
       dispatch(receiveUserInfo('', ...values));
 
       const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
-      dispatch(setProfilePhoto(profilePhoto ? profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`));
+      dispatch(setProfilePhoto(profilePhoto ? profilePhoto : studentPicture));
     }
   } catch(error) {
     Alert.alert(
       'Error',
-      `An error occurred, please check your internet connection.`,
+      'An error occurred, please check your internet connection.',
       [
         { text: 'OK' }
       ]
@@ -216,7 +225,6 @@ const fetchDates = refresh => async dispatch => {
       day
     }, index) => {
       if(month === 1) { //Second semester is in January
-        console.log(year, month, day);
         if(dates[index + 1].day !== day + 1 && new Date(year, month - 1, day + 1).getDay() === 6 && !pass) { //if not consecutive and next day isn't weekend
           pass = true;
           return [
@@ -255,6 +263,7 @@ export {
   setCredentials,
   receiveUserInfo,
   setProfilePhoto,
+  setSchoolPicture,
   setRefreshed,
   logOut,
   saveProfilePhoto,

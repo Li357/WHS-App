@@ -97,9 +97,18 @@ class App extends Component {
       storage: AsyncStorage,
       blacklist: ['profilePhoto']
     }, async () => {
-      const { dates } = store.getState();
-      if(dates.length === 0) { //Fetch dates on app first load
-        await store.dispatch(fetchDates());
+      if(store.getState().dates.length === 0) { //Fetch dates on app first load
+        try {
+          await store.dispatch(fetchDates());
+        } catch(error) {
+          Alert.alert(
+            'Error',
+            `An error occurred: ${error}`,
+            [
+              { text: 'OK' }
+            ]
+          );
+        }
       }
 
       if(this.hasLoggedIn()) {
@@ -108,14 +117,16 @@ class App extends Component {
           password,
           id,
           refreshedOne,
-          refreshedTwo
+          refreshedTwo,
+          profilePhoto,
+          studentPicture,
+          dates
         } = store.getState();
 
         try {
-          const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
-          store.dispatch(setProfilePhoto(profilePhoto ?
-            profilePhoto : `https://westsidestorage.blob.core.windows.net/student-pictures/${id}.jpg`
-          ));
+          if(!studentPicture) {
+            await store.dispatch(fetchUserInfo(username, password));
+          }
 
           const now = new Date();
           const refreshTimes = dates.filter(date => date.first || date.second);
@@ -132,12 +143,12 @@ class App extends Component {
 
           if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
             await store.dispatch(setRefreshed('one', true));
-            await store.dispatch(fetchUserInfo(username, password, true));
+            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto.startsWith('https://')));
           } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
             await store.dispatch(setRefreshed('two', true));
-            await store.dispatch(fetchUserInfo(username, password, true));
+            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto.startsWith('https://')));
           } else if(
-            +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()) //if after last day
+            +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth(), now.getDate()) //if after last day
           ) {
             await store.dispatch(setRefreshed('one', false));
             await store.dispatch(setRefreshed('two', false));

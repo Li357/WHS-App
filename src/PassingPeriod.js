@@ -10,6 +10,8 @@ import {
 } from './util/crossSection.js';
 import infoMap from './util/infoMap.js';
 
+const isHalfMod = modNumber => modNumber < 12 && modNumber > 3;
+
 const PassingPeriod = ({
   untilPassingPeriodIsOver,
   nextModNumber,
@@ -27,11 +29,11 @@ const PassingPeriod = ({
         },
         {
           value: nextModNumber,
-          title: 'NEXT MOD #'
+          title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD #`
         },
         {
           value: nextMod,
-          title: 'NEXT MOD',
+          title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD`,
           textStyle: {
             fontSize: 60
           },
@@ -40,7 +42,7 @@ const PassingPeriod = ({
         },
         nextModInfo ? {
           value: nextModInfo,
-          title: 'NEXT MOD ROOM',
+          title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD ROOM`,
           textStyle: {
             fontSize: 60
           }

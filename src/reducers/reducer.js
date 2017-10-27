@@ -2,6 +2,7 @@ import {
   SET_CREDENTIALS,
   RECEIVE_USER_INFO,
   SET_PROFILE_PHOTO,
+  SET_SCHOOL_PICTURE,
   RECEIVE_DATES,
   SET_REFRESHED,
   SET_LAST_SUMMER,
@@ -23,7 +24,8 @@ const whsApp = (state = {
   dates: [],
   refreshedOne: false,
   refreshedTwo: false,
-  lastSummerStart: null
+  lastSummerStart: null,
+  schoolPicture: ' '
 }, {
   type,
   username,
@@ -37,6 +39,7 @@ const whsApp = (state = {
   id,
   schedule,
   profilePhoto,
+  schoolPicture,
   dates,
   semester,
   refreshed,
@@ -65,8 +68,14 @@ const whsApp = (state = {
           counselor,
           dean,
           id,
-          schedule
+          schedule,
+          schoolPicture
         } : {})
+      };
+    case SET_SCHOOL_PICTURE:
+      return {
+        ...state,
+        schoolPicture
       };
     case RECEIVE_DATES:
       return {

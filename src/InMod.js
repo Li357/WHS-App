@@ -10,6 +10,10 @@ import {
 } from './util/crossSection.js';
 import infoMap from './util/infoMap.js';
 
+let currentCrossSectioned;
+
+const isHalfMod = modNumber => modNumber < 12 && modNumber > 3;
+
 const InMod = ({
   currentModNumber,
   untilModIsOver,
@@ -27,11 +31,11 @@ const InMod = ({
         },
         {
           value: untilModIsOver,
-          title: 'UNTIL MOD IS OVER'
+          title: `UNTIL ${isHalfMod(currentModNumber) ? 'HALF ' : ''}MOD IS OVER`
         },
         {
           value: nextMod,
-          title: 'NEXT MOD',
+          title: `NEXT ${isHalfMod(currentModNumber + 1) ? 'HALF ' : ''}MOD`,
           textStyle: {
             fontSize: 60
           },
@@ -40,7 +44,7 @@ const InMod = ({
         },
         nextModInfo ? {
           value: nextModInfo,
-          title: 'NEXT MOD ROOM',
+          title: `NEXT ${isHalfMod(currentModNumber + 1) ? 'HALF ' : ''}MOD ROOM`,
           textStyle: {
             fontSize: 60
           }
