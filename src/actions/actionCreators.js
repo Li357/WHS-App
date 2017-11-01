@@ -160,6 +160,7 @@ const fetchDates = refresh => async dispatch => {
     const year = new Date().getFullYear() + Boolean(refresh);
     const reasons = [
         'NO SCHOOL',
+        'LATE START',
         'NO SCHOOL (PROFESSIONAL DEVELOPMENT)',
         'FIRST DAY OF SCHOOL',
         'LAST DAY OF SCHOOL'
@@ -171,50 +172,75 @@ const fetchDates = refresh => async dispatch => {
       const modifiedYear = month < 8 ? year + 1 : year;
 
       const calendar = await fetch(
-        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01%2F${modifiedYear}${paddedMonth}28`
+        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`
       );
       const calendarHTML = await calendar.text();
 
-      const $ = cheerio.load(calendarHTML);
-      $('.tbg').each(function() {
-        const eventText = $(this).find('span').text();
-        if(reasons.includes(eventText.toUpperCase())) {
-          const td = $(this).parent().parent();
-          let extraSpans = 0; //# of extra colSpans in previous tds in each calendar row
-          td.prevAll().each(function() {
-              const colSpan = $(this)[0].attribs.colspan || 1;
-              extraSpans += colSpan - 1
-          });
-          const index = td.index() + extraSpans;
-          const datelines = td.parent().prevAll().not('.grid-row').not('col');
-          const closestTr = datelines.first(); //the closest tr to the current element has the day
+      const whsCalendar = await fetch(
+        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_qsgj2c0p7acid5c9t7dhe1q100@group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`
+      );
+      const whsCalendarHTML = await whsCalendar.text();
 
-          const day = +closestTr.children().eq(index).text();
-          if(!(day < 7 && datelines.length > 5)) {
-            const obj = {
-              month,
-              day,
-              year: modifiedYear,
-              first: false,
-              second: false,
-              last: false
-            };
-            if(eventText.toUpperCase() === reasons[2]) {
-              obj.first = true;
-              dates.push(obj);
-            } else if(eventText.toUpperCase() === reasons[3]) {
-              obj.last = true;
-              dates.push(obj);
-            } else {
-              Array.from(new Array(+td.toArray()[0].attribs.colspan || 1), (_, i) => i + 1).forEach(extraDay => {
-                dates.push({
-                  ...obj,
-                  day: day + extraDay - 1
+      [calendarHTML, whsCalendarHTML].forEach(html => {
+        const $ = cheerio.load(html);
+        $('.tbg').each(function() {
+          const eventText = $(this).find('span').text();
+          if(reasons.includes(eventText.toUpperCase()) || reasons.some(reason => eventText.toUpperCase().includes(reason)) && html === whsCalendarHTML) {
+            const td = $(this).parent().parent();
+            let extraSpans = 0; //# of extra colSpans in previous tds in each calendar row
+            td.prevAll().each(function() {
+                const colSpan = $(this)[0].attribs.colspan || 1;
+                extraSpans += colSpan - 1
+            });
+            const index = td.index() + extraSpans;
+            const datelines = td.parent().prevAll().not('.grid-row').not('col');
+            const closestTr = datelines.first(); //the closest tr to the current element has the day
+
+            const day = +closestTr.children().eq(index).text();
+            if(!(day < 7 && datelines.length > 5)) {
+              const obj = {
+                month,
+                day,
+                year: modifiedYear,
+                first: false,
+                second: false,
+                last: false,
+                late: false,
+                assembly: false
+              };
+              if(eventText.toUpperCase() === reasons[3]) {
+                obj.first = true;
+                dates.push(obj);
+              } else if(eventText.toUpperCase() === reasons[4]) {
+                obj.last = true;
+                dates.push(obj);
+              } else if(eventText.toUpperCase().includes(reasons[1])) {
+                obj.late = true;
+                dates.push(obj);
+              } else {
+                Array.from(new Array(+td.toArray()[0].attribs.colspan || 1), (_, i) => i + 1).forEach(extraDay => {
+                  dates.push({
+                    ...obj,
+                    day: day + extraDay - 1
+                  });
                 });
-              });
+              }
             }
           }
-        }
+        });
+      });
+    }
+
+    if(year === 2017) {
+      dates.push({ //Nov 2 assembly - hardcoded (BAD!)
+        month: 11,
+        day: 2,
+        year: 2017,
+        first: false,
+        second: false,
+        last: false,
+        late: false,
+        assembly: true
       });
     }
 

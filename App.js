@@ -97,17 +97,21 @@ class App extends Component {
       storage: AsyncStorage,
       blacklist: ['profilePhoto']
     }, async () => {
-      if(store.getState().dates.length === 0) { //Fetch dates on app first load
-        try {
-          await store.dispatch(fetchDates());
-        } catch(error) {
-          Alert.alert(
-            'Error',
-            `An error occurred: ${error}`,
-            [
-              { text: 'OK' }
-            ]
-          );
+      {
+        const { dates } = store.getState();
+        //late check is to check if app has late dates
+        if(dates.length === 0 || dates.every(({ late }) => !late)) { //Fetch dates on app first load
+          try {
+            await store.dispatch(fetchDates());
+          } catch(error) {
+            Alert.alert(
+              'Error',
+              `An error occurred: ${error}`,
+              [
+                { text: 'OK' }
+              ]
+            );
+          }
         }
       }
 

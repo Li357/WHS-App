@@ -19,7 +19,8 @@ const InMod = ({
   untilModIsOver,
   nextMod,
   nextModInfo,
-  crossSection
+  crossSection,
+  assembly
 }) => (
   currentCrossSectioned = getCurrentCrossSectioned({ startMod: currentModNumber + 1 }, crossSection),
   <View>
@@ -27,7 +28,7 @@ const InMod = ({
       [
         {
           value: currentModNumber,
-          title: 'CURRENT MOD #'
+          title: `CURRENT MOD${assembly ? '' : ' #'}`
         },
         {
           value: untilModIsOver,

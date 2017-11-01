@@ -35,7 +35,10 @@ class Dashboard extends Component {
     isBreak: false,
     isSummer: false,
     crossSectionedMods: null,
-    bgRef: null
+    bgRef: null,
+    schedule: [],
+    containsAssembly: false,
+    assemblyIndex: undefined
   }
 
   async componentDidMount() {
@@ -50,6 +53,7 @@ class Dashboard extends Component {
     } = this.state;
 
     if(today < 6 && today !== 0 && !isBreak && !isSummer) {
+      await this.selectSchedule();
       if(this.getCurrentMod(now) === 'BEFORE') {
         this.startBeginDayCountdown();
       } else {
@@ -68,6 +72,7 @@ class Dashboard extends Component {
         clearInterval(this.beginDayInterval);
         clearInterval(this.endDayInterval);
         if(state === 'active') {
+          await this.selectSchedule();
           if(this.getCurrentMod(new Date(new Date() - DEVIATION)) === 'BEFORE') {
             this.startBeginDayCountdown();
           } else {
@@ -80,6 +85,65 @@ class Dashboard extends Component {
     });
   }
 
+  selectSchedule = () => {
+    const now = new Date();
+    const today = now.getDay();
+    const { dates } = this.props;
+    const isLate = !!dates.find(({
+      late,
+      day,
+      month,
+      year
+    }) =>
+      late && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
+    );
+    const isLast = !!dates.find(({
+      last,
+      day,
+      month,
+      year
+    }) =>
+      last && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
+    );
+    const hasAssembly = !!dates.find(({
+      assembly,
+      day,
+      month,
+      year
+    }) =>
+      assembly && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
+    );
+    this.setState({
+      schedule: SCHEDULE[
+        isLast ?
+          'oneOClock'
+        :
+          !hasAssembly ?
+            today === 3 ?
+              isLate ?
+                'lateStartWednesday'
+              :
+                'wednesday'
+            :
+              isLate ?
+                'lateStart'
+              :
+                'regular'
+          :
+            'assembly'
+      ],
+      containsAssembly: hasAssembly
+    }, () => {
+      this.state.schedule.forEach((timePair, index) => {
+        if(timePair[2] === 'ASSEMBLY') {
+          this.setState({
+            assemblyIndex: index
+          });
+        }
+      });
+    });
+  }
+
   calculateBreak = () => {
     const {
       dates,
@@ -87,19 +151,23 @@ class Dashboard extends Component {
     } = this.props;
     const now = new Date();
 
+    const first = dates.filter(date => date.first)[0];
+
     this.setState({
       isBreak: !!dates.find(({
         first,
         second,
         last,
+        late,
+        assembly,
         day,
         month,
         year
       }) =>
-        !first && !last && !second &&
-        month === now.getMonth() + 1 && day === now.getDate() && year === now.getFullYear()
+        !first && !last && !second && !late && !assembly &&
+        +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
       ),
-      isSummer: now >= lastSummerStart && now <= dates.filter(date => date.first)[0]
+      isSummer: now >= lastSummerStart && now <= new Date(first.year, first.month - 1, first.day)
     });
   }
 
@@ -131,10 +199,15 @@ class Dashboard extends Component {
   calculateModCountdown = currentMod => {
     const now = new Date(new Date() - DEVIATION);
     const wednesday = now.getDay() === 3;
-    const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
+    const {
+      schedule,
+      assemblyIndex,
+      containsAssembly
+    } = this.state;
 
-    if(typeof currentMod === 'number' || currentMod === 'HR') {
-      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && currentMod - wednesday][1].split(':'), 0);
+    if(typeof currentMod === 'number' || currentMod === 'HR' || currentMod === 'ASSEMBLY') {
+      const modified = currentMod === 'ASSEMBLY' ? assemblyIndex : currentMod + Boolean(containsAssembly && currentMod >= assemblyIndex);
+      const endMod = new Date(now.getTime()).setHours(...schedule[+(currentMod !== 'HR') && modified - wednesday][1].split(':'), 0);
 
       return endMod - now;
     } else if(currentMod === 'PASSING PERIOD') {
@@ -219,39 +292,66 @@ class Dashboard extends Component {
   }
 
   getCurrentMod = now => {
-    const nowDay = now.getDay();
-    const wednesday = nowDay === 3;
-    const schedule = SCHEDULE[wednesday ? 'wednesday' : 'regular'];
+    const { schedule } = this.state;
 
-    const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
-    const first = new Date().setHours(...schedule[0][0].split(':'), 0);
-    if(nowDay > 5 || nowDay === 0 || now - afterEnd >= 0) {
-      return 'N/A';
+    if(schedule.length > 0) {
+      const nowDay = now.getDay();
+      const wednesday = nowDay === 3;
+      const {
+        containsAssembly,
+        assemblyIndex
+      } = this.state;
+
+      const afterEnd = new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0);
+      const first = new Date().setHours(...schedule[0][0].split(':'), 0);
+      if(nowDay > 5 || nowDay === 0 || now - afterEnd >= 0) {
+        return 'N/A';
+      }
+
+      if(now < first) {
+        return 'BEFORE';
+      }
+
+      const currentMod = schedule.reduce((current, timePair, index) => {
+        const isAssembly = timePair[2] === 'ASSEMBLY';
+        const [start, end] = timePair.slice(0, 2).map(time => time.split(':'));
+        const retVal = wednesday ? index + 1 : index;
+
+        return now - new Date(now.getTime()).setHours(...start, 0) >= 0 && now - new Date().setHours(...end, 0) < 0 ?
+          isAssembly ?
+            'ASSEMBLY'
+          :
+            retVal - Boolean(containsAssembly && index >= assemblyIndex)
+        :
+          current;
+      }, -1);
+
+      return currentMod === -1 ? 'PASSING PERIOD' :
+               currentMod === 0 ? 'HR' : currentMod;
     }
-
-    if(now < first) {
-      return 'BEFORE';
-    }
-
-    const currentMod = schedule.reduce((current, timePair, index) => {
-      const [start, end] = timePair.map(time => time.split(':'));
-      return now - new Date(now.getTime()).setHours(...start, 0) >= 0 && now - new Date().setHours(...end, 0) < 0 ?
-               wednesday ? index + 1 : index : current;
-    }, -1);
-
-    return currentMod === -1 ? 'PASSING PERIOD' :
-             currentMod === 0 ? 'HR' : currentMod;
   }
 
   getNextClass = (now, currentMod) => {
     const { schedule } = this.props;
+    const { assemblyIndex } = this.state;
     const future = new Date(now.getTime() - DEVIATION);
     future.setMinutes(future.getMinutes() + 6, 0);
     const nextMod = currentMod === 'HR' ? 1 :
-                      currentMod === 'PASSING PERIOD' ? this.getCurrentMod(future) :
-                        currentMod + 1 <= 14 ? currentMod + 1 : 'N/A';
+      currentMod === 'PASSING PERIOD' ?
+        this.getCurrentMod(future)
+      :
+        currentMod === 'ASSEMBLY' ?
+          assemblyIndex
+        :
+          currentMod === assemblyIndex - 1 ?
+            'ASSEMBLY'
+          :
+            currentMod + 1 <= 14 ?
+              currentMod + 1
+            :
+              'N/A';
 
-    return nextMod !== 'N/A' ?
+    return nextMod !== 'N/A' && nextMod !== 'ASSEMBLY' ?
       schedule.filter(mod => {
         const mods = Array.from(new Array(mod.length), (_, i) => i).map(key =>
           key + mod.startMod
@@ -263,21 +363,27 @@ class Dashboard extends Component {
         body: ''
       }
     :
-      {
-        title: 'N/A',
-        body: ''
-      };
+      nextMod === 'ASSEMBLY' ?
+        {
+          title: 'ASSEMBLY',
+          body: ''
+        }
+      :
+        {
+          title: 'N/A',
+          body: ''
+        };
   }
 
   getTimeUntilEnd = () => {
     const now = new Date(new Date() - DEVIATION);
-    const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
+    const { schedule } = this.state;
     return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - now;
   }
 
   getTimeUntilBegin = () => {
     const now = new Date(new Date() - DEVIATION);
-    const schedule = SCHEDULE[now.getDay() === 3 ? 'wednesday' : 'regular'];
+    const { schedule } = this.state;
     return new Date().setHours(...schedule[0][0].split(':'), 0) - now;
   }
 
@@ -328,7 +434,8 @@ class Dashboard extends Component {
       isBreak,
       isSummer,
       crossSectionedMods,
-      bgRef
+      bgRef,
+      assemblyIndex
     } = this.state;
 
     const {
@@ -345,6 +452,8 @@ class Dashboard extends Component {
     const formattedTimeUntil = this.formatTime(timeUntil);
     const now = new Date(new Date() - DEVIATION);
     const today = now.getDay();
+
+    const wednesdayFirstClass = this.getNextClass(now, 0);
 
     now.setMinutes(now.getMinutes() + 6);
     const nextModPassingPeriod = this.getCurrentMod(now);
@@ -441,13 +550,14 @@ class Dashboard extends Component {
           {
             currentMod ?
               (
-                (typeof currentMod === 'number' || currentMod === 'HR') && nextMod && crossSectionedMods ?
+                (typeof currentMod === 'number' || currentMod === 'HR' || currentMod === 'ASSEMBLY') && nextMod && crossSectionedMods ?
                   <InMod
                     currentModNumber={currentMod}
                     untilModIsOver={formattedTimeUntil}
                     nextMod={nextMod.title}
                     nextModInfo={nextMod.body}
                     crossSection={crossSectionedMods}
+                    assembly={currentMod === 'ASSEMBLY'}
                   />
                 :
                   currentMod === 'PASSING PERIOD' && nextMod && crossSectionedMods ?
@@ -455,8 +565,9 @@ class Dashboard extends Component {
                       untilPassingPeriodIsOver={formattedTimeUntil}
                       nextModNumber={nextModPassingPeriod}
                       nextMod={nextMod.title}
-                      nextModInfo={nextMod.body}qw
+                      nextModInfo={nextMod.body}
                       crossSection={crossSectionedMods}
+                      assembly={nextModPassingPeriod === 'ASSEMBLY'}
                     />
                   :
                     currentMod !== 'BEFORE' &&
@@ -487,6 +598,25 @@ class Dashboard extends Component {
                   value: this.formatTime(currentMod === 'BEFORE' ? beginTimeUntil : endTimeUntil),
                   title: currentMod === 'BEFORE' ?
                            'UNTIL SCHOOL STARTS' : today === 5 ? 'UNTIL WEEKEND' : 'UNTIL DAY IS OVER'
+                }
+              ].map(infoMap)
+          }
+          {
+            today === 3 && currentMod && currentMod === 'BEFORE' && beginTimeUntil <= 300000 && //less than 5 minutes
+              [
+                {
+                  value: wednesdayFirstClass.title,
+                  title: 'NEXT MOD',
+                  textStyle: {
+                    fontSize: 60
+                  }
+                },
+                {
+                  value: wednesdayFirstClass.body,
+                  title: 'NEXT MOD ROOM',
+                  textStyle: {
+                    fontSize: 60
+                  }
                 }
               ].map(infoMap)
           }
