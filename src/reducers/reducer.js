@@ -93,7 +93,24 @@ const whsApp = (state = {
         lastSummerStart
       }
     case LOG_OUT:
-      return whsApp(undefined, {});
+      return {
+        ...state,
+        username: ' ',
+        password: ' ',
+        error: '',
+        name: ' ',
+        classOf: ' ',
+        homeroom: ' ',
+        counselor: ' ',
+        dean: ' ',
+        id: ' ',
+        schedule: [],
+        profilePhoto: ' ',
+        refreshedOne: false,
+        refreshedTwo: false,
+        lastSummerStart: null,
+        schoolPicture: ' '
+      };
     default:
       return state;
   }

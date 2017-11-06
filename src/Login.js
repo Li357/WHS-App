@@ -102,7 +102,7 @@ class Login extends Component {
 
     const { error } = this.props;
 
-    const validLogin = /^[A-Z]+\d{3}$/ig.test(username) && /^[A-Z]{3}\d{2}[A-Z]{3}$/ig.test(password);
+    const validLogin = (/^[A-Z]+\d{3}$/ig.test(username) || /^[A-Z]+\.[A-Z]+$/ig.test(username)) && /^[A-Z]{3}\d{2}[A-Z]{3}$/ig.test(password);
 
     return (
       <KeyboardAvoidingView

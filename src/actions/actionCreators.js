@@ -127,12 +127,21 @@ const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async di
       const schedule = JSON.parse(rawJSON.slice(24, -2)).schedule;
       const studentPicture = $('.profile-picture')[0].attribs.style.slice(22, -2);
 
+      const classOf = $('.header-title > h6').text();
+
+      let mentors = [
+        children.eq(0).text().trim(), //Fixes weird bug on Android
+        children.eq(1).text().trim(),
+        children.eq(2).text().trim()
+      ];
+      if(classOf === 'Teacher') {
+        mentors = [null, null, null];
+      }
+
       const values = [
         name,
         $('.header-title > h6').text(),
-        children.eq(0).text().trim(), //Fixes weird bug on Android
-        children.eq(1).text().trim(),
-        children.eq(2).text().trim(),
+        ...mentors,
         id,
         schedule,
         studentPicture

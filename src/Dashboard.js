@@ -24,6 +24,7 @@ import PassingPeriod from './PassingPeriod.js';
 import SCHEDULE from './util/schedule.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
+import BlankUser from '../assets/images/blank-user.png';
 
 const DEVIATION = (new Date().getDay() !== 3 ? 14 : 22) * 1000;
 
@@ -458,18 +459,72 @@ class Dashboard extends Component {
     now.setMinutes(now.getMinutes() + 6);
     const nextModPassingPeriod = this.getCurrentMod(now);
 
-    const profileImage = {
-      uri: profilePhoto
-    } || schoolPicture;
+    const profileImage = profilePhoto ?
+      profilePhoto.includes('blank-user.png') ?
+        BlankUser
+      :
+        {
+          uri: profilePhoto
+        }
+    :
+      schoolPicture;
 
     return (
+      dashboardInfo = (
+        <View>
+          <View style={styles._dashboardUserProfile}>
+            <PhotoUpload
+              resetPhoto={schoolPicture}
+              onReset={this.uploadProfilePhoto}
+              onPhotoSelect={this.uploadProfilePhoto}
+            >
+              <Image
+                source={profileImage}
+                style={styles._dashboardUserImage}
+              />
+            </PhotoUpload>
+            <Text style={styles._dashboardUserName}>
+              {name}
+            </Text>
+            <Text style={styles._dashboardUserClassOf}>
+              {classOf}
+            </Text>
+          </View>
+          {
+            homeroom && counselor && dean && id &&
+              <View style={styles._dashboardUserInfo}>
+                <View style={styles._dashboardUserInfoContainer}>
+                  {
+                    [
+                      homeroom,
+                      counselor,
+                      dean
+                    ].map((mentor, index) =>
+                      <View
+                        key={index}
+                        style={styles._dashboardUserInfoCardTextContainer}
+                      >
+                        <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
+                        <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
+                      </View>
+                    )
+                  }
+                  <View style={styles._dashboardUserInfoCardTextContainer}>
+                    <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
+                    <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
+                  </View>
+                </View>
+              </View>
+          }
+        </View>
+      ),
       <View style={styles._dashboardContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         {
-          name && classOf && homeroom && profilePhoto.length > 1 &&
+          name && classOf && profilePhoto.length > 1 &&
             <View style={styles._dashboardSwiperContainer}>
               {
-                Platform.OS === 'ios' && profileImage &&
+                Platform.OS === 'ios' && profileImage && !profilePhoto.includes('blank-user.png') ?
                   <View>
     								<Image
                       ref={img => {
@@ -485,61 +540,26 @@ class Dashboard extends Component {
                       blurAmount={10}
                       style={styles.dashboardUserImageBlur}
                     />
-    	             </View>
+    	            </View>
+                :
+                  <View style={{
+                    backgroundColor: 'lightgray'
+                  }} />
               }
-              <Carousel
-                autoplay={false}
-                bullets
-                bulletStyle={styles._dashboardSwiperDot}
-                chosenBulletStyle={styles._dashboardSwiperActiveDot}
-                style={styles._dashboardSwiperContainer}
-              >
-                <View style={styles._dashboardUserProfile}>
-                  <PhotoUpload
-                    resetPhoto={schoolPicture}
-                    onReset={this.uploadProfilePhoto}
-                    onPhotoSelect={this.uploadProfilePhoto}
+              {
+                homeroom !== null && counselor !== null && dean !== null ?
+                  <Carousel
+                    autoplay={false}
+                    bullets
+                    bulletStyle={styles._dashboardSwiperDot}
+                    chosenBulletStyle={styles._dashboardSwiperActiveDot}
+                    style={styles._dashboardSwiperContainer}
                   >
-                    <Image
-                      source={profileImage}
-                      style={styles._dashboardUserImage}
-                    />
-                  </PhotoUpload>
-                  <Text style={styles._dashboardUserName}>
-                    {name}
-                  </Text>
-                  <Text style={styles._dashboardUserClassOf}>
-                    {classOf}
-                  </Text>
-                </View>
-                <View style={styles._dashboardUserInfo}>
-                  <View style={styles._dashboardUserInfoContainer}>
-                    {
-                      homeroom && counselor && dean &&
-                        [
-                          homeroom,
-                          counselor,
-                          dean
-                        ].map((mentor, index) =>
-                          <View
-                            key={index}
-                            style={styles._dashboardUserInfoCardTextContainer}
-                          >
-                            <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
-                            <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
-                          </View>
-                        )
-                    }
-                    {
-                      id &&
-                        <View style={styles._dashboardUserInfoCardTextContainer}>
-                          <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
-                          <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
-                        </View>
-                    }
-                  </View>
-                </View>
-              </Carousel>
+                    {dashboardInfo}
+                  </Carousel>
+                :
+                  dashboardInfo
+              }
             </View>
         }
         <ScrollView
