@@ -470,9 +470,8 @@ class Dashboard extends Component {
       schoolPicture;
 
     return (
-      dashboardInfo = (
-        <View>
-          <View style={styles._dashboardUserProfile}>
+      dashboardInfo = [
+          <View style={styles._dashboardUserProfile} key={0}>
             <PhotoUpload
               resetPhoto={schoolPicture}
               onReset={this.uploadProfilePhoto}
@@ -489,35 +488,34 @@ class Dashboard extends Component {
             <Text style={styles._dashboardUserClassOf}>
               {classOf}
             </Text>
-          </View>
-          {
-            homeroom && counselor && dean && id &&
-              <View style={styles._dashboardUserInfo}>
-                <View style={styles._dashboardUserInfoContainer}>
-                  {
-                    [
-                      homeroom,
-                      counselor,
-                      dean
-                    ].map((mentor, index) =>
-                      <View
-                        key={index}
-                        style={styles._dashboardUserInfoCardTextContainer}
-                      >
-                        <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
-                        <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
-                      </View>
-                    )
-                  }
-                  <View style={styles._dashboardUserInfoCardTextContainer}>
-                    <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
-                    <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
-                  </View>
+          </View>,
+          homeroom && counselor && dean && id ?
+            <View style={styles._dashboardUserInfo} key={1}>
+              <View style={styles._dashboardUserInfoContainer}>
+                {
+                  [
+                    homeroom,
+                    counselor,
+                    dean
+                  ].map((mentor, index) =>
+                    <View
+                      key={index}
+                      style={styles._dashboardUserInfoCardTextContainer}
+                    >
+                      <Text style={styles._dashboardUserInfoCardTextType}>{`${mentor.split('  ')[0]} `}</Text>
+                      <Text style={styles._dashboardUserInfoCardText}>{`${mentor.split('  ')[1]}`}</Text>
+                    </View>
+                  )
+                }
+                <View style={styles._dashboardUserInfoCardTextContainer}>
+                  <Text style={styles._dashboardUserInfoCardTextType}>Student ID: </Text>
+                  <Text style={styles._dashboardUserInfoCardText}>{id}</Text>
                 </View>
               </View>
-          }
-        </View>
-      ),
+            </View>
+          :
+            null
+      ],
       <View style={styles._dashboardContainer}>
         <HamburgerMenu navigation={this.props.navigation} />
         {
