@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 
 import cheerio from 'react-native-cheerio';
+import fetch from 'react-native-fetch-polyfill';
 
 import {
   SET_CREDENTIALS,
@@ -86,13 +87,15 @@ const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async di
     await fetch( //This is needed to clear the current user
       `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
       {
-        method: 'POST'
+        method: 'POST',
+        timeout: 6000
       }
     );
     const user = await fetch(
       `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
       {
-        method: 'POST'
+        method: 'POST',
+        timeout: 6000
       }
     );
     const userHTML = await user.text();
@@ -181,12 +184,14 @@ const fetchDates = refresh => async dispatch => {
       const modifiedYear = month < 8 ? year + 1 : year;
 
       const calendar = await fetch(
-        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`
+        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`,
+        { timeout: 7000 }
       );
       const calendarHTML = await calendar.text();
 
       const whsCalendar = await fetch(
-        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_qsgj2c0p7acid5c9t7dhe1q100@group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`
+        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_qsgj2c0p7acid5c9t7dhe1q100@group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`,
+        { timeout: 7000 }
       );
       const whsCalendarHTML = await whsCalendar.text();
 
@@ -286,7 +291,7 @@ const fetchDates = refresh => async dispatch => {
   } catch(error) {
     Alert.alert(
       'Error',
-      `An error occurred: ${error}`,
+      `An error occurred, please check your internet connection.`,
       [
         { text: 'OK' }
       ]

@@ -35,59 +35,64 @@ const ScheduleCard = ({ schedule, day, table, tableTitle, onLoad }) => (
           tableTitle
       }
     </Text>
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles._scheduleCardContentContainer}
-      style={styles._scheduleCard}
-    >
-      {
-        (
-          !table ?
-            schedule.filter(scheduleItem =>
-              scheduleItem.day === day
-            ).sort((a, b) =>
-              a.startMod - b.startMod
-            ).filter((scheduleItem, index, array) =>
-              index === array.findIndex(anotherItem =>
-                anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
-              )
-            ).reduce((withOpenMods, scheduleItem, index, array) => {
-              const filledMods = array.reduce((filled, scheduleItem) =>
-                [
-                  ...filled,
-                  ...Array.from(new Array(scheduleItem.length), (_, i) => i).map(key =>
-                    key + scheduleItem.startMod
+    {
+      schedule.length > 1 ?
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles._scheduleCardContentContainer}
+          style={styles._scheduleCard}
+        >
+          {
+            (
+              !table ?
+                schedule.filter(scheduleItem =>
+                  scheduleItem.day === day
+                ).sort((a, b) =>
+                  a.startMod - b.startMod
+                ).filter((scheduleItem, index, array) =>
+                  index === array.findIndex(anotherItem =>
+                    anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
                   )
-                ]
-              , []);
+                ).reduce((withOpenMods, scheduleItem, index, array) => {
+                  const filledMods = array.reduce((filled, scheduleItem) =>
+                    [
+                      ...filled,
+                      ...Array.from(new Array(scheduleItem.length), (_, i) => i).map(key =>
+                        key + scheduleItem.startMod
+                      )
+                    ]
+                  , []);
 
-              if(!filledMods.includes(scheduleItem.endMod) && scheduleItem.endMod !== 15) {
-                return [
-                  ...withOpenMods,
-                  scheduleItem,
-                  {
-                    title: 'OPEN MOD',
-                    length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod,
-                    startMod: scheduleItem.endMod
+                  if(!filledMods.includes(scheduleItem.endMod) && scheduleItem.endMod !== 15) {
+                    return [
+                      ...withOpenMods,
+                      scheduleItem,
+                      {
+                        title: 'OPEN MOD',
+                        length: (array[index + 1] ? array[index + 1].startMod : 15) - scheduleItem.endMod,
+                        startMod: scheduleItem.endMod
+                      }
+                    ]
                   }
-                ]
-              }
-              return [
-                ...withOpenMods,
-                scheduleItem
-              ];
-            }, [])
-          :
-            schedule
-        ).map((scheduleItem, index) =>
-          <ScheduleItem
-            key={index}
-            scheduleItem={scheduleItem}
-            crossSectionedMods={getCrossSectioned(schedule, day)}
-          />
-        )
-      }
-    </ScrollView>
+                  return [
+                    ...withOpenMods,
+                    scheduleItem
+                  ];
+                }, [])
+              :
+                schedule
+            ).map((scheduleItem, index) =>
+              <ScheduleItem
+                key={index}
+                scheduleItem={scheduleItem}
+                crossSectionedMods={getCrossSectioned(schedule, day)}
+              />
+            )
+          }
+        </ScrollView>
+      :
+        <Text>No schedule available</Text>
+    }
     {
       Platform.OS === 'android' &&
         <View style={{
