@@ -55,7 +55,7 @@ class Schedule extends Component {
               style={styles._scheduleSwiperContainer}
               currentPage={today > 0 && today < 6 ? today - 1 : 0}
               autoplay={false}
-              bullets
+              bullets={Platform.OS === 'Android'}
               bulletStyle={styles._scheduleDotStyle}
               chosenBulletStyle={styles._scheduleActiveDotStyle}
             >

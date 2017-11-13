@@ -18,7 +18,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "lint": "./node_modules/.bin/eslint src"
+    "lint": "./node_modules/.bin/eslint src",
+    "release": "code-push release-react WHS-iOS ios -m && code-push release-react WHS-iOS ios --targetBinaryVersion 1.0.1 -m && code-push release-react WHS-Android android -m"
   },
   "jest": {
     "preset": "jest-expo"

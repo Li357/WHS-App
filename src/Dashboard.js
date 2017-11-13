@@ -26,7 +26,7 @@ import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
 
-const DEVIATION = (new Date().getDay() !== 3 ? 14 : 22) * 1000;
+const DEVIATION = (new Date().getDay() !== 3 ? 29 : 37) * 1000;
 
 class Dashboard extends Component {
   state = {
