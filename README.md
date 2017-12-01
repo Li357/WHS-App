@@ -20,7 +20,7 @@ This is the list of everything I want to get done in the app:
 - [x] Mod & day timers
 - [x] Schedule viewer
 - [x] Handle cross-sectioned mods
-- [ ] Handle late-start/early dismissals
+- [x] Handle late-start/early dismissals
 - [x] Handle holidays/breaks
 - [x] Handle end of the school year & summer
 - [x] Upload profile photo

@@ -624,14 +624,14 @@ class Dashboard extends Component {
               [
                 {
                   value: wednesdayFirstClass.title,
-                  title: 'NEXT MOD',
+                  title: 'FIRST MOD',
                   textStyle: {
                     fontSize: 60
                   }
                 },
                 {
                   value: wednesdayFirstClass.body,
-                  title: 'NEXT MOD ROOM',
+                  title: 'FIRST MOD ROOM',
                   textStyle: {
                     fontSize: 60
                   }

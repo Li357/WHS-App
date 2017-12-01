@@ -75,7 +75,43 @@ const DrawerWrapper = ({ onLogout, ...props }) => (
 
 class App extends Component {
   state = {
-    loading: true
+    loading: true,
+    downloadStatus: 'Checking for updates...',
+    downloadProgress: '0%'
+  }
+  
+  codePushStatusDidChange(status) {
+    /* See codePush.SyncStatus
+       0: up to date
+       1: update installed
+       2: update ignored
+       3: unknown error
+       4: sync in progress
+       5: checking for updates
+       6: awaiting user action
+       7: downloading package
+       8: installing update
+    */
+    
+    this.setState({
+      downloadStatus: [
+        'Up to date',
+        'Update installed',
+        'Update ignored',
+        'Error',
+        'Syncing...',
+        'Checking for updates...',
+        'Awaiting user action...',
+        'Downloading updates: ',
+        'Installing update...'
+      ][status]
+    });
+  }
+
+  codePushDownloadDidProgress({ receivedBytes, totalBytes }) {
+    this.setState({
+      downloadProgress: `${(receivedBytes / totalBytes * 100).toFixed(0)}%`
+    });
   }
 
   hasLoggedIn = () => {
@@ -84,7 +120,7 @@ class App extends Component {
       password,
       error
     } = store.getState();
-    return `${username}${password}`.length > 2 && !error;
+    return `${username}${password}`.length > 2 && !error.trim();
   }
 
   handleLogout = navigate => {
@@ -99,6 +135,7 @@ class App extends Component {
     }, async () => {
       {
         const { dates } = store.getState();
+        
         //late check is to check if app has late dates
         if(dates.length === 0 || dates.every(({ late }) => !late)) { //Fetch dates on app first load
           try {
@@ -123,12 +160,12 @@ class App extends Component {
           refreshedOne,
           refreshedTwo,
           profilePhoto,
-          studentPicture,
+          schoolPicture,
           dates
         } = store.getState();
 
         try {
-          if(!studentPicture) {
+          if(!schoolPicture) {
             await store.dispatch(fetchUserInfo(username, password));
           }
 
@@ -177,7 +214,13 @@ class App extends Component {
   }
 
   render() {
-    if(!this.state.loading) {
+    const {
+      downloadProgress,
+      downloadStatus,
+      loading
+    } = this.state;
+    
+    if(!loading) {
       const Drawer = DrawerNavigator({
         Dashboard: {
           screen: Dashboard
@@ -189,7 +232,7 @@ class App extends Component {
           screen: Settings
         }
       }, {
-        initialRouteName: 'Dashboard',
+        initialRouteName: 'Settings',
         contentComponent: props => <DrawerWrapper
           onLogout={() => this.handleLogout(props.navigation.navigate)}
           {...props}
@@ -224,13 +267,20 @@ class App extends Component {
         </Provider>
       );
     }
-
+    
     return (
       <View style={styles._loadingAppContainer}>
         <Image
           style={styles._loadingGIF}
           source={LoadingGIF}
         />
+        <Text style={styles._codePushIndicator}>
+          {downloadStatus} 
+          {
+            downloadStatus === 'Downloading updates: ' &&
+              downloadProgress
+          }
+        </Text>
       </View>
     );
   }
@@ -262,6 +312,9 @@ const styles = EStyleSheet.create({
     fontFamily: 'Roboto-Light',
     fontSize: 17,
     textAlign: 'center'
+  },
+  codePushIndicator: {
+    margin: 10
   }
 });
 

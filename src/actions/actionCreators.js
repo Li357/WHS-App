@@ -83,7 +83,6 @@ const saveProfilePhoto = (username, profilePhoto) => async dispatch => {
 
 const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async dispatch => {
   try {
-    dispatch(setCredentials(username, password));
     await fetch( //This is needed to clear the current user
       `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
       {
@@ -123,6 +122,8 @@ const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async di
       );
       dispatch(receiveUserInfo(' '));
     } else {
+      dispatch(setCredentials(username, password));
+      
       const studentOverview = $('.card-header + .card-block');
       const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
       const rawJSON = $('.page-content + script')[0].children[0].data.trim();
