@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Alert,
   AsyncStorage,
+  Dimensions,
   Text,
   View
 } from 'react-native';
@@ -129,7 +130,6 @@ const Settings = ({
       <Text style={styles._settingsDescription}>
         If your schedule changed during the semester, manually refresh to update it. Your schedule only automatically refreshes at the beginning of every semester.
       </Text>
-      <Text style={styles._credit}>Created by Andrew Li, MIT License.</Text>
     </View>
   </View>
 );
@@ -141,16 +141,12 @@ const styles = EStyleSheet.create({
   },
   settingsLists: {
     flex: 1,
-    marginTop: 80
+    marginTop: Dimensions.get('window').height === 812 ? 90 : 80
   },
   settingsDescription: {
     color: 'gray',
     position: 'absolute',
     top: 100,
-    margin: 15
-  },
-  credit: {
-    color: 'gray',
     margin: 15
   }
 });

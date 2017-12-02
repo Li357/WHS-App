@@ -21,13 +21,15 @@ const HamburgerMenu = ({ navigation }) => (
   </TouchableOpacity>
 );
 
+const { height } = Dimensions.get('window');
+
 const styles = EStyleSheet.create({
   $hamburgerIconSize: 40,
   hamburger: {
     position: 'absolute',
     zIndex: 1,
-    top: Dimensions.get('window').height === 812 ? 40 : 25, //Handles iPhone X
-    left: 15,
+    top: height === 812 ? 40 : 25, //Handles iPhone X
+    left: height === 812 ? 25 : 15,
     backgroundColor: 'transparent'
   },
   hamburgerIcon: {
