@@ -76,10 +76,11 @@ const DrawerWrapper = ({ onLogout, ...props }) => (
 class App extends Component {
   state = {
     loading: true,
+    loadStatus: '',
     downloadStatus: 'Checking for updates...',
     downloadProgress: '0%'
   }
-  
+
   codePushStatusDidChange(status) {
     /* See codePush.SyncStatus
        0: up to date
@@ -92,26 +93,30 @@ class App extends Component {
        7: downloading package
        8: installing update
     */
-    
-    this.setState({
-      downloadStatus: [
-        'Up to date',
-        'Update installed',
-        'Update ignored',
-        'Error',
-        'Syncing...',
-        'Checking for updates...',
-        'Awaiting user action...',
-        'Downloading updates: ',
-        'Installing update...'
-      ][status]
-    });
+
+    if(this.state.loading) {
+      this.setState({
+        downloadStatus: [
+          'Up to date',
+          'Update installed',
+          'Update ignored',
+          'Error',
+          'Syncing...',
+          'Checking for updates...',
+          'Awaiting user action...',
+          'Downloading updates: ',
+          'Installing update...'
+        ][status]
+      });
+    }
   }
 
   codePushDownloadDidProgress({ receivedBytes, totalBytes }) {
-    this.setState({
-      downloadProgress: `${(receivedBytes / totalBytes * 100).toFixed(0)}%`
-    });
+    if(this.state.loading) {
+      this.setState({
+        downloadProgress: `${(receivedBytes / totalBytes * 100).toFixed(0)}%`
+      });
+    }
   }
 
   hasLoggedIn = () => {
@@ -135,9 +140,12 @@ class App extends Component {
     }, async () => {
       {
         const { dates } = store.getState();
-        
+
         //late check is to check if app has late dates
         if(dates.length === 0 || dates.every(({ late }) => !late)) { //Fetch dates on app first load
+          this.setState({
+            status: 'Fetching school calendar...'
+          });
           try {
             await store.dispatch(fetchDates());
           } catch(error) {
@@ -166,9 +174,15 @@ class App extends Component {
 
         try {
           if(!schoolPicture) {
+            this.setState({
+              status: 'Getting school picture...'
+            });
             await store.dispatch(fetchUserInfo(username, password));
           }
 
+          this.setState({
+            status: 'Calculating the semester...'
+          });
           const now = new Date();
           const refreshTimes = dates.filter(date => date.first || date.second);
           const [semesterTwo, semesterOne] = refreshTimes.map(({
@@ -217,9 +231,10 @@ class App extends Component {
     const {
       downloadProgress,
       downloadStatus,
-      loading
+      loading,
+      status
     } = this.state;
-    
+
     if(!loading) {
       const Drawer = DrawerNavigator({
         Dashboard: {
@@ -267,7 +282,7 @@ class App extends Component {
         </Provider>
       );
     }
-    
+
     return (
       <View style={styles._loadingAppContainer}>
         <Image
@@ -275,11 +290,13 @@ class App extends Component {
           source={LoadingGIF}
         />
         <Text style={styles._codePushIndicator}>
-          {downloadStatus} 
+          {downloadStatus}
           {
             downloadStatus === 'Downloading updates: ' &&
               downloadProgress
           }
+          {'\n'}
+          {status}
         </Text>
       </View>
     );
@@ -314,7 +331,8 @@ const styles = EStyleSheet.create({
     textAlign: 'center'
   },
   codePushIndicator: {
-    margin: 10
+    margin: 10,
+    textAlign: 'center'
   }
 });
 
