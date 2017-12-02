@@ -167,7 +167,6 @@ class App extends Component {
           id,
           refreshedOne,
           refreshedTwo,
-          profilePhoto,
           schoolPicture,
           dates
         } = store.getState();
@@ -179,6 +178,12 @@ class App extends Component {
             });
             await store.dispatch(fetchUserInfo(username, password));
           }
+
+          this.setState({
+            status: 'Getting profile photo...'
+          });
+          const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
+          await store.dispatch(setProfilePhoto(profilePhoto ? profilePhoto : schoolPicture));
 
           this.setState({
             status: 'Calculating the semester...'
@@ -247,7 +252,7 @@ class App extends Component {
           screen: Settings
         }
       }, {
-        initialRouteName: 'Settings',
+        initialRouteName: 'Dashboard',
         contentComponent: props => <DrawerWrapper
           onLogout={() => this.handleLogout(props.navigation.navigate)}
           {...props}
