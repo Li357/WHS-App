@@ -108,4 +108,43 @@ const SCHEDULE = (() => {
   };
 })();
 
-export default SCHEDULE;
+const selectSchedule = (dates, now) => {;
+  const today = now.getDay();
+
+  const isDate = dateKey => !!dates.find(({
+    [dateKey]: key,
+    day,
+    month,
+    year
+  }) =>
+    key && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
+  );
+
+  const isLate = isDate('late');
+  const isLast = isDate('last');
+  const hasAssembly = isDate('assembly');
+
+  return {
+    hasAssembly,
+    schedule: SCHEDULE[
+      isLast ?
+        'oneOClock'
+      :
+        !hasAssembly ?
+          today === 3 ?
+            isLate ?
+              'lateStartWednesday'
+            :
+              'wednesday'
+          :
+            isLate ?
+              'lateStart'
+            :
+              'regular'
+        :
+          'assembly'
+    ]
+  };
+}
+
+export default selectSchedule;

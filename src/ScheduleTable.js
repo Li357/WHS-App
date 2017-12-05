@@ -21,13 +21,18 @@ const ScheduleTable = ({ schedule }) => (
   </View>
 );
 
+const {
+  width,
+  height
+} = Dimensions.get('window');
+
 const styles = EStyleSheet.create({
   scheduleTableContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width,
+    height
   },
   scheduleTableItem: {
     flexWrap: 'wrap',

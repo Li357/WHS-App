@@ -21,7 +21,10 @@ import { BlurView } from 'react-native-blur';
 import HamburgerMenu from './HamburgerMenu.js';
 import InMod from './InMod.js';
 import PassingPeriod from './PassingPeriod.js';
-import SCHEDULE from './util/schedule.js';
+import selectSchedule from './util/schedule.js';
+import {
+  getCrossSectioned
+} from './util/crossSection.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
@@ -87,61 +90,16 @@ class Dashboard extends Component {
   }
 
   selectSchedule = () => {
-    const now = new Date();
-    const today = now.getDay();
     const { dates } = this.props;
-    const isLate = !!dates.find(({
-      late,
-      day,
-      month,
-      year
-    }) =>
-      late && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
-    );
-    const isLast = !!dates.find(({
-      last,
-      day,
-      month,
-      year
-    }) =>
-      last && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
-    );
-    const hasAssembly = !!dates.find(({
-      assembly,
-      day,
-      month,
-      year
-    }) =>
-      assembly && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
-    );
+    const {
+      schedule,
+      hasAssembly
+    } = selectSchedule(dates, new Date());
+
     this.setState({
-      schedule: SCHEDULE[
-        isLast ?
-          'oneOClock'
-        :
-          !hasAssembly ?
-            today === 3 ?
-              isLate ?
-                'lateStartWednesday'
-              :
-                'wednesday'
-            :
-              isLate ?
-                'lateStart'
-              :
-                'regular'
-          :
-            'assembly'
-      ],
-      containsAssembly: hasAssembly
-    }, () => {
-      this.state.schedule.forEach((timePair, index) => {
-        if(timePair[2] === 'ASSEMBLY') {
-          this.setState({
-            assemblyIndex: index
-          });
-        }
-      });
+      schedule,
+      containsAssembly,
+      assemblyIndex: schedule.find(timePair => timePair[2] === 'ASSEMBLY')
     });
   }
 
@@ -177,11 +135,7 @@ class Dashboard extends Component {
     const today = new Date().getDay();
 
     this.setState({
-      crossSectionedMods: schedule.filter((scheduleItem, index, array) =>
-        scheduleItem.day === today && index !== array.findIndex(anotherItem =>
-          anotherItem.day === scheduleItem.day && anotherItem.startMod === scheduleItem.startMod
-        )
-      )
+      crossSectionedMods: getCrossSectioned(schedule, today)
     });
   }
 

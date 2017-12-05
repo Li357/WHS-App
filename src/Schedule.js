@@ -16,7 +16,6 @@ import Carousel from 'react-native-looped-carousel';
 
 import HamburgerMenu from './HamburgerMenu.js';
 import ScheduleCard from './ScheduleCard.js';
-import SCHEDULE from './util/schedule.js';
 import LoadingGIF from '../assets/images/loading.gif';
 
 class Schedule extends Component {
@@ -60,24 +59,12 @@ class Schedule extends Component {
               chosenBulletStyle={styles._scheduleActiveDotStyle}
             >
               {
-                Array.from(new Array(7), (_, i) => i).map(key =>
-                  key < 5 ?
-                    <ScheduleCard
-                      key={key}
-                      schedule={schedule}
-                      day={key + 1}
-                    />
-                  :
-                    <ScheduleCard
-                      key={key}
-                      schedule={SCHEDULE[key === 5 ? 'regular' : 'wednesday'].map((timePair, index) => ({
-                        title: this.formatTableTimes(timePair),
-                        length: 1,
-                        startMod: index + (key !== 5)
-                      }))}
-                      table
-                      tableTitle={key === 5 ? 'Regular' : 'Wednesday'}
-                    />
+                Array.from(new Array(5), (_, i) => i).map(key =>
+                  <ScheduleCard
+                    key={key}
+                    schedule={schedule}
+                    day={key + 1}
+                  />
                 )
               }
             </Carousel>

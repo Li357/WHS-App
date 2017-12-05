@@ -20,7 +20,10 @@ let isHalfMod;
 let currentCrossSectionedMods;
 let content;
 
-const ScheduleItem = ({ scheduleItem, crossSectionedMods }) => (
+const ScheduleItem = ({
+  scheduleItem,
+  crossSectionedMods
+}) => (
   currentCrossSectionedMods = getCurrentCrossSectioned(scheduleItem, crossSectionedMods),
   content = (
     <View style={styles._scheduleCardWrappedContainer}>
