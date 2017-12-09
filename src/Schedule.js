@@ -23,13 +23,6 @@ class Schedule extends Component {
     loading: true
   }
 
-  formatTableTimes = timePair => {
-    return timePair.map(time => {
-      const splitTime = time.split(':');
-      return `${+splitTime[0] !== 12 ? +splitTime[0] % 12 : 12}:${splitTime[1]}`;
-    }).join(' - ');
-  }
-
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       this.setState({

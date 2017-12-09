@@ -187,8 +187,8 @@ class Dashboard extends Component {
       const { timeUntil } = this.state;
 
       if(timeUntil > 0) {
-        this.setState(prevState => ({
-          timeUntil: prevState.timeUntil - 1000
+        this.setState(({ timeUntil }) => ({
+          timeUntil: timeUntil - 1000
         }));
       } else {
         clearInterval(this.interval);
@@ -235,8 +235,8 @@ class Dashboard extends Component {
       const { beginTimeUntil } = this.state;
 
       if(beginTimeUntil > 0) {
-        this.setState(prevState => ({
-          beginTimeUntil: prevState.beginTimeUntil - 1000
+        this.setState(({ beginTimeUntil }) => ({
+          beginTimeUntil: beginTimeUntil - 1000
         }));
       } else {
         clearInterval(this.beginDayInterval);

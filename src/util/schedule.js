@@ -124,26 +124,27 @@ const selectSchedule = (dates, now) => {;
   const isLast = isDate('last');
   const hasAssembly = isDate('assembly');
 
+  const schedule = isLast ?
+    'oneOClock'
+  :
+    !hasAssembly ?
+      today === 3 ?
+        isLate ?
+          'lateStartWednesday'
+        :
+          'wednesday'
+      :
+        isLate ?
+          'lateStart'
+        :
+          'regular'
+    :
+      'assembly';
+
   return {
     hasAssembly,
-    schedule: SCHEDULE[
-      isLast ?
-        'oneOClock'
-      :
-        !hasAssembly ?
-          today === 3 ?
-            isLate ?
-              'lateStartWednesday'
-            :
-              'wednesday'
-          :
-            isLate ?
-              'lateStart'
-            :
-              'regular'
-        :
-          'assembly'
-    ]
+    schedule: SCHEDULE[schedule],
+    string: schedule
   };
 }
 

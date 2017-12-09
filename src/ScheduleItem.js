@@ -1,9 +1,9 @@
 import React from 'react';
 import {
   Alert,
+  Animated,
   Dimensions,
   Image,
-  Text,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -22,16 +22,26 @@ let content;
 
 const ScheduleItem = ({
   scheduleItem,
-  crossSectionedMods
+  crossSectionedMods,
+  textStyle
 }) => (
   currentCrossSectionedMods = getCurrentCrossSectioned(scheduleItem, crossSectionedMods),
+  textStyleObj = {
+    opacity: textStyle
+  },
   content = (
     <View style={styles._scheduleCardWrappedContainer}>
       <View style={styles._scheduleCardWrappedTextContainer}>
-        <Text style={styles._scheduleCardWrappedText}>{scheduleItem.title}</Text>
+        <Animated.Text style={[
+          styles._scheduleCardWrappedText,
+          textStyleObj
+        ]}>{scheduleItem.title}</Animated.Text>
         {
           scheduleItem.body &&
-            <Text style={styles._scheduleCardWrappedText}>{scheduleItem.body}</Text>
+            <Animated.Text style={[
+              styles._scheduleCardWrappedText,
+              textStyleObj
+            ]}>{scheduleItem.body}</Animated.Text>
         }
       </View>
       {
@@ -59,7 +69,7 @@ const ScheduleItem = ({
                     />
                   </View>
               }
-              <Text style={[
+              <Animated.Text style={[
                 styles._scheduleCardItemMod,
                 isHalfMod ? {
                   paddingTop: (75 / 2 - 17) / 2,
@@ -67,10 +77,11 @@ const ScheduleItem = ({
                 } : {},
                 currentCrossSectionedMods.length > 0 ? {
                   width: Dimensions.get('window').width * 0.65 * 0.0694
-                } : {}
+                } : {},
+                textStyleObj
               ]}>
                 {scheduleItem.startMod === 0 ? 'HR' : scheduleItem.startMod + key}
-              </Text>
+              </Animated.Text>
               <View
                 style={[
                   styles._scheduleCardItem,
