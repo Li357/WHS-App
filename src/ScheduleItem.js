@@ -27,6 +27,32 @@ let specialItems;
 let visible;
 let position;
 
+// MATH.SIGN POLYFILL
+if (!Math.sign) {
+  Math.sign = function(x) {
+    // If x is NaN, the result is NaN.
+    // If x is -0, the result is -0.
+    // If x is +0, the result is +0.
+    // If x is negative and not -0, the result is -1.
+    // If x is positive and not +0, the result is +1.
+    return ((x > 0) - (x < 0)) || +x;
+    // A more aesthetical persuado-representation is shown below
+    //
+    // ( (x > 0) ? 0 : 1 )  // if x is negative then negative one
+    //          +           // else (because you cant be both - and +)
+    // ( (x < 0) ? 0 : -1 ) // if x is positive then positive one
+    //         ||           // if x is 0, -0, or NaN, or not a number,
+    //         +x           // Then the result will be x, (or) if x is
+    //                      // not a number, then x converts to number
+  };
+}
+
+const widthTable = {
+  375: 0.45,
+  414: 0.41,
+  320: 0.53
+};
+
 const checkIfHalf = mod => mod >= 4 && mod <= 11;
 const range = (start, end) => Array.from(new Array(end - start), (_, i) => i + start);
 const getModHeight = (sum, mod) => sum +  75 / (checkIfHalf(mod) + 1);
@@ -83,6 +109,9 @@ const ScheduleItem = ({
               key={key}
               style={[
                 styles._scheduleCardItemContainer,
+                {
+                  height: 75
+                },
                 isHalfMod && !isFinals && {
                   height: 75 / 2
                 },
@@ -120,7 +149,7 @@ const ScheduleItem = ({
                     height: 75 / 2
                   },
                   modLength && {
-                    width: width * 0.7 * 0.842 / modLength
+                    width: width * 0.7 * 0.841 / modLength
                   },
                   modLength && modLength !== index + 1 && {
                     borderRightColor: 'gray',
@@ -146,7 +175,10 @@ const ScheduleItem = ({
               style={[
                 styles._scheduleCardWrappedTextContainer,
                 { // this assumes nobody has a cross-section of >3 classes
-                  left: `${Math.sign(position) * (position * 15 + width * 0.45 / length) + (position === 0 ? 15 : 0)}%`,
+                  //0.45 for X & regular sizes iOS
+                  //0.41 for plusses
+                  //0.53 for 5 & 4
+                  left: `${Math.sign(position) * (position * 15 + width * (widthTable[width] || 0.42) / length) + (position === 0 ? 15 : 0)}%`,
                   top: +(itemStart > startMod) && range(startMod, itemStart).reduce(getModHeight, 0),
                   bottom: +(itemEnd < endMod) && range(itemEnd, endMod).reduce(getModHeight, 0)
                 }
@@ -210,6 +242,9 @@ const ScheduleItem = ({
                   <View
                     style={[
                       visible && styles._scheduleCardItem,
+                      {
+                        height: 75
+                      },
                       item.sourceType === 'annotation' && visible && {
                         backgroundColor: 'darkgray'
                       },
@@ -217,7 +252,7 @@ const ScheduleItem = ({
                         height: 75 / 2
                       },
                       {
-                        width: width * 0.7 * 0.842 / modLength
+                        width: width * 0.7 * 0.841 / modLength
                       },
                       index !== modLength - 1 && visible && {
                         borderRightColor: 'gray',

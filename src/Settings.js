@@ -145,12 +145,12 @@ class Settings extends Component {
               arrowIcon={refreshLoading && LoadingGIF}
               hasNavArrow={false}
               title="Manual Refresh"
-              onPress={() => this.handleRefresh(dispatch, username, password, error, navigation)}
+              onPress={() => !refreshLoading && this.handleRefresh(dispatch, username, password, error, navigation)}
             />
             <SettingsList.Item
               hasNavArrow={false}
               title="Clear Storage"
-              onPress={() => this.handleClearStorage(dispatch, id)}
+              onPress={() => !clearLoading && this.handleClearStorage(dispatch, id)}
             />
           </SettingsList>
           <Text style={styles._settingsDescription}>

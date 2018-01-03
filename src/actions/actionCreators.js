@@ -170,7 +170,9 @@ const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async di
 
 const fetchDates = refresh => async dispatch => {
   try {
-    const year = new Date().getFullYear() + Boolean(refresh);
+    const now = new Date();
+    const fullYear = now.getFullYear();
+    const year = fullYear - (now.getMonth() + 1 < 8) + Boolean(refresh);
     const reasons = [
         'NO SCHOOL',
         'LATE START',
@@ -182,7 +184,7 @@ const fetchDates = refresh => async dispatch => {
 
     for(const month of Array.from(new Array(12), (_, i) => i + 1)) {
       const paddedMonth = `${month > 9 ? '' : '0'}${month}`;
-      const modifiedYear = month < 8 ? year + 1 : year;
+      const modifiedYear = year + (month < 8);
 
       const calendar = await fetch(
         `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`,
