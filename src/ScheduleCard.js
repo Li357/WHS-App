@@ -51,7 +51,7 @@ class ScheduleCard extends Component {
       this.state.opacity,
       {
         toValue: 0,
-        duration: 500
+        duration: 250
       }
     ).start(async () => {
       await onToggleTimes(day);
@@ -59,7 +59,7 @@ class ScheduleCard extends Component {
         this.state.opacity,
         {
           toValue: 1,
-          duration: 500
+          duration: 250
         }
       ).start();
     });
