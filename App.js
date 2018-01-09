@@ -141,8 +141,10 @@ class App extends Component {
       {
         const { dates } = store.getState();
 
+        //SET_SCHEDULE is an action for testing
+
         //late check is to check if app has late dates
-        if(dates.length === 0 || dates.every(({ late }) => !late)) { //Fetch dates on app first load
+        if(dates.length === 0 || dates.every(({ late }) => !late) || dates.every(({ finals }) => !finals)) { //Fetch dates on app first load
           this.setState({
             status: 'Fetching school calendar...'
           });
@@ -203,10 +205,10 @@ class App extends Component {
 
           if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
             await store.dispatch(setRefreshed('one', true));
-            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto.startsWith('https://')));
+            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
           } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
             await store.dispatch(setRefreshed('two', true));
-            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto.startsWith('https://')));
+            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
           } else if(
             +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth(), now.getDate()) //if after last day
           ) {

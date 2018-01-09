@@ -16,11 +16,10 @@ const PassingPeriod = ({
   untilPassingPeriodIsOver,
   nextModNumber,
   nextMod,
-  nextModInfo,
-  crossSection,
+  todayCrossSectioned,
   assembly
 }) => (
-  currentCrossSectioned = getCurrentCrossSectioned({ startMod: nextModNumber }, crossSection),
+  currentCrossSectioned = getCurrentCrossSectioned(nextMod, todayCrossSectioned),
   <View>
     {
       [
@@ -33,16 +32,16 @@ const PassingPeriod = ({
           title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD #`
         } : {},
         {
-          value: nextMod,
+          value: nextMod.title,
           title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD`,
           textStyle: {
             fontSize: 60
           },
-          crossSection: currentCrossSectioned,
-          crossSectionOnPress: () => alertCrossSectioned(currentCrossSectioned)
+          isCrossSectioned: currentCrossSectioned.length > 0,
+          crossSectionOnPress: () => alertCrossSectioned(nextMod, currentCrossSectioned)
         },
-        !assembly && nextModInfo ? {
-          value: nextModInfo,
+        !assembly && nextMod.body ? {
+          value: nextMod.body,
           title: `NEXT ${isHalfMod(nextModNumber) ? 'HALF ' : ''}MOD ROOM`,
           textStyle: {
             fontSize: 60

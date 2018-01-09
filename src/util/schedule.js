@@ -98,17 +98,27 @@ const SCHEDULE = (() => {
     ['14:40', '15:10']
   ];
 
+  const finals = [
+    ['8:00', '8:05'],
+    ['8:10', '9:10'],
+    ['9:15', '10:15'],
+    ['10:20', '11:20'],
+    ['11:25', '12:25'],
+    ['12:25', '4:00']
+  ];
+
   return {
     regular,
     wednesday,
     oneOClock,
     lateStart,
     lateStartWednesday,
-    assembly
+    assembly,
+    finals
   };
 })();
 
-const selectSchedule = (dates, now) => {;
+const selectSchedule = (dates, now, isTeacher) => {;
   const today = now.getDay();
 
   const isDate = dateKey => !!dates.find(({
@@ -123,6 +133,7 @@ const selectSchedule = (dates, now) => {;
   const isLate = isDate('late');
   const isLast = isDate('last');
   const hasAssembly = isDate('assembly');
+  const isFinals = isDate('finals');
 
   const schedule = isLast ?
     'oneOClock'
@@ -137,14 +148,20 @@ const selectSchedule = (dates, now) => {;
         isLate ?
           'lateStart'
         :
-          'regular'
+          isFinals ?
+            'finals'
+          :
+            'regular'
     :
       'assembly';
 
   return {
     hasAssembly,
-    schedule: SCHEDULE[schedule],
-    string: schedule
+    isFinals,
+    schedule: schedule === 'finals' && !isTeacher ? SCHEDULE[schedule].slice(0, -1) : SCHEDULE[schedule],
+    string: schedule,
+    isBreak: !(isFinals || hasAssembly || isLast || isLate),
+    isFinals
   };
 }
 

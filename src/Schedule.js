@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   Alert,
+  Animated,
   AsyncStorage,
   Dimensions,
   Image,
@@ -20,7 +21,12 @@ import LoadingGIF from '../assets/images/loading.gif';
 
 class Schedule extends Component {
   state = {
-    loading: true
+    loading: true,
+    isTimes1: false,
+    isTimes2: false,
+    isTimes3: false,
+    isTimes4: false,
+    isTimes5: false
   }
 
   componentDidMount() {
@@ -29,6 +35,20 @@ class Schedule extends Component {
         loading: false
       });
     });
+  }
+
+  clearTimes = page => {
+    this.setState({
+      [`isTimes${page + 1}`]: false
+    });
+  }
+
+  toggleTimes = day => {
+    const key = `isTimes${day}`;
+
+    this.setState(({ [key]: isTimes }) => ({
+      [key]: !isTimes
+    }));
   }
 
   render() {
@@ -50,6 +70,7 @@ class Schedule extends Component {
               bullets={Platform.OS !== 'android'}
               bulletStyle={styles._scheduleDotStyle}
               chosenBulletStyle={styles._scheduleActiveDotStyle}
+              onAnimateNextPage={this.clearTimes}
             >
               {
                 Array.from(new Array(5), (_, i) => i).map(key =>
@@ -57,6 +78,8 @@ class Schedule extends Component {
                     key={key}
                     schedule={schedule}
                     day={key + 1}
+                    isTimes={this.state[`isTimes${key + 1}`]}
+                    onToggleTimes={this.toggleTimes}
                   />
                 )
               }
@@ -72,11 +95,16 @@ class Schedule extends Component {
   }
 }
 
+const {
+  width,
+  height
+} = Dimensions.get('window');
+
 const scheduleSwiperDotConfig = {
   margin: 4,
   ...Platform.select({
     ios: {
-      top: -Dimensions.get('window').height + 120
+      top: -height + 105
     },
     android: {
       top: -10
@@ -100,8 +128,8 @@ const styles = EStyleSheet.create({
     height: 40
   },
   scheduleSwiperContainer: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height
+    width,
+    height
   },
   scheduleLoadingGIF: {
     width: 40,

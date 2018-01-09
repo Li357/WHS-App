@@ -18,33 +18,32 @@ const InMod = ({
   currentModNumber,
   untilModIsOver,
   nextMod,
-  nextModInfo,
-  crossSection,
+  todayCrossSectioned,
   assembly
 }) => (
-  currentCrossSectioned = getCurrentCrossSectioned({ startMod: currentModNumber + 1 }, crossSection),
+  currentCrossSectioned = getCurrentCrossSectioned(nextMod, todayCrossSectioned),
   <View>
     {
       [
         {
           value: currentModNumber,
-          title: `CURRENT MOD${assembly ? '' : ' #'}`
+          title: `CURRENT ${isHalfMod(currentModNumber) ? 'HALF ' : ''}MOD${assembly ? '' : ' #'}`
         },
         {
           value: untilModIsOver,
           title: `UNTIL ${isHalfMod(currentModNumber) ? 'HALF ' : ''}MOD IS OVER`
         },
         {
-          value: nextMod,
+          value: nextMod.title,
           title: `NEXT ${isHalfMod(currentModNumber + 1) ? 'HALF ' : ''}MOD`,
           textStyle: {
             fontSize: 60
           },
-          crossSection: currentModNumber < 14 ? currentCrossSectioned : null,
-          crossSectionOnPress: () => alertCrossSectioned(currentCrossSectioned)
+          isCrossSectioned: currentModNumber < 14 ? currentCrossSectioned.length > 0 : false,
+          crossSectionOnPress: () => alertCrossSectioned(nextMod, currentCrossSectioned)
         },
-        nextModInfo ? {
-          value: nextModInfo,
+        nextMod.body ? {
+          value: nextMod.body,
           title: `NEXT ${isHalfMod(currentModNumber + 1) ? 'HALF ' : ''}MOD ROOM`,
           textStyle: {
             fontSize: 60

@@ -111,6 +111,11 @@ const whsApp = (state = {
         lastSummerStart: null,
         schoolPicture: ' '
       };
+    case 'SET_SCHEDULE':
+      return {
+        ...state,
+        schedule
+      }
     default:
       return state;
   }

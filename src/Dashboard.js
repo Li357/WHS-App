@@ -22,9 +22,7 @@ import HamburgerMenu from './HamburgerMenu.js';
 import InMod from './InMod.js';
 import PassingPeriod from './PassingPeriod.js';
 import selectSchedule from './util/schedule.js';
-import {
-  getCrossSectioned
-} from './util/crossSection.js';
+import { getTodayCrossSectioned } from './util/crossSection.js';
 import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
@@ -38,6 +36,8 @@ class Dashboard extends Component {
     beginTimeUntil: 0,
     isBreak: false,
     isSummer: false,
+    isFinals: false,
+    isTeacher: false,
     crossSectionedMods: null,
     bgRef: null,
     schedule: [],
@@ -90,16 +90,25 @@ class Dashboard extends Component {
   }
 
   selectSchedule = () => {
-    const { dates } = this.props;
+    const {
+      dates,
+      dean,
+      counselor,
+      homeroom
+    } = this.props;
+    const isTeacher = [dean, counselor, homeroom].every(el => el === null);
     const {
       schedule,
-      hasAssembly
-    } = selectSchedule(dates, new Date());
+      hasAssembly,
+      isFinals
+    } = selectSchedule(dates, new Date(), isTeacher);
 
     this.setState({
       schedule,
-      containsAssembly,
-      assemblyIndex: schedule.find(timePair => timePair[2] === 'ASSEMBLY')
+      containsAssembly: hasAssembly,
+      assemblyIndex: schedule.find(timePair => timePair[2] === 'ASSEMBLY'),
+      isFinals,
+      isTeacher
     });
   }
 
@@ -119,11 +128,12 @@ class Dashboard extends Component {
         last,
         late,
         assembly,
+        finals,
         day,
         month,
         year
       }) =>
-        !first && !last && !second && !late && !assembly &&
+        !first && !last && !second && !late && !assembly && !finals &&
         +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
       ),
       isSummer: now >= lastSummerStart && now <= new Date(first.year, first.month - 1, first.day)
@@ -135,7 +145,7 @@ class Dashboard extends Component {
     const today = new Date().getDay();
 
     this.setState({
-      crossSectionedMods: getCrossSectioned(schedule, today)
+      crossSectionedMods: getTodayCrossSectioned(schedule, today)
     });
   }
 
@@ -287,7 +297,28 @@ class Dashboard extends Component {
   }
 
   getNextClass = (now, currentMod) => {
-    const { schedule } = this.props;
+    const { schedule: regular } = this.props;
+    const {
+      isFinals,
+      schedule: timeTable,
+      isTeacher
+    } = this.state;
+
+    const schedule = this.state.isFinals ? [
+      regular.find(({ sourceType }) => sourceType === 'homeroom') || {
+        startMod: 0,
+        title: 'Homeroom',
+        length: 1,
+        day: now.getDay()
+      },
+      ...timeTable.slice(1).map((_, index, array) => ({
+        title: index === array.length - 1 && isTeacher ? 'Lunch & Grading' : 'Finals',
+        length: 1,
+        startMod: index + 1,
+        day: now.getDay()
+      }))
+    ] : regular;
+
     const { assemblyIndex } = this.state;
     const future = new Date(now.getTime() - DEVIATION);
     future.setMinutes(future.getMinutes() + 6, 0);
@@ -314,7 +345,7 @@ class Dashboard extends Component {
 
         return mod.day === now.getDay() && mods.includes(nextMod);
       })[0] || {
-        title: 'Open Mod',
+        title: 'OPEN MOD',
         body: ''
       }
     :
@@ -388,6 +419,7 @@ class Dashboard extends Component {
       nextMod,
       isBreak,
       isSummer,
+      isTeacher,
       crossSectionedMods,
       bgRef,
       assemblyIndex
@@ -408,7 +440,7 @@ class Dashboard extends Component {
     const now = new Date(new Date() - DEVIATION);
     const today = now.getDay();
 
-    const wednesdayFirstClass = this.getNextClass(now, 0);
+    const wednesdayFirstClass = today === 3 && this.getNextClass(now, 0);
 
     now.setMinutes(now.getMinutes() + 6);
     const nextModPassingPeriod = this.getCurrentMod(now);
@@ -499,7 +531,7 @@ class Dashboard extends Component {
                   }} />
               }
               {
-                homeroom !== null && counselor !== null && dean !== null ?
+                !isTeacher ?
                   <Carousel
                     autoplay={false}
                     bullets
@@ -526,9 +558,8 @@ class Dashboard extends Component {
                   <InMod
                     currentModNumber={currentMod}
                     untilModIsOver={formattedTimeUntil}
-                    nextMod={nextMod.title}
-                    nextModInfo={nextMod.body}
-                    crossSection={crossSectionedMods}
+                    nextMod={nextMod}
+                    todayCrossSectioned={crossSectionedMods}
                     assembly={currentMod === 'ASSEMBLY'}
                   />
                 :
@@ -536,9 +567,8 @@ class Dashboard extends Component {
                     <PassingPeriod
                       untilPassingPeriodIsOver={formattedTimeUntil}
                       nextModNumber={nextModPassingPeriod}
-                      nextMod={nextMod.title}
-                      nextModInfo={nextMod.body}
-                      crossSection={crossSectionedMods}
+                      nextMod={nextMod}
+                      todayCrossSectioned={crossSectionedMods}
                       assembly={nextModPassingPeriod === 'ASSEMBLY'}
                     />
                   :

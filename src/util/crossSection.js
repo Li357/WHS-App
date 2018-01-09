@@ -1,40 +1,38 @@
 import { Alert } from 'react-native';
 
-const alertCrossSectioned = currentCrossSectionedMods => {
+const alertCrossSectioned = (scheduleItem, currentCrossSectioned) => {
   Alert.alert(
     'Schedule',
     `You are cross sectioned for this mod with:
 
-    - ${currentCrossSectionedMods.map(({ title, body, length, startMod }) =>
-      `${title} in ${body} for mod(s) ${Array.from(new Array(length), (x, i) => i).map(key => key + startMod).join(', ')}`
+    - ${currentCrossSectioned.map(({ title, body, ...modObj }) =>
+      `${title} in ${body} for mod(s) ${getOverlappingMods(scheduleItem, modObj).join(', ')}`
     ).join('\n - ')}`
   );
 }
 
-const getClassMods = (length, startMod) => Array.from(new Array(length), (x, i) => i).map(key => key + startMod);
+const getClassMods = ({ length, startMod }) => Array.from(new Array(length), (x, i) => i).map(key => key + startMod);
 
-const isOverlapping = ({
-  startMod: firstStart,
-  length: firstLength
-}, {
-  startMod: secondStart,
-  length: secondLength
-}) => getClassMods(firstLength, firstStart).some(mod => getClassMods(secondLength, secondStart).includes(mod));
+const getOverlappingMods = (firstMod, secondMod) => {
+  return getClassMods(firstMod).filter(mod => getClassMods(secondMod).includes(mod));
+}
 
-const getCrossSectioned = (schedule, day) => schedule.filter((scheduleItem, index, array) =>
-  scheduleItem.day === day && index !== array.findIndex(anotherItem =>
+const getTodayCrossSectioned = (schedule, day) => schedule.filter((scheduleItem, index, array) =>
+  scheduleItem && scheduleItem.day === day && index !== array.findIndex(anotherItem =>
     anotherItem.day === scheduleItem.day && (
-      anotherItem.startMod === scheduleItem.startMod || isOverlapping(scheduleItem, anotherItem)
+      anotherItem.startMod === scheduleItem.startMod || getOverlappingMods(scheduleItem, anotherItem).length > 0
     )
   )
 );
 
-const getCurrentCrossSectioned = ({ startMod }, crossSectionedMods) => crossSectionedMods.filter(item =>
-  item.startMod === startMod // instead of startmod use current mod-ish?
+const getCurrentCrossSectioned = (scheduleItem, todayCrossSectioned) => todayCrossSectioned.filter(item =>
+  getOverlappingMods(scheduleItem, item).length > 0
 );
 
 export {
   alertCrossSectioned,
-  getCrossSectioned,
-  getCurrentCrossSectioned
+  getOverlappingMods,
+  getTodayCrossSectioned,
+  getCurrentCrossSectioned,
+  getClassMods
 };

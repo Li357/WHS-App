@@ -123,7 +123,7 @@ const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async di
       dispatch(receiveUserInfo(' '));
     } else {
       dispatch(setCredentials(username, password));
-      
+
       const studentOverview = $('.card-header + .card-block');
       const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
       const rawJSON = $('.page-content + script')[0].children[0].data.trim();
@@ -221,18 +221,35 @@ const fetchDates = refresh => async dispatch => {
                 second: false,
                 last: false,
                 late: false,
-                assembly: false
+                assembly: false,
+                finals: false
               };
               if(eventText.toUpperCase() === reasons[3]) {
                 obj.first = true;
                 dates.push(obj);
               } else if(eventText.toUpperCase() === reasons[4]) {
-                obj.last = true;
-                dates.push(obj);
+                [1, 0].forEach(extraDay => {
+                  dates.push({
+                    ...obj,
+                    finals: true,
+                    day: day - extraDay,
+                    last: extraDay === 0
+                  });
+                });
               } else if(eventText.toUpperCase().includes(reasons[1])) {
                 obj.late = true;
                 dates.push(obj);
               } else {
+                if(month === 12 && day > 14) {
+                  [1, 0].forEach(extraDay => {
+                    dates.push({
+                      ...obj,
+                      finals: true,
+                      day: day - (3 + extraDay)
+                    });
+                  });
+                }
+
                 Array.from(new Array(+td.toArray()[0].attribs.colspan || 1), (_, i) => i + 1).forEach(extraDay => {
                   dates.push({
                     ...obj,

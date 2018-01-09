@@ -12,85 +12,120 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 
 import {
   alertCrossSectioned,
-  getCurrentCrossSectioned
+  getCurrentCrossSectioned,
+  getOverlappingMods,
+  getClassMods
 } from './util/crossSection.js';
-import Warning from '../assets/images/warning.png';
 
 let isHalfMod;
 let currentCrossSectionedMods;
+let textStyleObj;
+let calculatedWidth;
 let content;
+let items;
+let specialItems;
+let visible;
+let position;
+
+const checkIfHalf = mod => mod >= 4 && mod <= 11;
+const range = (start, end) => Array.from(new Array(end - start), (_, i) => i + start);
+const getModHeight = (sum, mod) => sum +  75 / (checkIfHalf(mod) + 1);
+
+const { width } = Dimensions.get('window');
 
 const ScheduleItem = ({
   scheduleItem,
   crossSectionedMods,
-  textStyle
+  textStyle,
+  startModNumber,
+  isFinals
 }) => (
   currentCrossSectionedMods = getCurrentCrossSectioned(scheduleItem, crossSectionedMods),
   textStyleObj = {
     opacity: textStyle
   },
-  content = (
-    <View style={styles._scheduleCardWrappedContainer}>
-      <View style={styles._scheduleCardWrappedTextContainer}>
+  items = ({ title, body, length, startMod, sourceType }, hasModIndicator, index, modLength) => (
+    calculatedWidth = modLength && { width: width * 0.75 * 85 / modLength },
+    <View key={index}>
+      <View style={[
+          styles._scheduleCardWrappedTextContainer,
+          modLength && {
+            left: index > 0 ? 0 : width * 0.11
+          }
+      ]}>
         <Animated.Text style={[
           styles._scheduleCardWrappedText,
-          textStyleObj
-        ]}>{scheduleItem.title}</Animated.Text>
+          textStyleObj,
+          modLength && {
+            fontSize: 15
+          }
+        ]}>
+          {title}
+        </Animated.Text>
         {
-          scheduleItem.body &&
+          body &&
             <Animated.Text style={[
               styles._scheduleCardWrappedText,
-              textStyleObj
-            ]}>{scheduleItem.body}</Animated.Text>
+              textStyleObj,
+              modLength && {
+                fontSize: 15
+              }
+            ]}>
+              {body}
+            </Animated.Text>
         }
       </View>
       {
-        Array.from(new Array(scheduleItem.length), (_, i) => i).map(key =>
+        range(0, length).map(key =>
           (
-            isHalfMod = scheduleItem.startMod + key >= 4 && scheduleItem.startMod + key <= 11,
+            isHalfMod = startMod + key >= 4 && startMod + key <= 11,
             <View
               key={key}
               style={[
                 styles._scheduleCardItemContainer,
-                isHalfMod ? {
+                isHalfMod && !isFinals && {
                   height: 75 / 2
-                } : {},
-                currentCrossSectionedMods.length > 0 ? {
+                },
+                currentCrossSectionedMods.length > 0 && {
                   backgroundColor: 'rgba(255, 255, 102, 0.5)'
-                } : {}
+                }
               ]}
             >
               {
-                currentCrossSectionedMods.length > 0 &&
-                  <View style={styles._scheduleModWarningContainer}>
-                    <Image
-                      source={Warning}
-                      style={styles._scheduleModWarning}
-                    />
-                  </View>
+                hasModIndicator &&
+                  <Animated.Text style={[
+                    styles._scheduleCardItemMod,
+                    currentCrossSectionedMods.length > 0 && {
+                      width: width * 0.7 * 0.15
+                    },
+                    isHalfMod && !isFinals && {
+                      paddingTop: (75 / 2 - 17) / 2,
+                      paddingBottom: (75 / 2 - 17) / 2,
+                    },
+                    textStyleObj
+                  ]}>
+                    {startMod === 0 ? 'HR' : startMod + key + startModNumber}
+                  </Animated.Text>
               }
-              <Animated.Text style={[
-                styles._scheduleCardItemMod,
-                isHalfMod ? {
-                  paddingTop: (75 / 2 - 17) / 2,
-                  paddingBottom: (75 / 2 - 17) / 2,
-                } : {},
-                currentCrossSectionedMods.length > 0 ? {
-                  width: Dimensions.get('window').width * 0.65 * 0.0694
-                } : {},
-                textStyleObj
-              ]}>
-                {scheduleItem.startMod === 0 ? 'HR' : scheduleItem.startMod + key}
-              </Animated.Text>
               <View
                 style={[
                   styles._scheduleCardItem,
-                  scheduleItem.title === 'OPEN MOD' ? {
+                  title === 'OPEN MOD' && {
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  } : {},
-                  isHalfMod ? {
+                  },
+                  sourceType === 'annotation' && {
+                    backgroundColor: 'darkgray'
+                  },
+                  isHalfMod && !isFinals && {
                     height: 75 / 2
-                  } : {}
+                  },
+                  modLength && {
+                    width: width * 0.7 * 0.842 / modLength
+                  },
+                  modLength && modLength !== index + 1 && {
+                    borderRightColor: 'gray',
+                    borderRightWidth: 1
+                  }
                 ]}
               />
             </View>
@@ -99,14 +134,122 @@ const ScheduleItem = ({
       }
     </View>
   ),
-  currentCrossSectionedMods.length > 0 ?
-    <TouchableOpacity
-      onPress={() => alertCrossSectioned(getCurrentCrossSectioned(scheduleItem, crossSectionedMods))}
-    >
-      {content}
-    </TouchableOpacity>
-  :
-    content
+  specialItems = (scheduleItems, { length, startMod, endMod }) => (
+    calculatedWidth = { width: width * 0.7 * 0.85 / scheduleItems.length },
+    <View style={styles._scheduleCardItemSpecialContainer}>
+      {
+        scheduleItems.map(({ startMod: itemStart, endMod: itemEnd, title, body }, index) =>
+          (
+            position = index + 1 - Math.ceil(length / 2),
+            <View
+              key={index}
+              style={[
+                styles._scheduleCardWrappedTextContainer,
+                { // this assumes nobody has a cross-section of >3 classes
+                  left: `${Math.sign(position) * (position * 15 + width * 0.45 / length) + (position === 0 ? 15 : 0)}%`,
+                  top: +(itemStart > startMod) && range(startMod, itemStart).reduce(getModHeight, 0),
+                  bottom: +(itemEnd < endMod) && range(itemEnd, endMod).reduce(getModHeight, 0)
+                }
+              ]}
+            >
+              <Animated.Text style={[
+                styles._scheduleCardWrappedText,
+                textStyleObj,
+                calculatedWidth,
+                { fontSize: 15 }
+              ]}>
+                {title}
+              </Animated.Text>
+              {
+                body &&
+                  <Animated.Text style={[
+                    styles._scheduleCardWrappedText,
+                    textStyleObj,
+                    calculatedWidth,
+                    { fontSize: 15 }
+                  ]}>
+                    {body}
+                  </Animated.Text>
+              }
+            </View>
+          )
+        )
+      }
+      {
+        range(0, length).map(key =>
+          (
+            isHalfMod = startMod + key >= 4 && startMod + key <= 11,
+            scheduleItems.map((item, index, { length: modLength }) =>
+              (
+                visible = getClassMods(item).includes(key + startMod),
+                <View
+                  key={`${key} ${index}`}
+                  style={[
+                    styles._scheduleCardItemContainer,
+                    isHalfMod && !isFinals && {
+                      height: 75 / 2
+                    }
+                  ]}
+                >
+                  {
+                    index === 0 &&
+                      <Animated.Text style={[
+                        styles._scheduleCardItemMod,
+                        {
+                          width: width * 0.7 * 0.15
+                        },
+                        isHalfMod && !isFinals && {
+                          paddingTop: (75 / 2 - 17) / 2,
+                          paddingBottom: (75 / 2 - 17) / 2,
+                        },
+                        textStyleObj
+                      ]}>
+                        {item.startMod === 0 ? 'HR' : item.startMod + key + startModNumber}
+                      </Animated.Text>
+                  }
+                  <View
+                    style={[
+                      visible && styles._scheduleCardItem,
+                      item.sourceType === 'annotation' && visible && {
+                        backgroundColor: 'darkgray'
+                      },
+                      isHalfMod && !isFinals && {
+                        height: 75 / 2
+                      },
+                      {
+                        width: width * 0.7 * 0.842 / modLength
+                      },
+                      index !== modLength - 1 && visible && {
+                        borderRightColor: 'gray',
+                        borderRightWidth: 1,
+                      }
+                    ]}
+                  />
+                </View>
+              )
+            )
+          )
+        )
+      }
+    </View>
+  ),
+  <View style={[
+    styles._scheduleCardWrappedContainer,
+    currentCrossSectionedMods.length > 0 && styles._scheduleCardItemContainer
+  ]}>
+    {
+      currentCrossSectionedMods.length > 0 ?
+        scheduleItem.irregular ?
+          specialItems([scheduleItem.unmodified, ...currentCrossSectionedMods], scheduleItem)
+        :
+          [
+            scheduleItem,
+            ...currentCrossSectionedMods
+          ].map((scheduleItem, index, { length }) => items(scheduleItem, index < 1, index, length))
+      :
+        items(scheduleItem, true, 0)
+    }
+  </View>
 );
 
 const styles = EStyleSheet.create({
@@ -122,28 +265,19 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     top: 0,
-    left: 30,
+    left: '15%',
     right: 0,
     bottom: 0
   },
   scheduleCardWrappedText: {
     fontFamily: 'BebasNeueBook',
-    fontSize: 17
+    fontSize: 17,
+    textAlign: 'center'
   },
   scheduleCardItemContainer: {
     flexWrap: 'wrap',
     alignItems: 'flex-start',
-    flexDirection: 'row',
-    height: 75
-  },
-  scheduleModWarningContainer: {
-    width: '7.75%'
-  },
-  scheduleModWarning: {
-    width: 12,
-    height: 12,
-    marginTop: 31,
-    marginLeft: 2.5
+    flexDirection: 'row'
   },
   scheduleCardItemMod: {
     width: '15%',
@@ -157,6 +291,12 @@ const styles = EStyleSheet.create({
     width: '85%',
     height: 75,
     backgroundColor: 'lightgray'
+  },
+  scheduleCardItemSpecialContainer: {
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 102, 0.5)'
   }
 });
 

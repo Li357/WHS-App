@@ -8,16 +8,13 @@ import {
   View
 } from 'react-native';
 
-import { getCurrentCrossSectioned } from './crossSection.js';
-import Warning from '../../assets/images/warning.png';
-
 let content;
 
 const infoMap = ({
   value,
   title,
   textStyle,
-  crossSection,
+  isCrossSectioned,
   crossSectionOnPress
 }, index) => (
   content = (
@@ -37,7 +34,7 @@ const infoMap = ({
     {
       value && title &&
         (
-          crossSection && crossSection.length > 0 ?
+          isCrossSectioned ?
             <TouchableOpacity
               onPress={crossSectionOnPress}
               style={[

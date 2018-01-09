@@ -55,3 +55,4 @@ fastlane/screenshots
 .expo/
 android/
 ios/
+.tern-project
