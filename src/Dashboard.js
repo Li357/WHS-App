@@ -27,8 +27,6 @@ import infoMap from './util/infoMap.js';
 import LoadingGIF from '../assets/images/loading.gif';
 import BlankUser from '../assets/images/blank-user.png';
 
-const DEVIATION = (new Date().getDay() !== 3 ? 29 : 37) * 1000;
-
 class Dashboard extends Component {
   state = {
     timeUntil: 0,
@@ -46,7 +44,7 @@ class Dashboard extends Component {
   }
 
   async componentDidMount() {
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const today = now.getDay();
 
     await this.calculateBreak(); //wait until state is set (is getting batched)
@@ -77,7 +75,7 @@ class Dashboard extends Component {
         clearInterval(this.endDayInterval);
         if(state === 'active') {
           await this.selectSchedule();
-          if(this.getCurrentMod(new Date(new Date() - DEVIATION)) === 'BEFORE') {
+          if(this.getCurrentMod(new Date()) === 'BEFORE') {
             this.startBeginDayCountdown();
           } else {
             this.runTimer();
@@ -129,11 +127,12 @@ class Dashboard extends Component {
         late,
         assembly,
         finals,
+        early,
         day,
         month,
         year
       }) =>
-        !first && !last && !second && !late && !assembly && !finals &&
+        !first && !last && !second && !late && !assembly && !finals && !early &&
         +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
       ),
       isSummer: now >= lastSummerStart && now <= new Date(first.year, first.month - 1, first.day)
@@ -150,7 +149,7 @@ class Dashboard extends Component {
   }
 
   runTimer = () => {
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const currentMod = this.getCurrentMod(now);
     const nextMod = this.getNextClass(now, currentMod);
     this.setState({
@@ -162,7 +161,7 @@ class Dashboard extends Component {
   }
 
   calculateModCountdown = currentMod => {
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const wednesday = now.getDay() === 3;
     const {
       schedule,
@@ -202,7 +201,7 @@ class Dashboard extends Component {
         }));
       } else {
         clearInterval(this.interval);
-        const future = new Date(new Date() - DEVIATION);
+        const future = new Date();
         future.setMinutes(future.getMinutes() + 1, 0);
         const nextMod = this.getCurrentMod(future);
         const nextModClass = this.getNextClass(future, nextMod);
@@ -320,7 +319,7 @@ class Dashboard extends Component {
     ] : regular;
 
     const { assemblyIndex } = this.state;
-    const future = new Date(now.getTime() - DEVIATION);
+    const future = new Date(now.getTime());
     future.setMinutes(future.getMinutes() + 6, 0);
     const nextMod = currentMod === 'HR' ? 1 :
       currentMod === 'PASSING PERIOD' ?
@@ -362,13 +361,13 @@ class Dashboard extends Component {
   }
 
   getTimeUntilEnd = () => {
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const { schedule } = this.state;
     return new Date().setHours(...schedule.slice(-1)[0][1].split(':'), 0) - now;
   }
 
   getTimeUntilBegin = () => {
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const { schedule } = this.state;
     return new Date().setHours(...schedule[0][0].split(':'), 0) - now;
   }
@@ -437,7 +436,7 @@ class Dashboard extends Component {
     } = this.props;
 
     const formattedTimeUntil = this.formatTime(timeUntil);
-    const now = new Date(new Date() - DEVIATION);
+    const now = new Date();
     const today = now.getDay();
 
     const wednesdayFirstClass = today === 3 && this.getNextClass(now, 0);

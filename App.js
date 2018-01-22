@@ -144,7 +144,15 @@ class App extends Component {
         //SET_SCHEDULE is an action for testing
 
         //late check is to check if app has late dates
-        if(dates.length === 0 || (dates.length > 0 && (dates.every(({ late }) => !late) || dates.every(({ finals }) => !finals)))) { //Fetch dates on app first load
+        if(dates.length === 0 ||
+          (dates.length > 0 &&
+            (
+              dates.every(({ late }) => !late) ||
+              dates.every(({ finals }) => !finals) ||
+              dates.every(({ early }) => !early)
+            )
+          )
+        ) { //Fetch dates on app first load
           this.setState({
             status: 'Fetching school calendar...'
           });

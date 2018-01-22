@@ -134,8 +134,9 @@ const selectSchedule = (dates, now, isTeacher) => {;
   const isLast = isDate('last');
   const hasAssembly = isDate('assembly');
   const isFinals = isDate('finals');
+  const isEarly = isDate('early');
 
-  const schedule = isLast ?
+  const schedule = isLast || isEarly ?
     'oneOClock'
   :
     !hasAssembly ?

@@ -224,7 +224,8 @@ const fetchDates = refresh => async dispatch => {
                 last: false,
                 late: false,
                 assembly: false,
-                finals: false
+                finals: false,
+                early: false
               };
               if(eventText.toUpperCase() === reasons[3]) {
                 obj.first = true;
@@ -265,18 +266,30 @@ const fetchDates = refresh => async dispatch => {
       });
     }
 
-    if(year === 2017) {
-      dates.push({ //Nov 2 assembly - hardcoded (BAD!)
-        month: 11,
-        day: 2,
-        year: 2017,
+    dates.push({ //Nov 2 assembly - hardcoded (BAD!)
+      month: 11,
+      day: 2,
+      year: 2017,
+      first: false,
+      second: false,
+      last: false,
+      late: false,
+      assembly: true,
+      early: false
+    });
+    [0, 1].forEach(num => {
+      dates.push({ //Counselor days for next year schedule
+        month: 1,
+        day: 22 + num,
+        year: 2018,
         first: false,
         second: false,
         last: false,
         late: false,
-        assembly: true
+        assembly: false,
+        early: true
       });
-    }
+    });
 
     let pass = false; //only want check to run once
     const withSecondSemester = dates.reduce((newArray, { //find date of second semester start
@@ -285,7 +298,7 @@ const fetchDates = refresh => async dispatch => {
       day
     }, index) => {
       if(month === 1) { //Second semester is in January
-        if(dates[index + 1].day !== day + 1 && new Date(year, month - 1, day + 1).getDay() === 6 && !pass) { //if not consecutive and next day isn't weekend
+        if(dates[index + 1] && dates[index + 1].day !== day + 1 && new Date(year, month - 1, day + 1).getDay() === 6 && !pass) { //if not consecutive and next day isn't weekend
           pass = true;
           return [
             ...newArray,
