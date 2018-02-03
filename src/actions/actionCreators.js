@@ -341,5 +341,6 @@ export {
   logOut,
   saveProfilePhoto,
   fetchUserInfo,
+  receiveDates,
   fetchDates
 };

@@ -70,7 +70,7 @@ const ScheduleItem = ({
   textStyleObj = {
     opacity: textStyle
   },
-  items = ({ title, body, length, startMod, sourceType }, hasModIndicator, index, modLength) => (
+  items = ({ title, body, length, startMod, sourceType, assembly, assemblyIndex }, hasModIndicator, index, modLength) => (
     calculatedWidth = modLength && { width: width * 0.75 * 85 / modLength },
     <View key={index}>
       <View style={[
@@ -133,7 +133,15 @@ const ScheduleItem = ({
                     },
                     textStyleObj
                   ]}>
-                    {startMod === 0 ? 'HR' : startMod + key + startModNumber}
+                    {
+                      startMod === 0 ?
+                        'HR'
+                      :
+                        assembly ?
+                          'AS'
+                        :
+                          startMod - (startMod > assemblyIndex) + key + startModNumber
+                    }
                   </Animated.Text>
               }
               <View
@@ -236,7 +244,15 @@ const ScheduleItem = ({
                         },
                         textStyleObj
                       ]}>
-                        {item.startMod === 0 ? 'HR' : item.startMod + key + startModNumber}
+                        {
+                          item.startMod === 0 ?
+                            'HR'
+                          :
+                            assembly ?
+                              'AS'
+                            :
+                              item.startMod - (item.startMod > item.assemblyIndex) + key + startModNumber
+                        }
                       </Animated.Text>
                   }
                   <View

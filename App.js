@@ -32,6 +32,7 @@ import {
 } from 'redux-persist';
 import {
   fetchDates,
+  receiveDates,
   fetchUserInfo,
   setProfilePhoto,
   setRefreshed,
@@ -167,6 +168,27 @@ class App extends Component {
               ]
             );
           }
+        }
+
+        if(!dates.find(({
+          day,
+          month,
+          year
+        }) => day === 2 && month === 2 && year === 2018)) {
+          store.dispatch(receiveDates([
+            ...dates,
+            {
+              month: 2,
+              day: 2,
+              year: 2018,
+              first: false,
+              second: false,
+              last: false,
+              late: false,
+              assembly: true,
+              early: false
+            }
+          ]));
         }
       }
 

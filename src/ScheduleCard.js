@@ -97,6 +97,8 @@ class ScheduleCard extends Component {
     } = selectSchedule(dates, dayOfWeek, isTeacher);
     const startModNumber = isFinals && day === 5 ? 4 : 0;
 
+    const assemblyIndex = timeTable.findIndex(timePair => timePair[2] === 'ASSEMBLY');
+
     const schedule = !isTimes ?
       isFinals ?
         [
@@ -114,8 +116,10 @@ class ScheduleCard extends Component {
         daySchedule
     :
       timeTable.map((timePair, index) => ({
-        title: this.formatTableTimes(timePair),
+        title: this.formatTableTimes(timePair.slice(0, 2)),
         length: 1,
+        assembly: timePair[2] === 'ASSEMBLY',
+        assemblyIndex: assemblyIndex > -1 ? assemblyIndex : 15,
         startMod: index + (['wednesday', 'lateStartWednesday'].includes(string))
       }));
 

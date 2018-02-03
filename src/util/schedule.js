@@ -130,7 +130,9 @@ const selectSchedule = (dates, now, isTeacher) => {;
     key && +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
   );
 
+  const isFirst = isDate('first');
   const isLate = isDate('late');
+  const isSecond = isDate('second');
   const isLast = isDate('last');
   const hasAssembly = isDate('assembly');
   const isFinals = isDate('finals');
@@ -161,7 +163,7 @@ const selectSchedule = (dates, now, isTeacher) => {;
     isFinals,
     schedule: schedule === 'finals' && !isTeacher ? SCHEDULE[schedule].slice(0, -1) : SCHEDULE[schedule],
     string: schedule,
-    isBreak: !(isFinals || hasAssembly || isLast || isLate),
+    isBreak: !(isFirst || isSecond || isFinals || hasAssembly || isLast || isLate),
     isFinals
   };
 }

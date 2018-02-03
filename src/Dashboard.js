@@ -104,7 +104,7 @@ class Dashboard extends Component {
     this.setState({
       schedule,
       containsAssembly: hasAssembly,
-      assemblyIndex: schedule.find(timePair => timePair[2] === 'ASSEMBLY'),
+      assemblyIndex: schedule.findIndex(timePair => timePair[2] === 'ASSEMBLY'),
       isFinals,
       isTeacher
     });
