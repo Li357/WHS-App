@@ -176,7 +176,7 @@ class App extends Component {
           year
         }) => day === 2 && month === 2 && year === 2018)) {
           store.dispatch(receiveDates([
-            ...dates,
+            ...store.getState().dates,
             {
               month: 2,
               day: 2,
@@ -197,9 +197,10 @@ class App extends Component {
           username,
           password,
           id,
+          schoolPicture,
+          profilePhoto,
           refreshedOne,
           refreshedTwo,
-          schoolPicture,
           dates
         } = store.getState();
 
@@ -221,7 +222,7 @@ class App extends Component {
             status: 'Calculating the semester...'
           });
           const now = new Date();
-          const refreshTimes = dates.filter(date => date.first || date.second);
+          const refreshTimes = dates.filter(({ first, second }) => first || second);
           const [semesterTwo, semesterOne] = refreshTimes.map(({
             year,
             month,
@@ -231,21 +232,23 @@ class App extends Component {
             year,
             month,
             day
-          } = dates.filter(date => date.last)[0];
+          } = dates.filter(date => date.last)[0] || {};
 
-          if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
-            await store.dispatch(setRefreshed('one', true));
-            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
-          } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
-            await store.dispatch(setRefreshed('two', true));
-            await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
-          } else if(
-            +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth(), now.getDate()) //if after last day
-          ) {
-            await store.dispatch(setRefreshed('one', false));
-            await store.dispatch(setRefreshed('two', false));
-            await store.dispatch(setLastSummer(+new Date(year, month - 1, day)));
-            await store.dispatch(fetchDates(true)); //fetch dates after last day
+          if(year) {
+            if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
+              await store.dispatch(setRefreshed('one', true));
+              await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
+            } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
+              await store.dispatch(setRefreshed('two', true));
+              await store.dispatch(fetchUserInfo(username, password, true, profilePhoto && profilePhoto.startsWith('https://')));
+            } else if(
+              +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth(), now.getDate()) //if after last day
+            ) {
+              await store.dispatch(setRefreshed('one', false));
+              await store.dispatch(setRefreshed('two', false));
+              await store.dispatch(setLastSummer(+new Date(year, month - 1, day)));
+              await store.dispatch(fetchDates(true)); //fetch dates after last day
+            }
           }
         } catch(error) {
           Alert.alert(
@@ -257,6 +260,18 @@ class App extends Component {
           );
         }
       }
+
+      //try {
+
+      /*} catch(error) {
+        Alert.alert(
+          'Error',
+          `An error occurred: ${error}`,
+          [
+            { text: 'OK' }
+          ]
+        );
+      }*/
 
       this.setState({
         loading: false

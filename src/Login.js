@@ -18,7 +18,12 @@ import { connect } from 'react-redux';
 import cheerio from 'react-native-cheerio';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-import { fetchUserInfo } from './actions/actionCreators.js';
+import {
+  fetchUserInfo,
+  setRefreshed,
+  setLastSummer,
+  fetchDates
+} from './actions/actionCreators.js';
 import WHS from '../assets/images/WHS.png';
 import LoadingGIF from '../assets/images/loading.gif';
 
@@ -53,6 +58,7 @@ class Login extends Component {
     });
 
     await dispatch(fetchUserInfo(`${username[0].toUpperCase()}${username.slice(1)}`, password));
+    await this.calculateSemester();
 
     this.setState({
       loading: false
@@ -69,6 +75,43 @@ class Login extends Component {
           routeName: 'Dashboard'
         }
       });
+    }
+  }
+
+  calculateSemester = async () => {
+    const {
+      dates,
+      refreshedOne,
+      refreshedTwo,
+      dispatch
+    } = this.props;
+
+    const now = new Date();
+    const refreshTimes = dates.filter(({ first, second }) => first || second);
+    const [semesterTwo, semesterOne] = refreshTimes.map(({
+      year,
+      month,
+      day
+    }) => new Date(year, month - 1, day));
+    const {
+      year,
+      month,
+      day
+    } = dates.filter(({ last }) => last)[0] || {};
+
+    if(year) {
+      if(now >= semesterOne && now <= semesterTwo && !refreshedOne) { //if between sem 1 and sem 2 and not refreshed
+        await dispatch(setRefreshed('one', true));
+      } else if(now >= semesterTwo && now <= new Date(year, month - 1, day) && !refreshedTwo) { //if between sem 2 and last day of school and not refreshed
+        await dispatch(setRefreshed('two', true));
+      } else if(
+        +new Date(year, month - 1, day) <= +new Date(now.getFullYear(), now.getMonth(), now.getDate()) //if after last day
+      ) {
+        await dispatch(setRefreshed('one', false));
+        await dispatch(setRefreshed('two', false));
+        await dispatch(setLastSummer(+new Date(year, month - 1, day)));
+        await dispatch(fetchDates(true)); //fetch dates after last day
+      }
     }
   }
 
@@ -234,10 +277,16 @@ const styles = EStyleSheet.create({
 
 const mapStateToProps = ({
   error,
-  username
+  username,
+  dates,
+  refreshedOne,
+  refreshedTwo
 }) => ({
   error,
-  username
+  username,
+  dates,
+  refreshedOne,
+  refreshedTwo
 });
 
 export default connect(
