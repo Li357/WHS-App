@@ -216,7 +216,6 @@ class App extends Component {
           this.setState({
             status: 'Getting profile photo...'
           });
-          await this.checkProfilePicture();
           const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
           await store.dispatch(setProfilePhoto(profilePhoto ? profilePhoto : schoolPicture));
 
