@@ -205,7 +205,8 @@ class App extends Component {
         } = store.getState();
 
         try {
-          if(!schoolPicture) {
+          const pictureId = schoolPicture && schoolPicture.slice(63);
+          if(!schoolPicture || pictureId.length === 5 && pictureId === id) {
             this.setState({
               status: 'Getting school picture...'
             });
@@ -215,6 +216,7 @@ class App extends Component {
           this.setState({
             status: 'Getting profile photo...'
           });
+          await this.checkProfilePicture();
           const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
           await store.dispatch(setProfilePhoto(profilePhoto ? profilePhoto : schoolPicture));
 
