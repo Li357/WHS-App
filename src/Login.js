@@ -22,7 +22,8 @@ import {
   fetchUserInfo,
   setRefreshed,
   setLastSummer,
-  fetchDates
+  fetchDates,
+  fetchSpecialDates
 } from './actions/actionCreators.js';
 import WHS from '../assets/images/WHS.png';
 import LoadingGIF from '../assets/images/loading.gif';
@@ -50,7 +51,8 @@ class Login extends Component {
 
     const {
       dispatch,
-      navigation
+      navigation,
+      dates
     } = this.props;
 
     this.setState({
@@ -59,6 +61,11 @@ class Login extends Component {
 
     await dispatch(fetchUserInfo(`${username[0].toUpperCase()}${username.slice(1)}`, password));
     await this.calculateSemester();
+
+    if(dates.length < 1) {
+      await dispatch(fetchDates());
+      await dispatch(fetchSpecialDates());
+    }
 
     this.setState({
       loading: false

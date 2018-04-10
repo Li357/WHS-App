@@ -32,6 +32,7 @@ import {
 } from 'redux-persist';
 import {
   fetchDates,
+  fetchSpecialDates,
   receiveDates,
   fetchUserInfo,
   setProfilePhoto,
@@ -159,6 +160,13 @@ class App extends Component {
           });
           try {
             await store.dispatch(fetchDates());
+
+            if(store.getState().dates.length > 0) {
+              this.setState({
+                status: 'Fetching special dates...'
+              });
+              await store.dispatch(fetchSpecialDates()) //Maybe pass current year to get current year special dates
+            }
           } catch(error) {
             Alert.alert(
               'Error',
@@ -168,27 +176,6 @@ class App extends Component {
               ]
             );
           }
-        }
-
-        if(!dates.find(({
-          day,
-          month,
-          year
-        }) => day === 2 && month === 2 && year === 2018)) {
-          store.dispatch(receiveDates([
-            ...store.getState().dates,
-            {
-              month: 2,
-              day: 2,
-              year: 2018,
-              first: false,
-              second: false,
-              last: false,
-              late: false,
-              assembly: true,
-              early: false
-            }
-          ]));
         }
       }
 
@@ -205,6 +192,13 @@ class App extends Component {
         } = store.getState();
 
         try {
+          if(!dates.find(({ special }) => !special)) {
+            this.setState({
+              status: 'Fetching special dates...'
+            });
+            await store.dispatch(fetchSpecialDates()) //Maybe pass current year to get current year special dates
+          }
+
           const pictureId = schoolPicture && schoolPicture.slice(63);
           if(!schoolPicture || pictureId.length === 5 && pictureId === id) {
             this.setState({
@@ -261,18 +255,6 @@ class App extends Component {
           );
         }
       }
-
-      //try {
-
-      /*} catch(error) {
-        Alert.alert(
-          'Error',
-          `An error occurred: ${error}`,
-          [
-            { text: 'OK' }
-          ]
-        );
-      }*/
 
       this.setState({
         loading: false

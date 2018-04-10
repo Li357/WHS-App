@@ -266,31 +266,6 @@ const fetchDates = refresh => async dispatch => {
       });
     }
 
-    dates.push({ //Nov 2 assembly - hardcoded (BAD!)
-      month: 11,
-      day: 2,
-      year: 2017,
-      first: false,
-      second: false,
-      last: false,
-      late: false,
-      assembly: true,
-      early: false
-    });
-    [0, 1].forEach(num => {
-      dates.push({ //Counselor days for next year schedule
-        month: 1,
-        day: 22 + num,
-        year: 2018,
-        first: false,
-        second: false,
-        last: false,
-        late: false,
-        assembly: false,
-        early: true
-      });
-    });
-
     let pass = false; //only want check to run once
     const withSecondSemester = dates.reduce((newArray, { //find date of second semester start
       year,
@@ -332,6 +307,38 @@ const fetchDates = refresh => async dispatch => {
   }
 };
 
+const fetchSpecialDates = () => async (dispatch, getState) => {
+  try {
+    const { dates } = getState();
+
+    const specDates = await fetch(`https://whs-server.herokuapp.com/dates`, { timeout: 3000 });
+    const specJSON = await specDates.json();
+
+    const fetched = specJSON.filter(({
+      month,
+      day,
+      year
+    }) => !dates.find(({
+      month: dMonth,
+      day: dDay,
+      year: dYear
+    }) => month == dMonth && day == dDay && year == dYear));
+
+    await dispatch(receiveDates([
+      ...dates,
+      ...fetched
+    ]));
+  } catch(error) {
+    Alert.alert(
+      'Error',
+      'An error occurred, please check your internet connection.',
+      [
+        { text: 'OK' }
+      ]
+    );
+  }
+}
+
 export {
   setCredentials,
   receiveUserInfo,
@@ -342,5 +349,6 @@ export {
   saveProfilePhoto,
   fetchUserInfo,
   receiveDates,
-  fetchDates
+  fetchDates,
+  fetchSpecialDates
 };
