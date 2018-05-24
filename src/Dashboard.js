@@ -135,7 +135,7 @@ class Dashboard extends Component {
         !first && !last && !second && !late && !assembly && !finals && !early &&
         +new Date(year, month - 1, day) === now.setHours(0, 0, 0, 0)
       ),
-      isSummer: now >= lastSummerStart && now <= new Date(first.year, first.month - 1, first.day)
+      isSummer: now >= lastSummerStart && (first.year === now.getFullYear() ? now <= new Date(first.year, first.month - 1, first.day) : true)
     });
   }
 

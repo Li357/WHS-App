@@ -345,6 +345,7 @@ export {
   setProfilePhoto,
   setSchoolPicture,
   setRefreshed,
+  setLastSummer,
   logOut,
   saveProfilePhoto,
   fetchUserInfo,

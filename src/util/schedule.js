@@ -135,10 +135,10 @@ const selectSchedule = (dates, now, isTeacher) => {;
   const isSecond = isDate('second');
   const isLast = isDate('last');
   const hasAssembly = isDate('assembly');
-  const isFinals = isDate('finals');
+  const isFinals = isLast || isDate('finals');
   const isEarly = isDate('early');
 
-  const schedule = isLast || isEarly ?
+  const schedule = isEarly ?
     'oneOClock'
   :
     !hasAssembly ?
@@ -163,8 +163,7 @@ const selectSchedule = (dates, now, isTeacher) => {;
     isFinals,
     schedule: schedule === 'finals' && !isTeacher ? SCHEDULE[schedule].slice(0, -1) : SCHEDULE[schedule],
     string: schedule,
-    isBreak: !(isFirst || isSecond || isFinals || hasAssembly || isLast || isLate),
-    isFinals
+    isBreak: !(isFirst || isSecond || isFinals || hasAssembly || isLast || isLate)
   };
 }
 

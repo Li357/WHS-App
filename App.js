@@ -177,6 +177,11 @@ class App extends Component {
             );
           }
         }
+
+        /* Filter May 2, 2018 - For some reason (need to delete soon) */
+        if(dates.find(({ month, year, day }) => month === 5 && year === 2018 && day === 2)) {
+          store.dispatch(receiveDates(dates.filter(({ month, year, day }) => !(month === 5 && year === 2018 && day === 2))));
+        }
       }
 
       if(this.hasLoggedIn()) {
@@ -188,6 +193,7 @@ class App extends Component {
           profilePhoto,
           refreshedOne,
           refreshedTwo,
+          lastSummerStart,
           dates
         } = store.getState();
 
@@ -200,7 +206,7 @@ class App extends Component {
           }
 
           const pictureId = schoolPicture && schoolPicture.slice(63);
-          if(!schoolPicture || pictureId.length === 5 && pictureId === id) {
+          if(!schoolPicture || (pictureId.length === 5 && pictureId === id)) {
             this.setState({
               status: 'Getting school picture...'
             });
@@ -241,8 +247,11 @@ class App extends Component {
             ) {
               await store.dispatch(setRefreshed('one', false));
               await store.dispatch(setRefreshed('two', false));
-              await store.dispatch(setLastSummer(+new Date(year, month - 1, day)));
-              await store.dispatch(fetchDates(true)); //fetch dates after last day
+              await store.dispatch(setLastSummer(new Date(year, month - 1, day)));
+            } else if(
+              lastSummerStart && +new Date(now.getFullYear(), now.getMonth(), now.getDate()) >= +lastSummerStart
+            ) {
+              await store.dispatch(fetchDates(true)); //fetch dates two months after end
             }
           }
         } catch(error) {

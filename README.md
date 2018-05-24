@@ -1,9 +1,11 @@
 # WHS
 
+
+
 A schedule & mod information app for [WHS](http://whs.westside66.org/). Created
 with [Expo](https://expo.io/)/[CRNA](https://github.com/react-community/create-react-native-app)
 & [React Native](https://facebook.github.io/react-native/) by Andrew Li. This has
-been ejected. © 2017 Andrew Li, MIT License.
+been ejected. © 2018 Andrew Li, MIT License.
 
 # Known Bugs
 
