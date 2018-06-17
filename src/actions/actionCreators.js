@@ -1,4 +1,4 @@
-import { Alert, AsyncStorage } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import fetch from 'react-native-fetch-polyfill';
 import { load } from 'react-native-cheerio';
 
@@ -15,7 +15,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
   type,
   ...argNames.reduce((argObj, argName, index) => ({
     ...argObj,
-    argName: args[index],
+    [argName]: args[index],
   }), {}),
 });
 
@@ -59,24 +59,26 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
       // TODO: Logout then alert error
       return;
     }
-    dispatch(setCredentials(username, password));
 
     const jsonPrefix = 'window._pageDataJson = \'';
     const profilePhotoPrefix = 'background-image: url(';
 
+    // This is either 'Class of 20XX' or 'Teacher'
     const nameSubtitle = $('.header-title > h6').text();
     const infoCard = $('.card-header + .card-block');
-    const scheduleString = $('.page-content + script').contents()[0];
+    const scheduleString = $('.page-content + script').contents()[0].data.trim();
     const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
     const studentPicture = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
-    // This is either 'Class of 20XX' or 'Teacher'
 
+    // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
     const studentInfo = nameSubtitle !== 'Teacher'
       ? infoCard
-        .find('.card-subtitle:not(.text-muted), .card-text:last-child')
+        .find('.card-subtitle a, .card-text:last-child')
         .contents()
+        .map((index, { data }) => data.split(':').slice(-1)[0].trim())
       : [null, null, null];
 
+    dispatch(setCredentials(username, password));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, schedule, studentPicture));
 
     // This prevents the erasure of profile photos on a user info fetch
@@ -84,11 +86,8 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
   } catch (error) {
     // TODO: Better error reporting
-    Alert.alert(
-      'Error', 'An error occurred, please check your internet connection.',
-      [{ text: 'OK' }],
-    );
     dispatch(setLoginError(error));
+    throw error; // Throw back to show alert UIs
   }
 };
 

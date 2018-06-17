@@ -36,36 +36,46 @@ const hasLoggedIn = () => {
 };
 
 export default class App extends Component {
-  render() {
-    const Drawer = createDrawerNavigator({
-      Dashboard: { screen: Dashboard },
-      Schedule: { screen: Schedule },
-      Settings: { screen: Settings },
-    }, {
-      initialRouteName: 'Dashboard',
-      contentOptions: {
-        activeTintColor: 'black',
-        inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
-      },
-    });
+  state = { rehydrated: false }
 
-    const Navigator = createStackNavigator({
-      Login: { screen: Login },
-      Drawer: { screen: Drawer },
-    }, {
-      initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login',
-      navigationOptions: {
-        header: null,
-        gesturesEnabled: false,
-      },
-    });
+  handleRehydrate = () => {
+    this.setState({ rehydrated: true });
+  }
+
+  render() {
+    const { rehydrated } = this.state;
+    let Navigator;
+    if (rehydrated) {
+      const Drawer = createDrawerNavigator({
+        Dashboard: { screen: Dashboard },
+        Schedule: { screen: Schedule },
+        Settings: { screen: Settings },
+      }, {
+        initialRouteName: 'Dashboard',
+        contentOptions: {
+          activeTintColor: 'black',
+          inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      });
+
+      Navigator = createStackNavigator({
+        Login: { screen: Login },
+        Drawer: { screen: Drawer },
+      }, {
+        initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login',
+        navigationOptions: {
+          header: null,
+          gesturesEnabled: false,
+        },
+      });
+    }
 
     return (
       <Provider store={store}>
-        <PersistGate loading={/* TODO */ null} persistor={persistor}>
+        <PersistGate loading={/* TODO */ null} persistor={persistor} onBeforeLift={this.handleRehydrate}>
           <View style={styles.container}>
             <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
-            <Navigator onNavigationStateChange={null} style={{width: 305}} />
+            {Navigator && <Navigator onNavigationStateChange={null} />}
           </View>
         </PersistGate>
       </Provider>
@@ -79,4 +89,9 @@ const styles = EStyleSheet.create({
   },
 });
 
-EStyleSheet.build();
+EStyleSheet.build({
+  $fontThin: 'Roboto-Thin',
+  $fontLight: 'Roboto-Light',
+  $fontRegular: 'Roboto-Regular',
+  $fontBold: 'Roboto-Bold',
+});
