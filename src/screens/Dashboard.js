@@ -7,7 +7,6 @@ import { withNavigation } from 'react-navigation';
 
 import UserInfo from '../components/UserInfo';
 import withHamburger from '../util/withHamburger';
-import Background from '../../assets/images/background.jpg';
 
 const mapStateToProps = ({
   loginError, schedule, dates, ...studentInfo,

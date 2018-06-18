@@ -5,8 +5,8 @@ import { Container, Input, Item, Button, Icon } from 'native-base';
 import { connect } from 'react-redux';
 
 import { fetchUserInfo } from '../actions/actionCreators';
-import WHSLogo from '../../assets/images/WHS.png';
-import Loading from '../../assets/images/loading.gif';
+import logo from '../../assets/images/WHS.png';
+import loading from '../../assets/images/loading.gif';
 
 @connect()
 export default class Login extends Component {
@@ -42,7 +42,7 @@ export default class Login extends Component {
 
     return (
       <Container style={styles.container}>
-        <Image source={WHSLogo} style={styles.logo} />
+        <Image source={logo} style={styles.logo} />
         <Text style={styles.text}>Login to WHS</Text>
         <Item rounded style={styles.inputContainer}>
           <Input
@@ -63,7 +63,7 @@ export default class Login extends Component {
           <Text style={styles.loginText}>Login</Text>
           {
             loggingIn ?
-              <Image source={Loading} style={styles.loading} />
+              <Image source={loading} style={styles.loading} />
             :
               <Icon name="arrow-forward" />
           }
