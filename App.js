@@ -15,6 +15,7 @@ import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
+import DrawerContent from './src/util/DrawerContent';
 import { setProfilePhoto } from './src/actions/actionCreators';
 
 const persistConfig = {
@@ -71,6 +72,7 @@ export default class App extends Component {
         Settings: { screen: Settings },
       }, {
         initialRouteName: 'Dashboard',
+        contentComponent: DrawerContent,
         contentOptions: {
           activeTintColor: 'black',
           inactiveTintColor: 'rgba(0, 0, 0, 0.5)',

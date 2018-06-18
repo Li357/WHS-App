@@ -105,10 +105,12 @@ const styles = EStyleSheet.create({
   name: {
     textAlign: 'center',
     fontSize: 25,
+    fontFamily: '$fontRegular',
   },
   classOf: {
     textAlign: 'center',
     fontSize: 17,
+    fontFamily: '$fontRegular',
     marginBottom: '$studentInfoHeight - 32%',
   },
 });
