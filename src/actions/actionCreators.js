@@ -82,7 +82,7 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, schedule, studentPicture));
 
     // This prevents the erasure of profile photos on a user info fetch
-    const profilePhoto = await AsyncStorage.getItem('profilePhoto');
+    const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
   } catch (error) {
     // TODO: Better error reporting
@@ -93,6 +93,9 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
 
 const fetchSpecialDates = () => {
   // TODO: Finish up calendar scraping
+  // May decide to parse PDFs instead of
+  // relying solely on school calendars
+  // for more stable sources
 };
 
 export {

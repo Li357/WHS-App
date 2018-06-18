@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { Alert, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -15,10 +15,12 @@ import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
+import { setProfilePhoto } from './src/actions/actionCreators';
 
 const persistConfig = {
   key: 'root',
   storage,
+  blacklist: ['profilePhoto'],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
 const store = createStore(
@@ -36,16 +38,33 @@ const hasLoggedIn = () => {
 };
 
 export default class App extends Component {
-  state = { rehydrated: false }
+  state = { loaded: false }
 
-  handleRehydrate = () => {
-    this.setState({ rehydrated: true });
+  handleRehydrate = async () => {
+    // This runs some preload manual rehydrating and calculating after auto rehydrate
+    if (hasLoggedIn()) {
+      try {
+        // Explicit blacklist from store rehydration and manual getting
+        // of profile photo gets rid of profile photo collision when
+        // more than two people login on the same device
+        const { username, schoolPicture } = store.getState();
+        const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
+        store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
+      } catch (error) {
+        Alert.alert(
+          'Error', `${error}`,
+          [{ text: 'OK' }],
+        );
+        // TODO: Alert error & better error reporting
+      }
+    }
+    this.setState({ loaded: true });
   }
 
   render() {
-    const { rehydrated } = this.state;
+    const { loaded } = this.state;
     let Navigator;
-    if (rehydrated) {
+    if (loaded) {
       const Drawer = createDrawerNavigator({
         Dashboard: { screen: Dashboard },
         Schedule: { screen: Schedule },
@@ -72,10 +91,17 @@ export default class App extends Component {
 
     return (
       <Provider store={store}>
-        <PersistGate loading={/* TODO */ null} persistor={persistor} onBeforeLift={this.handleRehydrate}>
+        <PersistGate
+          loading={null}
+          persistor={persistor}
+          onBeforeLift={this.handleRehydrate}
+        >
           <View style={styles.container}>
             <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
-            {Navigator && <Navigator onNavigationStateChange={null} />}
+            {
+              loaded &&
+                <Navigator onNavigationStateChange={null} />
+            }
           </View>
         </PersistGate>
       </Provider>
@@ -83,7 +109,7 @@ export default class App extends Component {
   }
 }
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },

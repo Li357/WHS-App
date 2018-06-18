@@ -81,8 +81,8 @@ const styles = EStyleSheet.create({
     backgroundColor: 'white',
   },
   logo: {
-    width: '50%',
-    height: '25%',
+    width: '44%',
+    height: '22%',
   },
   text: {
     fontSize: 40,
