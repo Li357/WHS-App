@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Image, View, findNodeHandle, StyleSheet } from 'react-native';
 import { BlurView } from 'react-native-blur';
 
-export default class UserBackground extends Component {
+export default class UserBackground extends PureComponent {
   state = { blurRef: null }
 
   handleImageLoad = () => {

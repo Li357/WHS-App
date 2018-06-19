@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Alert, AsyncStorage, View, Text, Dimensions, StyleSheet } from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-export default class UserInfo extends Component {
+export default class UserInfo extends PureComponent {
   saveProfilePhoto = async (newPhoto) => {
     try {
       const { username } = this.props;

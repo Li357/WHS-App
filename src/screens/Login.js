@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Alert, Image, Text } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { Container, Input, Item, Button, Icon } from 'native-base';
@@ -9,7 +9,7 @@ import logo from '../../assets/images/WHS.png';
 import loading from '../../assets/images/loading.gif';
 
 @connect()
-export default class Login extends Component {
+export default class Login extends PureComponent {
   state = {
     username: '',
     password: '',
