@@ -3,12 +3,18 @@ import { Alert, AsyncStorage, View, Text, Dimensions, StyleSheet } from 'react-n
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { connect } from 'react-redux';
 
+import { setProfilePhoto } from '../actions/actionCreators';
+
+@connect()
 export default class UserInfo extends PureComponent {
   saveProfilePhoto = async (newPhoto) => {
     try {
-      const { username } = this.props;
-      await AsyncStorage.setItem(`${username}:profilePhoto`, newPhoto);
+      const { username, dispatch } = this.props;
+      const base64 = `data:image/jpeg;base64,${newPhoto}`; // newPhoto is a base64 encoded image
+      await AsyncStorage.setItem(`${username}:profilePhoto`, base64); // Set in AsyncStorage
+      dispatch(setProfilePhoto(base64)); // Also set in state for current app session
     } catch (error) {
       Alert.alert(
         'Error', `${error}`,
