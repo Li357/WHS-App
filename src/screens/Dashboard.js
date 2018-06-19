@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, Dimensions } from 'react-native';
-import ReactNativeParallaxHeader from 'react-native-parallax-header';
+import { View, Image, Text, Dimensions } from 'react-native';
+import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
 
 import UserInfo from '../components/UserInfo';
+import UserBackground from '../components/UserBackground';
 import withHamburger from '../util/withHamburger';
 
 const mapStateToProps = ({
@@ -14,50 +15,56 @@ const mapStateToProps = ({
   ...studentInfo,
 });
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 @withNavigation
 @withHamburger
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
-  handleScroll = ({ nativeEvent: { contentOffset } }) => {
-    console.log(contentOffset.y);
-  }
-
-  renderNavBar = () => {
-    return <UserInfo {...this.props} />
-  }
-
-  renderContent = () => {
+  renderForeground = () => <UserInfo {...this.props} />
+  renderBackground = () => <UserBackground {...this.props} />
+  renderStickyHeader = () => {
+    const profilePhotoObj = { uri: this.props.schoolPicture }
     return (
-      <ScrollView onScroll={this.handleScroll} style={styles.scheduleInfo}>
-
-      </ScrollView>
+      <View style={styles.header}>
+        <Image source={profilePhotoObj} style={styles.headerImage} />
+      </View>
     );
   }
 
   render() {
-    // TODO: Refactor ScrollView into new component ScheduleInfo
+    // TODO: Refactor content of Dashboard into new component ScheduleInfo
     // This component will be presentational, with countdown logic
     // and mod calculations in this component
-    //
-    // TODO: Fix this Parallax Header and hook it up to profile photo
-    // and image resizing animation
     return (
-      <ReactNativeParallaxHeader
-        headerMinHeight={height * 0.1}
-        headerMaxHeight={height * 0.35}
-        renderNavBar={this.renderNavBar}
-        renderContent={this.renderContent}
-        extraScrollHeight={50}
-      />
+      <ParallaxScrollView
+        backgroundColor="#c73436"
+        parallaxHeaderHeight={height * 0.35}
+        stickyHeaderHeight={height * 0.1}
+        renderForeground={this.renderForeground}
+        renderBackground={this.renderBackground}
+        renderStickyHeader={this.renderStickyHeader}
+        showsVerticalScrollIndicator={false}
+      >
+
+      </ParallaxScrollView>
     );
   }
 }
 
 const styles = EStyleSheet.create({
-  scheduleInfo: {
-    //height: '65%',
-    backgroundColor: 'white',
+  header: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  headerImage: {
+    alignSelf: 'flex-end',
+    width: '10%',
+    height: width * 0.1,
+    borderRadius: width * 0.1 / 2,
+    marginTop: '3%',
+    right: '6%',
+  }
 });

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { View, Image, Text, ScrollView } from 'react-native';
 import { Container } from 'native-base';
 import { DrawerItems, SafeAreaView } from 'react-navigation';
-import ReactNativeParallaxHeader from 'react-native-parallax-header';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 

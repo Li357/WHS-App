@@ -1,0 +1,46 @@
+import React, { Component } from 'react';
+import { Image, View, findNodeHandle, StyleSheet } from 'react-native';
+import { BlurView } from 'react-native-blur';
+
+export default class UserBackground extends Component {
+  state = { blurRef: null }
+
+  handleImageLoad = () => {
+    this.setState({ blurRef: findNodeHandle(this.backgroundImage) });
+  }
+
+  render() {
+    // TODO: Reset back to school picture
+    const { blurRef } = this.state;
+    const profilePhotoObj = { uri: this.props.profilePhoto };
+
+    return (
+      <View style={styles.blurContainer}>
+        <Image
+          ref={(img) => { this.backgroundImage = img; }}
+          source={profilePhotoObj}
+          onLoadEnd={this.handleImageLoad}
+          style={styles.blur}
+        />
+        <BlurView
+          viewRef={blurRef}
+          blurType="light"
+          blurAmount={5}
+          style={styles.blur}
+        />
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  blurContainer: {
+    width: '100%',
+    height: '100%',
+  },
+  blur: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+});

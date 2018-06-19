@@ -5012,9 +5012,11 @@ react-native-keyboard-aware-scroll-view@0.5.0:
     prop-types "^15.6.0"
     react-native-iphone-x-helper "^1.0.1"
 
-react-native-parallax-header@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/react-native-parallax-header/-/react-native-parallax-header-1.0.6.tgz#87edbd52d4849aab89e3180f0a0e85d80faad347"
+"react-native-parallax-scroll-view@git+https://github.com/Li357/react-native-parallax-scroll-view.git":
+  version "0.21.1"
+  resolved "git+https://github.com/Li357/react-native-parallax-scroll-view.git#8aab6e8c062a539ed6e2d8b20afc2c6da3cd3ef7"
+  dependencies:
+    prop-types "^15.6.0"
 
 react-native-parse-html@^2.2.6:
   version "2.2.6"
