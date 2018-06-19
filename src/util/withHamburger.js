@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Icon } from 'native-base';
+import { withNavigation } from 'react-navigation';
 
 const Hamburger = ({ navigation: { openDrawer } }) => (
   <Button transparent onPress={openDrawer} style={styles.hamburgerContainer}>
@@ -8,10 +9,11 @@ const Hamburger = ({ navigation: { openDrawer } }) => (
   </Button>
 );
 
-const withHamburger = (Component) => ({ navigation }) => (
+const NavigationHamburger = withNavigation(Hamburger);
+const withHamburger = Component => () => (
   <View style={styles.container}>
     <Component />
-    <Hamburger navigation={navigation} />
+    <NavigationHamburger />
   </View>
 );
 export default withHamburger;
@@ -27,6 +29,6 @@ const styles = StyleSheet.create({
   },
   hamburger: {
     fontSize: 35,
-    color: 'black'
+    color: 'black',
   },
 });

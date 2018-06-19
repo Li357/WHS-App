@@ -3,6 +3,11 @@
   "extends": "airbnb",
   "rules": {
     "no-use-before-define": ["error", { "variables": false }],
-    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }]
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
+    "react/prop-types": "off"
+  },
+  "globals": {
+    "it": false,
+    "expect": false
   }
 }

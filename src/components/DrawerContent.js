@@ -1,19 +1,44 @@
 import React, { Component } from 'react';
-import { View, Image, Text, ScrollView } from 'react-native';
-import { Container } from 'native-base';
-import { DrawerItems, SafeAreaView } from 'react-navigation';
+import { View, Image, Text } from 'react-native';
+import { Container, Button, Icon } from 'native-base';
+import { DrawerItems, withNavigation } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
-import Background from '../../assets/images/background.jpg';
+import { logOut } from '../actions/actionCreators';
+import background from '../../assets/images/background.png';
 
+const mapStateToProps = (state, ownProps) => ({
+  ...state,
+  ...ownProps,
+});
+
+@withNavigation
+@connect(mapStateToProps)
 export default class DrawerContent extends Component {
+  handleLogout = () => {
+    const { dispatch, navigation: { navigate } } = this.props;
+    dispatch(logOut());
+    navigate('Login');
+  }
+
   render() {
+    const now = moment();
+
     return (
       <Container style={styles.container}>
-        <Image source={Background} style={styles.header} />
-        <Text style={styles.date}>{moment().format('MMMM D, YYYY')}</Text>
+        <Image source={background} style={styles.header} />
+        <View style={styles.dateContainer}>
+          <Text style={styles.weekday}>{now.format('dddd')}</Text>
+          <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
+        </View>
         <DrawerItems {...this.props} />
+        <View style={styles.separator} />
+        <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
+          <Icon name="md-log-out" style={styles.icon} />
+          <Text allowFontScaling style={styles.text}>Logout</Text>
+        </Button>
       </Container>
     );
   }
@@ -29,12 +54,39 @@ const styles = EStyleSheet.create({
     position: 'relative',
     height: '30%',
   },
-  date: {
+  dateContainer: {
     position: 'absolute',
-    top: '23%',
-    left: '5%',
+    top: '16%',
+    left: '6%',
+  },
+  weekday: {
+    fontSize: 30,
+    color: 'white',
+    fontFamily: '$fontRegular',
+  },
+  date: {
     fontSize: 35,
     color: 'white',
-    fontFamily: '$fontLight'
+    fontFamily: '$fontLight',
+  },
+  separator: {
+    marginHorizontal: 18,
+    borderBottomColor: 'lightgrey',
+    borderBottomWidth: 0.75,
+  },
+  logout: {
+    marginHorizontal: 16,
+  },
+  icon: {
+    fontSize: 20,
+    marginLeft: 0,
+    marginRight: 20,
+    paddingLeft: 4,
+    color: 'rgba(0, 0, 0, 0.4)',
+  },
+  text: {
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    color: 'rgba(0, 0, 0, 0.4)',
   },
 });

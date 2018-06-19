@@ -91,15 +91,13 @@ const styles = EStyleSheet.create({
     marginBottom: 30,
   },
   inputContainer: {
-    borderWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     width: '70%',
     margin: 5,
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingHorizontal: 10,
   },
   input: {
     fontSize: 18,

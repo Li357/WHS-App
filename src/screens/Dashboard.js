@@ -1,30 +1,29 @@
 import React, { Component } from 'react';
-import { View, Image, Text, Dimensions } from 'react-native';
+import { View, Image, Dimensions } from 'react-native';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
+import { Icon } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
-import { withNavigation } from 'react-navigation';
 
 import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
 import withHamburger from '../util/withHamburger';
 
 const mapStateToProps = ({
-  loginError, schedule, dates, ...studentInfo,
+  loginError, schedule, dates, ...studentInfo
 }) => ({
   ...studentInfo,
 });
 
 const { height, width } = Dimensions.get('window');
 
-@withNavigation
 @withHamburger
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
   renderForeground = () => <UserInfo {...this.props} />
   renderBackground = () => <UserBackground {...this.props} />
   renderStickyHeader = () => {
-    const profilePhotoObj = { uri: this.props.schoolPicture }
+    const profilePhotoObj = { uri: this.props.schoolPicture };
     return (
       <View style={styles.header}>
         <Image source={profilePhotoObj} style={styles.headerImage} />
@@ -46,11 +45,18 @@ export default class Dashboard extends Component {
         renderStickyHeader={this.renderStickyHeader}
         showsVerticalScrollIndicator={false}
       >
-
+        {/* TODO: Content */}
       </ParallaxScrollView>
     );
   }
 }
+
+// Until decorators get fixed, need to assign outside of class
+Dashboard.navigationOptions = {
+  drawerIcon: ({ tintColor }) => (
+    <Icon type="MaterialIcons" name="dashboard" style={[styles.icon, { color: tintColor }]} />
+  ),
+};
 
 const styles = EStyleSheet.create({
   header: {
@@ -63,8 +69,9 @@ const styles = EStyleSheet.create({
     alignSelf: 'flex-end',
     width: '10%',
     height: width * 0.1,
-    borderRadius: width * 0.1 / 2,
+    borderRadius: (width * 0.1) / 2,
     marginTop: '3%',
     right: '6%',
-  }
+  },
+  icon: { fontSize: 20 },
 });

@@ -74,7 +74,7 @@ export default class App extends Component {
         initialRouteName: 'Dashboard',
         contentComponent: DrawerContent,
         contentOptions: {
-          activeTintColor: 'black',
+          activeTintColor: 'red',
           inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
         },
       });
@@ -88,7 +88,7 @@ export default class App extends Component {
           header: null,
           gesturesEnabled: false,
         },
-        cardStyle: { backgroundColor: 'white', },
+        cardStyle: { backgroundColor: 'white' },
       });
     }
 

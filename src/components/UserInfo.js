@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AsyncStorage, View, Text, Dimensions, StyleSheet } from 'react-native';
+import { Alert, AsyncStorage, View, Text, Dimensions, StyleSheet } from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
