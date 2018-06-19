@@ -14,7 +14,6 @@ const mapStateToProps = ({
 }) => ({
   ...studentInfo,
 });
-
 const { height, width } = Dimensions.get('window');
 
 @withHamburger

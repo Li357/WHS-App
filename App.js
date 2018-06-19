@@ -71,7 +71,7 @@ export default class App extends Component {
         Schedule: { screen: Schedule },
         Settings: { screen: Settings },
       }, {
-        initialRouteName: 'Dashboard',
+        initialRouteName: 'Schedule',
         contentComponent: DrawerContent,
         contentOptions: {
           activeTintColor: 'red',
