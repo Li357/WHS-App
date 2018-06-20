@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardItem } from 'react-native';
+import { CardItem } from 'native-base';
 
 const ScheduleItem = () => (
   <CardItem>

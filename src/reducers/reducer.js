@@ -8,7 +8,7 @@ import {
 } from '../actions/actions';
 
 const initialState = {
-  loginError: '',
+  loginError: false,
   username: '',
   password: '',
   name: '',

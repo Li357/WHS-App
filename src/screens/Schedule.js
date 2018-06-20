@@ -8,7 +8,7 @@ import _ from 'lodash';
 import ScheduleCard from '../components/ScheduleCard';
 import withHamburger from '../util/withHamburger';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const mapStateToProps = ({ schedule }) => ({ schedule });
 
 @withHamburger
@@ -33,10 +33,13 @@ export default class Schedule extends Component {
   render() {
     return (
       <Carousel
+        loop
         data={this.state.schedule}
         renderItem={this.renderItem}
-        sliderWidth={width * 0.8}
-        itemWidth={width * 0.75}
+        sliderWidth={width}
+        itemWidth={width * 0.8}
+        containerCustomStyle={styles.container}
+        contentContainerCustomStyle={styles.content}
       />
     );
   }
@@ -49,5 +52,7 @@ Schedule.navigationOptions = {
 };
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  content: { marginTop: height * 0.1 },
   icon: { fontSize: 20 },
 });

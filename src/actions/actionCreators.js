@@ -19,7 +19,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
   }), {}),
 });
 
-const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'error');
+const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
 const setUserInfo = createActionCreator(
   SET_USER_INFO,
   'name', 'classOf', 'homeroom', 'counselor', 'dean', 'id', 'schedule', 'schoolPicture',
@@ -32,6 +32,7 @@ const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const logOut = createActionCreator(LOG_OUT);
 
+// Function returns false on failed login
 const fetchUserInfo = (username, password) => async (dispatch) => {
   try {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
@@ -53,11 +54,11 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     const name = $('title').text().split('|')[0].trim();
 
     if (error !== '') { // If error exists
-      dispatch(setLoginError(error));
-      return;
+      dispatch(setLoginError(!!error)); // Convert error to boolean
+      return false;
     } else if (name === 'Login') { // If login failed (page has Login as <title>)
       // TODO: Logout then alert error
-      return;
+      return false;
     }
 
     const jsonPrefix = 'window._pageDataJson = \'';
@@ -84,6 +85,7 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     // This prevents the erasure of profile photos on a user info fetch
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
+    return true;
   } catch (error) {
     // TODO: Better error reporting
     dispatch(setLoginError(error));

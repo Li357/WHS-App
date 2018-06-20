@@ -19,8 +19,8 @@ const mapStateToProps = (state, ownProps) => ({
 export default class DrawerContent extends Component {
   handleLogout = () => {
     const { dispatch, navigation: { navigate } } = this.props;
-    dispatch(logOut());
     navigate('Login');
+    dispatch(logOut());
   }
 
   render() {
@@ -72,7 +72,7 @@ const styles = EStyleSheet.create({
   separator: {
     marginHorizontal: 18,
     borderBottomColor: 'lightgrey',
-    borderBottomWidth: 0.75,
+    borderBottomWidth: 1,
   },
   logout: {
     marginHorizontal: 16,

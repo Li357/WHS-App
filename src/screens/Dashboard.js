@@ -22,6 +22,7 @@ export default class Dashboard extends Component {
   renderForeground = () => <UserInfo {...this.props} />
   renderBackground = () => <UserBackground {...this.props} />
   renderStickyHeader = () => {
+    // TODO: Adjust header height for iPhone X
     const profilePhotoObj = { uri: this.props.schoolPicture };
     return (
       <View style={styles.header}>

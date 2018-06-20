@@ -1,19 +1,31 @@
 import React, { PureComponent } from 'react';
-import { Alert, Image, Text } from 'react-native';
+import { Animated, Alert, KeyboardAvoidingView, Image, Text, Dimensions, Easing } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { Container, Input, Item, Button, Icon } from 'native-base';
+import { Form, Input, Item, Button } from 'native-base';
 import { connect } from 'react-redux';
 
 import { fetchUserInfo } from '../actions/actionCreators';
 import logo from '../../assets/images/WHS.png';
 import loading from '../../assets/images/loading.gif';
 
-@connect()
+const { width } = Dimensions.get('window');
+const mapStateToProps = ({ loginError }) => ({ loginError });
+
+@connect(mapStateToProps)
 export default class Login extends PureComponent {
   state = {
     username: '',
     password: '',
     loggingIn: false,
+    opacity: new Animated.Value(0),
+    loginWidth: new Animated.Value(width * 0.75),
+    loginAnimDone: false,
+  }
+
+  componentDidMount() {
+    Animated.timing(this.state.opacity, {
+      toValue: 1, duration: 3000,
+    }).start();
   }
 
   handleInput = key => (text) => {
@@ -23,11 +35,30 @@ export default class Login extends PureComponent {
   handleLogin = async () => {
     this.setState({ loggingIn: true });
 
+    // TODO: Find more permanent solution than just * 0.2
+    Animated.timing(this.state.loginWidth, {
+      easing: Easing.sin, toValue: width * 0.2 * 0.75, duration: 250,
+    }).start(() => {
+      this.setState({ loginAnimDone: true });
+    });
+
     try {
       const { dispatch, navigation: { navigate } } = this.props;
       const { username, password } = this.state;
-      await dispatch(fetchUserInfo(username, password));
-      navigate('Dashboard');
+      const success = await dispatch(fetchUserInfo(username, password));
+      if (success) {
+        navigate('Dashboard');
+        return;
+      }
+      // Reverse animation if login failure
+      Animated.timing(this.state.loginWidth, {
+        toValue: width * 0.75, duration: 250,
+      }).start(() => {
+        this.setState({
+          loggingIn: false,
+          loginAnimDone: false,
+        });
+      });
     } catch (error) {
       Alert.alert(
         'Error', `${error}`,
@@ -38,37 +69,59 @@ export default class Login extends PureComponent {
   }
 
   render() {
-    const { loggingIn } = this.state;
+    const {
+      loggingIn, opacity, loginWidth, loginAnimDone, username, password,
+    } = this.state;
+    const { loginError } = this.props;
 
+    // TODO: Test keyboard offset on Android & make more dynamic
     return (
-      <Container style={styles.container}>
-        <Image source={logo} style={styles.logo} />
-        <Text style={styles.text}>Login to WHS</Text>
-        <Item rounded style={styles.inputContainer}>
-          <Input
-            onChangeText={this.handleInput('username')}
-            placeholder="Username"
-            style={styles.input}
-          />
-        </Item>
-        <Item rounded style={styles.inputContainer}>
-          <Input
-            onChangeText={this.handleInput('password')}
-            secureTextEntry
-            placeholder="Password"
-            style={styles.input}
-          />
-        </Item>
-        <Button iconRight danger onPress={this.handleLogin} style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
-          {
-            loggingIn ?
-              <Image source={loading} style={styles.loading} />
-            :
-              <Icon name="arrow-forward" />
-          }
-        </Button>
-      </Container>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-width * 0.45} style={styles.container}>
+        <Animated.View style={[styles.container, { opacity }]}>
+          <Image source={logo} style={styles.logo} />
+          <Text style={styles.text}>Login to WHS</Text>
+          <Form>
+            <Item error={loginError} rounded style={styles.inputContainer}>
+              <Input
+                autoCorrect={false}
+                autoCapitalize="none"
+                onChangeText={this.handleInput('username')}
+                placeholder="Username"
+                style={styles.input}
+              />
+            </Item>
+            <Item error={loginError} rounded style={styles.inputContainer}>
+              <Input
+                onChangeText={this.handleInput('password')}
+                secureTextEntry
+                placeholder="Password"
+                style={styles.input}
+              />
+            </Item>
+          </Form>
+          <Animated.View style={[styles.loginContainer, {
+              width: loginWidth,
+              paddingHorizontal: loginAnimDone ? 6 : 0,
+            }]}
+          >
+            <Button
+              block
+              rounded
+              danger
+              disabled={!username || !password || loggingIn}
+              onPress={this.handleLogin}
+              style={styles.loginButton}
+            >
+              {
+                loggingIn ?
+                  <Image source={loading} style={styles.loading} />
+                :
+                  <Text style={styles.loginText}>Login</Text>
+              }
+            </Button>
+          </Animated.View>
+        </Animated.View>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -79,42 +132,39 @@ const styles = EStyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+    width, // For some reason this doesn't work with '100%'
   },
   logo: {
-    width: '44%',
+    width: '48%',
     height: '22%',
   },
   text: {
     fontSize: 40,
     fontFamily: '$fontLight',
     margin: 15,
-    marginBottom: 30,
+    marginBottom: 25,
   },
   inputContainer: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    width: '70%',
     margin: 5,
     paddingHorizontal: 10,
+    width: '75%',
   },
-  input: {
-    fontSize: 18,
-  },
+  input: { fontSize: 18 },
   loginButton: {
     margin: 10,
     alignSelf: 'center',
+    width: '100%',
   },
   loginText: {
     color: 'white',
     fontSize: 18,
-    marginLeft: 16,
-    marginRight: 10,
   },
   loading: {
     width: 20,
     height: 20,
-    marginRight: 16,
   },
 });

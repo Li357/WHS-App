@@ -5,7 +5,7 @@ import { Container, Card } from 'native-base';
 import ScheduleItem from './ScheduleItem';
 
 const ScheduleCard = ({ content }) => (
-  <Container style={styles.card}>
+  <Container>
     <Card>
       {content.map(({ sourceId, ...item }) => <ScheduleItem key={sourceId} item={item} />)}
     </Card>
@@ -14,5 +14,5 @@ const ScheduleCard = ({ content }) => (
 export default ScheduleCard;
 
 const styles = StyleSheet.create({
-  card: { flex: 1 },
+
 });

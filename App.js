@@ -21,7 +21,7 @@ import { setProfilePhoto } from './src/actions/actionCreators';
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['profilePhoto'],
+  blacklist: ['profilePhoto', 'loginError'],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
 const store = createStore(

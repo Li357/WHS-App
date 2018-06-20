@@ -19,9 +19,7 @@ const withHamburger = Component => () => (
 export default withHamburger;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   hamburgerContainer: {
     position: 'absolute',
     top: '2.5%',
