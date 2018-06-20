@@ -1,22 +1,13 @@
 import React from 'react';
-import { Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import { CardItem } from 'native-base';
 
 const { height } = Dimensions.get('window');
-const ScheduleItem = ({ body, length }) => (
-  <CardItem
-    bordered
-    style={[
-      styles.item, { height: height * 0.1 * length },
-    ]}
-  >
-    <Text>{body}</Text>
+const ScheduleItem = ({ length, style }) => (
+  <CardItem style={[style, { height: height * 0.2 * length }]}>
+    <View>
+      {/* TODO: Content */}
+    </View>
   </CardItem>
 );
 export default ScheduleItem;
-
-const styles = StyleSheet.create({
-  item: {
-    justifyContent: 'center',
-  },
-});

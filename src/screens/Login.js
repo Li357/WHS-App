@@ -117,6 +117,7 @@ export default class Login extends PureComponent {
             >
               {
                 loggingIn ?
+                  // TODO: Use react-native-progress instead of image
                   <Image source={loading} style={styles.loading} />
                 :
                   <Text style={styles.loginText}>Login</Text>

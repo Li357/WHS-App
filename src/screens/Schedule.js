@@ -4,7 +4,6 @@ import { Icon } from 'native-base';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import _, { sortBy } from 'lodash';
 
 import ScheduleCard from '../components/ScheduleCard';
 import withHamburger from '../util/withHamburger';
@@ -15,21 +14,6 @@ const mapStateToProps = ({ schedule }) => ({ schedule });
 @withHamburger
 @connect(mapStateToProps)
 export default class Schedule extends Component {
-  state = { schedule: [] }
-
-  static getDerivedStateFromProps({ schedule }) {
-    if (schedule.length !== 5) {
-      const grouped = _(schedule)
-        .groupBy('day')
-        .values()
-        .map(dayArray => sortBy(dayArray, 'startMod'))
-        .value();
-
-      return { schedule: grouped };
-    }
-    return null;
-  }
-
   renderItem = ({ item }) => <ScheduleCard content={item} />
 
   render() {
@@ -40,7 +24,7 @@ export default class Schedule extends Component {
       <Carousel
         loop
         firstItem={Math.min(currentDay, 4)}
-        data={this.state.schedule}
+        data={this.props.schedule}
         renderItem={this.renderItem}
         sliderWidth={width}
         itemWidth={width * 0.8}
