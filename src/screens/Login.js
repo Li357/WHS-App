@@ -99,10 +99,13 @@ export default class Login extends PureComponent {
               />
             </Item>
           </Form>
-          <Animated.View style={[styles.loginContainer, {
-              width: loginWidth,
-              paddingHorizontal: loginAnimDone ? 6 : 0,
-            }]}
+          <Animated.View
+            style={[
+              styles.loginContainer, {
+                width: loginWidth,
+                paddingHorizontal: loginAnimDone ? 6 : 0,
+              },
+            ]}
           >
             <Button
               block

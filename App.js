@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import moment from 'moment';
 
 import WHSApp from './src/reducers/reducer';
 import Login from './src/screens/Login';
@@ -33,6 +34,11 @@ const store = createStore(
 );
 const persistor = persistStore(store);
 
+// Set global moment locale
+moment.updateLocale('en', {
+  week: { dow: 1 },
+});
+
 const hasLoggedIn = () => {
   const { username, password } = store.getState();
   return username && password;
@@ -45,9 +51,11 @@ export default class App extends Component {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
-        // Explicit blacklist from store rehydration and manual getting
-        // of profile photo gets rid of profile photo collision when
-        // more than two people login on the same device
+        /**
+         * Explicit blacklist from store rehydration and manual getting
+         * of profile photo gets rid of profile photo collision when
+         * more than two people login on the same device
+         */
         const { username, schoolPicture } = store.getState();
         const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
         store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
