@@ -10,17 +10,19 @@ import { setProfilePhoto } from '../actions/actionCreators';
 @connect()
 export default class UserInfo extends PureComponent {
   saveProfilePhoto = async (newPhoto) => {
-    try {
-      const { username, dispatch } = this.props;
-      const base64 = `data:image/jpeg;base64,${newPhoto}`; // newPhoto is a base64 encoded image
-      await AsyncStorage.setItem(`${username}:profilePhoto`, base64); // Set in AsyncStorage
-      dispatch(setProfilePhoto(base64)); // Also set in state for current app session
-    } catch (error) {
-      Alert.alert(
-        'Error', `${error}`,
-        [{ text: 'OK' }],
-      );
-      // TODO: Alert error & better error reporting
+    if(newPhoto) {
+      try {
+        const { username, dispatch } = this.props;
+        const base64 = `data:image/jpeg;base64,${newPhoto}`; // newPhoto is a base64 encoded image
+        await AsyncStorage.setItem(`${username}:profilePhoto`, base64); // Set in AsyncStorage
+        dispatch(setProfilePhoto(base64)); // Also set in state for current app session
+      } catch (error) {
+        Alert.alert(
+          'Error', `${error}`,
+          [{ text: 'OK' }],
+        );
+        // TODO: Alert error & better error reporting
+      }
     }
   }
 
