@@ -24,7 +24,7 @@ export default class Login extends PureComponent {
 
   componentDidMount() {
     Animated.timing(this.state.opacity, {
-      toValue: 1, duration: 3000,
+      toValue: 1, duration: 1500,
     }).start();
   }
 
