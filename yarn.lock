@@ -5040,6 +5040,12 @@ react-native-photo-upload@^1.2.0:
     react-native-image-picker "^0.26.7"
     react-native-image-resizer "^1.0.0"
 
+"react-native-progress@git+https://github.com/Li357/react-native-progress.git":
+  version "3.5.0"
+  resolved "git+https://github.com/Li357/react-native-progress.git#503513f6354b1749d6103e1081c9240d3ac50555"
+  dependencies:
+    prop-types "^15.5.8"
+
 react-native-safe-area-view@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.7.0.tgz#38f5ab9368d6ef9e5d18ab64212938af3ec39421"

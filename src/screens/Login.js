@@ -2,11 +2,11 @@ import React, { PureComponent } from 'react';
 import { Animated, Alert, KeyboardAvoidingView, Image, Text, Dimensions, Easing } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { Form, Input, Item, Button } from 'native-base';
+import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
 import { fetchUserInfo } from '../actions/actionCreators';
 import logo from '../../assets/images/WHS.png';
-import loading from '../../assets/images/loading.gif';
 
 const { width } = Dimensions.get('window');
 const mapStateToProps = ({ loginError }) => ({ loginError });
@@ -117,8 +117,7 @@ export default class Login extends PureComponent {
             >
               {
                 loggingIn ?
-                  // TODO: Use react-native-progress instead of image
-                  <Image source={loading} style={styles.loading} />
+                  <CircleSnail color="white" size={25} />
                 :
                   <Text style={styles.loginText}>Login</Text>
               }
