@@ -6,11 +6,13 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import ScheduleCard from '../components/ScheduleCard';
+import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 
 const { width, height } = Dimensions.get('window');
 const mapStateToProps = ({ schedule }) => ({ schedule });
 
+@waitForAnimation
 @withHamburger
 @connect(mapStateToProps)
 export default class Schedule extends Component {

@@ -10,7 +10,7 @@ import { setProfilePhoto } from '../actions/actionCreators';
 @connect()
 export default class UserInfo extends PureComponent {
   saveProfilePhoto = async (newPhoto) => {
-    if(newPhoto) {
+    if (newPhoto) {
       try {
         const { username, dispatch } = this.props;
         const base64 = `data:image/jpeg;base64,${newPhoto}`; // newPhoto is a base64 encoded image

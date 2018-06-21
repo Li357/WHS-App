@@ -10,9 +10,9 @@ const Hamburger = ({ navigation: { openDrawer } }) => (
 );
 
 const NavigationHamburger = withNavigation(Hamburger);
-const withHamburger = Component => () => (
+const withHamburger = Child => () => (
   <View style={styles.container}>
-    <Component />
+    <Child />
     <NavigationHamburger />
   </View>
 );

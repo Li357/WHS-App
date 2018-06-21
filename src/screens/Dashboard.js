@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
+import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 
 const mapStateToProps = ({
@@ -16,6 +17,7 @@ const mapStateToProps = ({
 });
 const { height, width } = Dimensions.get('window');
 
+@waitForAnimation
 @withHamburger
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
