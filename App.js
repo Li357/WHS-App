@@ -7,7 +7,7 @@ import storage from 'redux-persist/lib/storage';
 import { PersistGate } from 'redux-persist/integration/react';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
-import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
+import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 
@@ -87,7 +87,7 @@ export default class App extends Component {
         },
       });
 
-      Navigator = createStackNavigator({
+      Navigator = createSwitchNavigator({
         Login: { screen: Login },
         Drawer: { screen: Drawer },
       }, {
