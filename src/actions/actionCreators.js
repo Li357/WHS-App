@@ -57,9 +57,6 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     if (error !== '') { // If error exists
       dispatch(setLoginError(!!error)); // Convert error to boolean
       return false;
-    } else if (name === 'Login') { // If login failed (page has Login as <title>)
-      // TODO: Logout then alert error
-      return false;
     }
 
     const jsonPrefix = 'window._pageDataJson = \'';
