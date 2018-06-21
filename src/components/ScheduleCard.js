@@ -12,8 +12,6 @@ const { height } = Dimensions.get('window');
 const ITEMS_HEIGHT = height * 0.1 * 14;
 
 export default class ScheduleCard extends Component {
-  state = { barHeight: 0 }
-
   render() {
     const { content } = this.props;
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
