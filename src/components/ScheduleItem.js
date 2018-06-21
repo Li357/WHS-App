@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Dimensions } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { CardItem } from 'native-base';
 
 const { height } = Dimensions.get('window');
-const ScheduleItem = ({ length }) => (
-  <CardItem style={{ height: height * 0.2 * length }}>
+const ScheduleItem = ({ body, title, length }) => (
+  <CardItem style={{ height: height * 0.1 * length }}>
     <View>
-      {/* TODO: Content */}
+      <Text>{title}</Text>
+      <Text>{body}</Text>
     </View>
   </CardItem>
 );
