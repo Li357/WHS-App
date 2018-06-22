@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
-import { Alert, AsyncStorage, View, Text, Dimensions, StyleSheet } from 'react-native';
+import { Alert, AsyncStorage, View, Text, StyleSheet } from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
 import { setProfilePhoto } from '../actions/actionCreators';
+import { WIDTH } from '../constants/constants';
 
 @connect()
 export default class UserInfo extends PureComponent {
@@ -45,9 +46,8 @@ export default class UserInfo extends PureComponent {
   }
 }
 
-const { width } = Dimensions.get('window');
 const styles = EStyleSheet.create({
-  $profilePhotoSize: width / 3,
+  $profilePhotoSize: WIDTH / 3,
   $studentInfoHeight: '35%',
   studentProfile: {
     width: '100%',

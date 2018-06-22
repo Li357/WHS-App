@@ -1,29 +1,33 @@
 import _, { minBy, maxBy, sortBy } from 'lodash';
 
-// This function is inclusive
-const range = (start, end) => Array((end + 1) - start).fill().map((x, i) => i + start);
+// This function is exclusive
+const range = (start, end) => Array(end - start).fill().map((x, i) => i + start);
 
 const getMods = ({ startMod, endMod }) => range(startMod, endMod);
 
 const getOccupiedMods = (scheduleItems) => {
   const min = minBy(scheduleItems, 'startMod');
   const max = maxBy(scheduleItems, 'endMod');
-  return range(min, max);
+  return range(min, max + 1);
 };
 
 const interpolateOpenMods = scheduleItems => (
-  scheduleItems.reduce((withOpenMods, { endMod }, index, array) => {
+  scheduleItems.reduce((withOpenMods, { endMod, sourceId }, index, array) => {
     const newArray = [...withOpenMods, array[index]];
     const next = array[index + 1];
     if (
-      next && endMod < next.startMod // Either next exists and endMod < next startMod
-      || !next && endMod != 15 // Or next does not exist and endMod is not 15 (last mod(s) are open)
+      (next && endMod < next.startMod) // Either next exists and endMod < next startMod
+      || (!next && endMod !== 15) // Or next does not exist and endMod not 15 (last mod(s) are open)
     ) {
+      const openModLength = (next ? next.startMod : 15) - endMod;
       return [
         ...newArray,
         {
+          sourceId: sourceId + 1000, // Set sourceType of open mods for keys in React iterations
           title: 'Open Mod',
-          length: (next ? next.startMod : 15) - endMod, // If next does not exist, use 15
+          startMod: endMod,
+          length: openModLength, // If next does not exist, use 15
+          endMod: endMod + openModLength,
         },
       ];
     }
@@ -32,7 +36,7 @@ const interpolateOpenMods = scheduleItems => (
 );
 
 const interpolateCrossSectionedMods = scheduleItems => (
-  scheduleItems.reduce((withCrossSections, { endMod }, index, array) => {
+  scheduleItems.reduce((withCrossSections, { endMod, sourceId }, index, array) => {
     const newArray = [...withCrossSections, array[index]];
     const next = array[index + 1];
     if (next && endMod > next.startMod) {
@@ -41,9 +45,11 @@ const interpolateCrossSectionedMods = scheduleItems => (
         return nextItem && item.endMod > nextItem.startMod;
       });
       const occupiedMods = getOccupiedMods(crossSectioned);
+      // TODO: Make schedule items UNIFORM w/ TS and update UI
       return [
         ...newArray,
         {
+          sourceId: sourceId + 2000,
           crossSectionBlock: true,
           modOccupiedMatrix: occupiedMods.map(modNumber => (
             crossSectioned.map(item => getMods(item).includes(modNumber))
@@ -85,3 +91,4 @@ const processSchedule = schedule => (
 );
 
 export default processSchedule;
+export { getMods };

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, Dimensions } from 'react-native';
+import { View, Image } from 'react-native';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 import { Icon } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -9,13 +9,13 @@ import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
+import { WIDTH, HEIGHT } from '../constants/constants';
 
 const mapStateToProps = ({
   loginError, schedule, dates, ...studentInfo
 }) => ({
   ...studentInfo,
 });
-const { height, width } = Dimensions.get('window');
 
 @waitForAnimation
 @withHamburger
@@ -40,8 +40,8 @@ export default class Dashboard extends Component {
     return (
       <ParallaxScrollView
         backgroundColor="#c73436"
-        parallaxHeaderHeight={height * 0.35}
-        stickyHeaderHeight={height * 0.1}
+        parallaxHeaderHeight={HEIGHT * 0.35}
+        stickyHeaderHeight={HEIGHT * 0.1}
         renderForeground={this.renderForeground}
         renderBackground={this.renderBackground}
         renderStickyHeader={this.renderStickyHeader}
@@ -70,8 +70,9 @@ const styles = EStyleSheet.create({
   headerImage: {
     alignSelf: 'flex-end',
     width: '10%',
-    height: width * 0.1,
-    borderRadius: (width * 0.1) / 2,
+    height: WIDTH * 0.1,
+    borderRadius: (WIDTH * 0.1) / 2,
+    // TODO: Better values for these properties
     marginTop: '3%',
     right: '6%',
   },

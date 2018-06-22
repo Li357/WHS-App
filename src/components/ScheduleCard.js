@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, Dimensions } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { Card, CardItem } from 'native-base';
 import { VerticalBar } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
-
-// TODO: Better, more robust solution needed for sizing
-const { height } = Dimensions.get('window');
-const ITEMS_HEIGHT = height * 0.1 * 14;
+import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
 export default class ScheduleCard extends Component {
   render() {
@@ -30,7 +27,7 @@ export default class ScheduleCard extends Component {
             {
               isCurrentDay && // Only show day progress on current day's schedule
                 <View style={styles.barContainer}>
-                  <VerticalBar progress={0.4} height={ITEMS_HEIGHT} style={styles.bar} />
+                  <VerticalBar progress={0.4} height={MOD_ITEMS_HEIGHT} style={styles.bar} />
                 </View>
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>

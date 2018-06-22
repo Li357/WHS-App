@@ -1,14 +1,14 @@
 import React, { PureComponent } from 'react';
-import { Animated, Alert, KeyboardAvoidingView, Image, Text, Dimensions, Easing } from 'react-native';
+import { Animated, Alert, KeyboardAvoidingView, Image, Text, Easing } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
 import { fetchUserInfo } from '../actions/actionCreators';
+import { WIDTH } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
-const { width } = Dimensions.get('window');
 const mapStateToProps = ({ loginError }) => ({ loginError });
 
 @connect(mapStateToProps)
@@ -18,7 +18,7 @@ export default class Login extends PureComponent {
     password: '',
     loggingIn: false,
     opacity: new Animated.Value(0),
-    loginWidth: new Animated.Value(width * 0.75),
+    loginWidth: new Animated.Value(WIDTH * 0.75),
     loginAnimDone: false,
   }
 
@@ -37,7 +37,7 @@ export default class Login extends PureComponent {
 
     // TODO: Find more permanent solution than just * 0.2
     Animated.timing(this.state.loginWidth, {
-      easing: Easing.sin, toValue: width * 0.2 * 0.75, duration: 250,
+      easing: Easing.sin, toValue: WIDTH * 0.2 * 0.75, duration: 250,
     }).start(() => {
       this.setState({ loginAnimDone: true });
     });
@@ -52,7 +52,7 @@ export default class Login extends PureComponent {
       }
       // Reverse animation if login failure
       Animated.timing(this.state.loginWidth, {
-        toValue: width * 0.75, duration: 250,
+        toValue: WIDTH * 0.75, duration: 250,
       }).start(() => {
         this.setState({
           loggingIn: false,
@@ -76,7 +76,7 @@ export default class Login extends PureComponent {
 
     // TODO: Test keyboard offset on Android & make more dynamic
     return (
-      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-width * 0.45} style={styles.container}>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-WIDTH * 0.45} style={styles.container}>
         <Animated.View style={[styles.container, { opacity }]}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.text}>Login to WHS</Text>
@@ -135,7 +135,7 @@ const styles = EStyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    width, // For some reason this doesn't work with '100%'
+    width: WIDTH, // For some reason this doesn't work with '100%'
   },
   logo: {
     width: '48%',
