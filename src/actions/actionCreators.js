@@ -1,7 +1,8 @@
 import { AsyncStorage } from 'react-native';
 import fetch from 'react-native-fetch-polyfill';
 import { load } from 'react-native-cheerio';
-import _, { sortBy } from 'lodash';
+
+import processSchedule from '../util/processSchedule';
 
 import {
   SET_LOGIN_ERROR,
@@ -77,19 +78,19 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
         .map((index, { data }) => data.split(':').slice(-1)[0].trim())
       : [null, null, null];
 
-    // Group schedule based on day of week and sort based on start mod
-    const grouped = _(schedule)
-      .groupBy('day')
-      .values()
-      .map(dayArray => sortBy(dayArray, 'startMod'))
-      .value();
-
-    dispatch(setCredentials(username, password));
-    dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, grouped, studentPicture));
+    const processedSchedule = processSchedule(schedule);
 
     // This prevents the erasure of profile photos on a user info fetch
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
+
+    /**
+     *  Do all heavy lifting before setting credentials in case user interrupts user info fetching,
+     *  so they're technically not logged in and refetch can happen as necessary
+     */
+    dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
+    dispatch(setCredentials(username, password));
+
     return true;
   } catch (error) {
     // TODO: Better error reporting
