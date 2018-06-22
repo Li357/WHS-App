@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { Alert, AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -17,12 +17,13 @@ import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
-import { setProfilePhoto } from './src/actions/actionCreators';
+import { setProfilePhoto, setDaySchedule } from './src/actions/actionCreators';
+import selectSchedule from './src/util/selectSchedule';
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['profilePhoto', 'loginError'],
+  blacklist: ['profilePhoto', 'loginError', 'daySchedule'],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
 const store = createStore(
@@ -45,20 +46,36 @@ const hasLoggedIn = () => {
 };
 
 export default class App extends Component {
-  state = { loaded: false }
+  state = {
+    loaded: false,
+    lastUpdate: moment(),
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this.handleAppStateChange);
+  }
+
+  handleAppStateChange = (newStatus) => {
+    /**
+     * This handler handles the case where the user does not quit the app but
+     * has it in the background, in which case the app must do some updates
+     */
+     const { lastUpdate } = this.state;
+     const now = moment();
+     if (
+       newStatus === 'active'
+       && lastUpdate.day() !== now.day() // Only update if not updated in one day
+     ) {
+       this.updateSchedule(now);
+     }
+  }
 
   handleRehydrate = async () => {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
-        /**
-         * Explicit blacklist from store rehydration and manual getting
-         * of profile photo gets rid of profile photo collision when
-         * more than two people login on the same device
-         */
-        const { username, schoolPicture } = store.getState();
-        const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
-        store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
+        this.updateSchedule();
+        this.updateProfilePhoto();
       } catch (error) {
         Alert.alert(
           'Error', `${error}`,
@@ -68,6 +85,27 @@ export default class App extends Component {
       }
     }
     this.setState({ loaded: true });
+  }
+
+  updateSchedule = (date = moment()) => {
+    const { specialDates } = store.getState();
+    store.dispatch(setDaySchedule(selectSchedule(specialDates, date)));
+    this.setState({ lastUpdate: date });
+  }
+
+  updateProfilePhoto = async () => {
+    /**
+     * Explicit blacklist from store rehydration and manual getting
+     * of profile photo gets rid of profile photo collision when
+     * more than two people login on the same device
+     */
+    const { username, schoolPicture } = store.getState();
+    const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
+    store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this.handleAppStateChange);
   }
 
   render() {

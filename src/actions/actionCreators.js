@@ -3,6 +3,7 @@ import fetch from 'react-native-fetch-polyfill';
 import { load } from 'react-native-cheerio';
 
 import processSchedule from '../util/processSchedule';
+import { SCHEDULES } from '../constants/constants';
 
 import {
   SET_LOGIN_ERROR,
@@ -10,6 +11,7 @@ import {
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
+  SET_DAY_SCHEDULE,
   LOG_OUT,
 } from './actions';
 
@@ -21,6 +23,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
   }), {}),
 });
 
+// Login error represents a credential mismatch, not an internal error
 const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
 const setUserInfo = createActionCreator(
   SET_USER_INFO,
@@ -32,10 +35,11 @@ const setCredentials = createActionCreator(
 );
 const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
+const setDaySchedule = createActionCreator(SET_DAY_SCHEDULE, 'daySchedule');
 const logOut = createActionCreator(LOG_OUT);
 
 // Function returns false on failed login
-const fetchUserInfo = (username, password) => async (dispatch) => {
+const fetchUserInfo = (username, password) => async (dispatch, getState) => {
   try {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
     const timeout = 6000;
@@ -78,23 +82,25 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
         .map((index, { data }) => data.split(':').slice(-1)[0].trim())
       : [null, null, null];
 
+    /**
+     *  Do all heavy lifting before setting credentials in case user interrupts user info fetching,
+     *  so they're technically not logged in and refetch can happen as necessary
+     */
+
     const processedSchedule = processSchedule(schedule);
 
     // This prevents the erasure of profile photos on a user info fetch
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
-
-    /**
-     *  Do all heavy lifting before setting credentials in case user interrupts user info fetching,
-     *  so they're technically not logged in and refetch can happen as necessary
-     */
+    // TODO: Call fetchSpecialDates here too
+    // And also calculate the day schedule
+    dispatch(setDaySchedule(SCHEDULES.REGULAR))
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
     dispatch(setCredentials(username, password));
 
     return true;
   } catch (error) {
     // TODO: Better error reporting
-    dispatch(setLoginError(error));
     throw error; // Throw back to show alert UIs
   }
 };
@@ -109,6 +115,7 @@ const fetchSpecialDates = () => {
 export {
   setUserInfo,
   setProfilePhoto,
+  setDaySchedule,
   logOut,
   fetchUserInfo,
   fetchSpecialDates,

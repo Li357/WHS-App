@@ -7,3 +7,4 @@ const MOD_ITEM_HEIGHT = HEIGHT * MOD_ITEM_FACTOR;
 const MOD_ITEMS_HEIGHT = MOD_ITEM_HEIGHT * 11; // HR + 6 regular mods + 8 half mods
 
 export { WIDTH, HEIGHT, MOD_ITEM_HEIGHT, MOD_ITEMS_HEIGHT };
+export { default as SCHEDULES } from './schedules';

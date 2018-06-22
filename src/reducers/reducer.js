@@ -4,6 +4,7 @@ import {
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
+  SET_DAY_SCHEDULE,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -18,6 +19,7 @@ const initialState = {
   dean: null,
   id: '',
   schedule: [],
+  daySchedule: [],
   profilePhoto: null,
   schoolPicture: null,
   dates: [],
@@ -29,6 +31,7 @@ const WHSApp = (state = initialState, {
   username,
   password,
   schedule,
+  daySchedule,
   profilePhoto,
   schoolPicture,
   dates,
@@ -62,6 +65,11 @@ const WHSApp = (state = initialState, {
       return {
         ...state,
         profilePhoto,
+      };
+    case SET_DAY_SCHEDULE:
+      return {
+        ...state,
+        daySchedule,
       };
     case LOG_OUT:
       return WHSApp(undefined, {});

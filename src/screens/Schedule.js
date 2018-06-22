@@ -10,13 +10,19 @@ import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
-const mapStateToProps = ({ schedule }) => ({ schedule });
+const mapStateToProps = ({
+  schedule, daySchedule, specialDates,
+}) => ({
+  schedule, daySchedule, specialDates,
+});
 
 @waitForAnimation
 @withHamburger
 @connect(mapStateToProps)
 export default class Schedule extends Component {
-  renderItem = ({ item }) => <ScheduleCard content={item} />
+  renderItem = ({ item }) => (
+    <ScheduleCard content={item} daySchedule={daySchedule} specialDates={specialDates} />
+  )
 
   render() {
     // Monday is 0, Friday is 4

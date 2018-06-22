@@ -6,14 +6,17 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
+import selectSchedule from '../util/selectSchedule';
 import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
 export default class ScheduleCard extends Component {
   render() {
-    const { content } = this.props;
+    const { content, daySchedule, specialDates } = this.props;
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
     const date = moment();
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
+
+    const cardSchedule = isCurrentDay ? daySchedule : selectSchedule(specialDates, date);
     // TODO: Progress for bar is diff(date, beginning of day) / diff(end of day, beginning of day)
 
     return (

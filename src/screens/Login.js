@@ -43,11 +43,11 @@ export default class Login extends PureComponent {
     });
 
     try {
-      const { dispatch, navigation: { navigate } } = this.props;
+      const { dispatch, navigation } = this.props;
       const { username, password } = this.state;
       const success = await dispatch(fetchUserInfo(username, password));
       if (success) {
-        navigate('Dashboard');
+        navigation.navigate('Dashboard');
         return;
       }
       // Reverse animation if login failure

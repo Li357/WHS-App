@@ -3,8 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Icon } from 'native-base';
 import { withNavigation } from 'react-navigation';
 
-const Hamburger = ({ navigation: { openDrawer } }) => (
-  <Button transparent onPress={openDrawer} style={styles.hamburgerContainer}>
+const Hamburger = ({ navigation }) => (
+  <Button transparent onPress={navigation.openDrawer} style={styles.hamburgerContainer}>
     <Icon name="md-menu" style={styles.hamburger} />
   </Button>
 );

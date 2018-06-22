@@ -18,8 +18,8 @@ const mapStateToProps = (state, ownProps) => ({
 @connect(mapStateToProps)
 export default class DrawerContent extends Component {
   handleLogout = () => {
-    const { dispatch, navigation: { navigate } } = this.props;
-    navigate('Login');
+    const { dispatch, navigation } = this.props;
+    navigation.navigate('Login');
     dispatch(logOut());
   }
 
