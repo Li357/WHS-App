@@ -84,8 +84,8 @@ const processSchedule = schedule => (
     .values()
     .map(dayArray => interpolateOpenMods(
       interpolateCrossSectionedMods(
-        sortBy(dayArray, ['startMod', 'length'])
-      )
+        sortBy(dayArray, ['startMod', 'length']),
+      ),
     ))
     .value()
 );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, Text } from 'react-native';
+import { View, ImageBackground, Text } from 'react-native';
 import { Container, Button, Icon } from 'native-base';
 import { DrawerItems, withNavigation } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -29,11 +29,12 @@ export default class DrawerContent extends Component {
 
     return (
       <Container style={styles.container}>
-        <Image source={background} style={styles.header} />
-        <View style={styles.dateContainer}>
-          <Text style={styles.weekday}>{now.format('dddd')}</Text>
-          <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
-        </View>
+        <ImageBackground source={background} style={styles.header}>
+          <View style={styles.dateContainer}>
+            <Text style={styles.weekday}>{now.format('dddd')}</Text>
+            <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
+          </View>
+        </ImageBackground>
         <DrawerItems {...this.props} />
         <View style={styles.separator} />
         <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
@@ -57,7 +58,7 @@ const styles = EStyleSheet.create({
   },
   dateContainer: {
     position: 'absolute',
-    top: '16% - 20',
+    bottom: '10%',
     left: '6%',
   },
   weekday: {

@@ -21,7 +21,7 @@ const ScheduleItem = ({
   const scheduleItemHeight = sum(modHeights);
 
   const [classStart, classEnd] = [
-    cardSchedule[classMods[0]][0], cardSchedule[classMods.slice(-1)[0]][1]
+    cardSchedule[classMods[0]][0], cardSchedule[classMods.slice(-1)[0]][1],
   ].map(time => moment(time, 'H:mm').format('h:mm'));
 
   return (

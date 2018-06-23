@@ -67,10 +67,10 @@ export default class App extends Component {
     const { lastUpdate } = this.state;
     const now = moment();
     if (
-     newStatus === 'active'
-     && lastUpdate.day() !== now.day() // Only update if not updated in one day
+      newStatus === 'active'
+      && lastUpdate.day() !== now.day() // Only update if not updated in one day
     ) {
-     this.updateSchedule(now);
+      this.updateSchedule(now);
     }
   }
 
@@ -79,7 +79,8 @@ export default class App extends Component {
     if (hasLoggedIn()) {
       try {
         this.updateSchedule();
-        this.updateProfilePhoto();
+        // Since next line is async, must wait for it or else state will be set before it finishes
+        await this.updateProfilePhoto();
       } catch (error) {
         Alert.alert(
           'Error', `${error}`,
@@ -117,7 +118,7 @@ export default class App extends Component {
         Schedule: { screen: Schedule },
         Settings: { screen: Settings },
       }, {
-        initialRouteName: 'Schedule',
+        initialRouteName: 'Dashboard',
         contentComponent: DrawerContent,
         contentOptions: {
           activeTintColor: 'red',

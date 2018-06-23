@@ -39,7 +39,11 @@ export default class ScheduleCard extends Component {
             {
               isCurrentDay && // Only show day progress on current day's schedule
                 <View style={styles.barContainer}>
-                  <VerticalBar progress={progress} height={MOD_ITEMS_HEIGHT - 25} style={styles.bar} />
+                  <VerticalBar
+                    progress={progress}
+                    height={MOD_ITEMS_HEIGHT - 20}
+                    style={styles.bar}
+                  />
                 </View>
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
