@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Icon } from 'native-base';
 
 import waitForAnimation from '../util/waitForAnimation';
@@ -7,7 +7,9 @@ import waitForAnimation from '../util/waitForAnimation';
 @waitForAnimation
 export default class Settings extends Component {
   render() {
-    return null;
+    return (
+      <View />
+    );
   }
 }
 

@@ -6,7 +6,7 @@ with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2
 ## v2.0.0
 
 Complete rewrite and redesign with NativeBase. Getting rid of CodePush for app version uniformity.
-Making the app less crappy and bug prone, with linting and unit testing (I hope). Less sloppy code.
+Making the app less crappy and bug prone, with linting and  testing (I hope). Less sloppy code.
 
 Rewrite Roadmap:
 
@@ -33,9 +33,8 @@ Rewrite Roadmap:
     - [ ] Revamp or remove user info carousel (show mentor info somewhere else)
     - [x] Parallax scroll view
     - [ ] Customizable information to be shown on dashboard
-    - [ ] Top bar to parallax scroll view
     - [x] Upload own photo
-    - [ ] Option to reset to school photo
+    - [x] Option to reset to school photo
   - [ ] Schedule
     - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
     - [x] Wait for drawer animation to finish to reduce choppiness

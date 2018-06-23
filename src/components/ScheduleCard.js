@@ -19,10 +19,11 @@ export default class ScheduleCard extends Component {
     const cardSchedule = isCurrentDay ? daySchedule : selectSchedule(specialDates, date);
     let progress;
     if (isCurrentDay) {
-      const [firstHour, firstMinutes] = cardSchedule[0][0].split(':');
-      const [lastHour, lastMinutes] = cardSchedule.slice(-1)[0][1].split(':');
-      const first = moment().hours(firstHour).minutes(firstMinutes);
-      const last = moment().hours(lastHour).minutes(lastMinutes);
+      const startOfDay = cardSchedule[0][0].split(':');
+      const endOfDay = cardSchedule.slice(-1)[0][1].split(':');
+      const [first, last] = [startOfDay, endOfDay].map(([hours, minutes]) => (
+        moment().hours(hours).minutes(minutes)
+      ));
       const currentDiff = date.diff(first);
 
       progress = currentDiff > 0 ? currentDiff / last.diff(first) : 1;
@@ -30,7 +31,7 @@ export default class ScheduleCard extends Component {
 
     return (
       <Card style={styles.container}>
-        <CardItem header style={styles.header}>
+        <CardItem header bordered style={styles.header}>
           <Text style={styles.day}>{date.weekday(day - 1).format('dddd')} </Text>
           <Text style={styles.date}>{date.format('MMM DD')}</Text>
         </CardItem>
@@ -62,7 +63,7 @@ export default class ScheduleCard extends Component {
 
 const styles = EStyleSheet.create({
   container: { flex: 1 },
-  header: { alignSelf: 'flex-end' },
+  header: { width: '100%' },
   day: {
     fontFamily: '$fontRegular',
     fontSize: 18,

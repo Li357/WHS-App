@@ -5018,9 +5018,9 @@ react-native-keyboard-aware-scroll-view@0.5.0:
     prop-types "^15.6.0"
     react-native-iphone-x-helper "^1.0.1"
 
-"react-native-parallax-scroll-view@git+https://github.com/Li357/react-native-parallax-scroll-view.git":
-  version "0.21.1"
-  resolved "git+https://github.com/Li357/react-native-parallax-scroll-view.git#8aab6e8c062a539ed6e2d8b20afc2c6da3cd3ef7"
+react-native-parallax-scroll-view@^0.21.3:
+  version "0.21.3"
+  resolved "https://registry.yarnpkg.com/react-native-parallax-scroll-view/-/react-native-parallax-scroll-view-0.21.3.tgz#d956ad224ce3b0a2725b80574bcbf688bbeda14e"
   dependencies:
     prop-types "^15.6.0"
 
@@ -5030,9 +5030,9 @@ react-native-parse-html@^2.2.6:
   dependencies:
     react-native-stream "^0.1.0"
 
-react-native-photo-upload@^1.2.0:
+"react-native-photo-upload@git+https://github.com/Li357/react-native-photo-upload.git":
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-photo-upload/-/react-native-photo-upload-1.2.0.tgz#035a49af45ebed6765b3e914b662f5aedc25bccd"
+  resolved "git+https://github.com/Li357/react-native-photo-upload.git#301cf0707b3e92c8f641a1e03a969438cd78de32"
   dependencies:
     prop-types "^15.5.10"
     react-native-fs "^2.5.1"
@@ -5161,9 +5161,9 @@ react-navigation-deprecated-tab-navigator@1.3.0:
   dependencies:
     react-native-tab-view "^0.0.77"
 
-react-navigation-drawer@0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/react-navigation-drawer/-/react-navigation-drawer-0.3.2.tgz#f9b0bd29c6859500201ec4742e81db992074aec2"
+react-navigation-drawer@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/react-navigation-drawer/-/react-navigation-drawer-0.4.2.tgz#49aa1bc6684923294a9c112dce75d8ec4184c64f"
   dependencies:
     react-native-drawer-layout-polyfill "^1.3.2"
 
@@ -5177,19 +5177,18 @@ react-navigation-tabs@0.5.1:
     react-native-safe-area-view "^0.7.0"
     react-native-tab-view "^1.0.0"
 
-react-navigation@^2.3.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-2.4.1.tgz#2452fdd60f731914dcf8900c24bd68c65771dc12"
+react-navigation@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-2.5.2.tgz#b1ab2d1931eecda71ec0e0684c7ff484844e2d10"
   dependencies:
     clamp "^1.0.1"
     create-react-context "^0.2.1"
     hoist-non-react-statics "^2.2.0"
     path-to-regexp "^1.7.0"
-    prop-types "^15.5.10"
     react-lifecycles-compat "^3"
     react-native-safe-area-view "^0.8.0"
     react-navigation-deprecated-tab-navigator "1.3.0"
-    react-navigation-drawer "0.3.2"
+    react-navigation-drawer "0.4.2"
     react-navigation-tabs "0.5.1"
 
 react-proxy@^1.1.7:

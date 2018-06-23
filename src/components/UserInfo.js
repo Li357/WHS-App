@@ -10,13 +10,14 @@ import { WIDTH, HEIGHT } from '../constants/constants';
 
 @connect()
 export default class UserInfo extends PureComponent {
-  saveProfilePhoto = async (newPhoto) => {
+  saveProfilePhoto = async (newPhoto, reset = false) => {
     if (newPhoto) {
       try {
         const { username, dispatch } = this.props;
-        const base64 = `data:image/jpeg;base64,${newPhoto}`; // newPhoto is a base64 encoded image
-        await AsyncStorage.setItem(`${username}:profilePhoto`, base64); // Set in AsyncStorage
-        dispatch(setProfilePhoto(base64)); // Also set in state for current app session
+        // Need to use templates because newPhoto is base64 encoded string when not resetting
+        const photo = reset ? newPhoto : `data:image/jpeg;base64,${newPhoto}`;
+        await AsyncStorage.setItem(`${username}:profilePhoto`, photo); // Set in AsyncStorage
+        dispatch(setProfilePhoto(photo)); // Also set in state for current app session
       } catch (error) {
         Alert.alert(
           'Error', `${error}`,
@@ -27,14 +28,22 @@ export default class UserInfo extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { schoolPicture } = this.props;
+    this.saveProfilePhoto(schoolPicture, true);
+  }
+
   render() {
     const { name, classOf, profilePhoto } = this.props;
     const profilePhotoObj = { uri: profilePhoto };
+    const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
 
     return (
       <View style={styles.studentProfile}>
         <PhotoUpload
           onPhotoSelect={this.saveProfilePhoto}
+          customButtons={customButtons}
+          onTapCustomButton={this.handleReset}
           containerStyle={StyleSheet.flatten(styles.photoUploader)}
         >
           <Thumbnail source={profilePhotoObj} style={styles.profilePhoto} />

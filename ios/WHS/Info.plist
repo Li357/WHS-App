@@ -70,5 +70,9 @@
 		<string>Roboto-Thin.ttf</string>
 		<string>Roboto-Light.ttf</string>
 	</array>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>WHS wants to access your photo library.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>WHS wants to use your camera.</string>
 </dict>
 </plist>
