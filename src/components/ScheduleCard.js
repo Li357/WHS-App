@@ -17,7 +17,16 @@ export default class ScheduleCard extends Component {
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
 
     const cardSchedule = isCurrentDay ? daySchedule : selectSchedule(specialDates, date);
-    // TODO: Progress for bar is diff(date, beginning of day) / diff(end of day, beginning of day)
+    let progress;
+    if (isCurrentDay) {
+      const [firstHour, firstMinutes] = cardSchedule[0][0].split(':');
+      const [lastHour, lastMinutes] = cardSchedule.slice(-1)[0][1].split(':');
+      const first = moment().hours(firstHour).minutes(firstMinutes);
+      const last = moment().hours(lastHour).minutes(lastMinutes);
+      const currentDiff = date.diff(first);
+
+      progress = currentDiff > 0 ? currentDiff / last.diff(first) : 1;
+    }
 
     return (
       <Card style={styles.container}>
@@ -30,7 +39,7 @@ export default class ScheduleCard extends Component {
             {
               isCurrentDay && // Only show day progress on current day's schedule
                 <View style={styles.barContainer}>
-                  <VerticalBar progress={0.4} height={MOD_ITEMS_HEIGHT} style={styles.bar} />
+                  <VerticalBar progress={progress} height={MOD_ITEMS_HEIGHT} style={styles.bar} />
                 </View>
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>

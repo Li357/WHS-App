@@ -55,19 +55,23 @@ export default class App extends Component {
     AppState.addEventListener('change', this.handleAppStateChange);
   }
 
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this.handleAppStateChange);
+  }
+
   handleAppStateChange = (newStatus) => {
     /**
      * This handler handles the case where the user does not quit the app but
      * has it in the background, in which case the app must do some updates
      */
-     const { lastUpdate } = this.state;
-     const now = moment();
-     if (
-       newStatus === 'active'
-       && lastUpdate.day() !== now.day() // Only update if not updated in one day
-     ) {
-       this.updateSchedule(now);
-     }
+    const { lastUpdate } = this.state;
+    const now = moment();
+    if (
+     newStatus === 'active'
+     && lastUpdate.day() !== now.day() // Only update if not updated in one day
+    ) {
+     this.updateSchedule(now);
+    }
   }
 
   handleRehydrate = async () => {
@@ -102,10 +106,6 @@ export default class App extends Component {
     const { username, schoolPicture } = store.getState();
     const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
     store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
-  }
-
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleAppStateChange);
   }
 
   render() {

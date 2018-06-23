@@ -122,5 +122,5 @@ export default {
   LATE_START,
   LATE_START_WEDNESDAY,
   ASSEMBLY,
-  FINALS
+  FINALS,
 };

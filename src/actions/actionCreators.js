@@ -39,7 +39,7 @@ const setDaySchedule = createActionCreator(SET_DAY_SCHEDULE, 'daySchedule');
 const logOut = createActionCreator(LOG_OUT);
 
 // Function returns false on failed login
-const fetchUserInfo = (username, password) => async (dispatch, getState) => {
+const fetchUserInfo = (username, password) => async (dispatch) => {
   try {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
     const timeout = 6000;
@@ -94,7 +94,7 @@ const fetchUserInfo = (username, password) => async (dispatch, getState) => {
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
     // TODO: Call fetchSpecialDates here too
     // And also calculate the day schedule
-    dispatch(setDaySchedule(SCHEDULES.REGULAR))
+    dispatch(setDaySchedule(SCHEDULES.REGULAR));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
     dispatch(setCredentials(username, password));
 
