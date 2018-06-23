@@ -6,7 +6,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
 import { setProfilePhoto } from '../actions/actionCreators';
-import { WIDTH } from '../constants/constants';
+import { WIDTH, HEIGHT } from '../constants/constants';
 
 @connect()
 export default class UserInfo extends PureComponent {
@@ -47,7 +47,7 @@ export default class UserInfo extends PureComponent {
 }
 
 const styles = EStyleSheet.create({
-  $profilePhotoSize: WIDTH / 3,
+  $profilePhotoSize: HEIGHT / 5.5,
   $studentInfoHeight: '35%',
   studentProfile: {
     width: '100%',
@@ -63,13 +63,13 @@ const styles = EStyleSheet.create({
   },
   name: {
     textAlign: 'center',
-    fontSize: 25,
+    fontSize: WIDTH / 15,
     fontFamily: '$fontRegular',
   },
   classOf: {
     textAlign: 'center',
-    fontSize: 17,
-    fontFamily: '$fontRegular',
+    fontSize: WIDTH / 20,
+    fontFamily: '$fontLight',
     marginBottom: '$studentInfoHeight - 32%',
   },
 });

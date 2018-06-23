@@ -6,7 +6,7 @@ import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
 import { fetchUserInfo } from '../actions/actionCreators';
-import { WIDTH } from '../constants/constants';
+import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
 const mapStateToProps = ({ loginError }) => ({ loginError });
@@ -35,7 +35,6 @@ export default class Login extends PureComponent {
   handleLogin = async () => {
     this.setState({ loggingIn: true });
 
-    // TODO: Find more permanent solution than just * 0.2
     Animated.timing(this.state.loginWidth, {
       easing: Easing.sin, toValue: WIDTH * 0.2 * 0.75, duration: 250,
     }).start(() => {
@@ -76,7 +75,7 @@ export default class Login extends PureComponent {
 
     // TODO: Test keyboard offset on Android & make more dynamic
     return (
-      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-WIDTH * 0.45} style={styles.container}>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-HEIGHT * 0.1} style={styles.container}>
         <Animated.View style={[styles.container, { opacity }]}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.text}>Login to WHS</Text>
@@ -103,7 +102,7 @@ export default class Login extends PureComponent {
             style={[
               styles.loginContainer, {
                 width: loginWidth,
-                paddingHorizontal: loginAnimDone ? 6 : 0,
+                paddingHorizontal: loginAnimDone ? WIDTH / 150 : 0,
               },
             ]}
           >
@@ -135,11 +134,11 @@ const styles = EStyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    width: WIDTH, // For some reason this doesn't work with '100%'
+    width: WIDTH,
   },
   logo: {
     width: '48%',
-    height: '22%',
+    height: '22% + 20',
   },
   text: {
     fontSize: 40,

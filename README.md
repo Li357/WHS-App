@@ -37,9 +37,9 @@ Rewrite Roadmap:
     - [x] Upload own photo
     - [ ] Option to reset to school photo
   - [ ] Schedule
-    - [ ] Preprocess data in action creators before rendering in Schedule to reduce lag
+    - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
     - [x] Wait for drawer animation to finish to reduce choppiness
-    - [ ] Vertical progress bar to signify relative position in day
+    - [x] Vertical progress bar to signify relative position in day
     - [ ] Better approach to showing time tables for mods
   - [ ] Settings
     - [ ] Options to change drawer banner image

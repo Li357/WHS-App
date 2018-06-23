@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { logOut } from '../actions/actionCreators';
+import { HEIGHT } from '../constants/constants';
 import background from '../../assets/images/background.png';
 
 const mapStateToProps = (state, ownProps) => ({
@@ -56,16 +57,16 @@ const styles = EStyleSheet.create({
   },
   dateContainer: {
     position: 'absolute',
-    top: '16%',
+    top: '16% - 20',
     left: '6%',
   },
   weekday: {
-    fontSize: 30,
+    fontSize: HEIGHT / 19,
     color: 'white',
     fontFamily: '$fontRegular',
   },
   date: {
-    fontSize: 35,
+    fontSize: HEIGHT / 21,
     color: 'white',
     fontFamily: '$fontLight',
   },

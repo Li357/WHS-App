@@ -39,13 +39,13 @@ export default class ScheduleCard extends Component {
             {
               isCurrentDay && // Only show day progress on current day's schedule
                 <View style={styles.barContainer}>
-                  <VerticalBar progress={progress} height={MOD_ITEMS_HEIGHT} style={styles.bar} />
+                  <VerticalBar progress={progress} height={MOD_ITEMS_HEIGHT - 25} style={styles.bar} />
                 </View>
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
                 content.map(({ sourceId, ...item }) => (
-                  <ScheduleItem key={sourceId} {...item} />
+                  <ScheduleItem key={sourceId} {...item} cardSchedule={cardSchedule} />
                 ))
               }
             </View>
@@ -71,7 +71,7 @@ const styles = EStyleSheet.create({
   barContainer: {
     width: '15%',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: 10,
   },
   bar: { width: 6 },
 });
