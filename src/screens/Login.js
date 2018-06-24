@@ -5,7 +5,7 @@ import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
-import { fetchUserInfo } from '../actions/actionCreators';
+import { fetchUserInfo, fetchSpecialDates } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
@@ -41,29 +41,39 @@ export default class Login extends PureComponent {
       this.setState({ loginAnimDone: true });
     });
 
-    try {
-      const { dispatch, navigation } = this.props;
-      const { username, password } = this.state;
-      const success = await dispatch(fetchUserInfo(username, password));
-      if (success) {
-        navigation.navigate('Dashboard');
-        return;
-      }
-      // Reverse animation if login failure
-      Animated.timing(this.state.loginWidth, {
-        toValue: WIDTH * 0.75, duration: 250,
-      }).start(() => {
-        this.setState({
-          loggingIn: false,
-          loginAnimDone: false,
-        });
+    const { navigation } = this.props;
+    const success = await this.performLogin();
+    if (success) {
+      navigation.navigate('Dashboard');
+      return;
+    }
+    // Reverse animation if login failure
+    Animated.timing(this.state.loginWidth, {
+      toValue: WIDTH * 0.75, duration: 250,
+    }).start(() => {
+      this.setState({
+        loggingIn: false,
+        loginAnimDone: false,
       });
+    });
+  }
+
+  performLogin = async () => {
+    const { dispatch } = this.props;
+    const { username, password } = this.state;
+    try {
+      const success = await dispatch(fetchUserInfo(username, password));
+      if (success) { // Performance check, only fetch special dates if valid login
+        await dispatch(fetchSpecialDates());
+      }
+      return success;
     } catch (error) {
       Alert.alert(
         'Error', `${error}`,
         [{ text: 'OK' }],
       );
       // TODO: Alert error & better error reporting
+      return false;
     }
   }
 

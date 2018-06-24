@@ -93,8 +93,7 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     // This prevents the erasure of profile photos on a user info fetch
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
-    // TODO: Call fetchSpecialDates here too
-    // And also calculate the day schedule
+    // fetchSpecialDates is called separately by Login to decouple the two
     dispatch(setDaySchedule(SCHEDULES.REGULAR));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
     dispatch(setCredentials(username, password));
@@ -109,7 +108,8 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
 const fetchSpecialDates = () => async (dispatch) => {
   try {
     // Connect to express server which does the heavy lifting
-    const specialDatesResponse = await fetch('https://whs-server.herokuapp.com/specialDates');
+    // Must pass {} as second argument due to https://github.com/robinpowered/react-native-fetch-polyfill/issues/8
+    const specialDatesResponse = await fetch('https://whs-server.herokuapp.com/specialDates', {});
     const json = await specialDatesResponse.json();
     dispatch(setSpecialDates(json));
   } catch (error) {
