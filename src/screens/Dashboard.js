@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
-import DashboardInfo from '../components/DashboardInfo';
+import DashboardBlock from '../components/DashboardBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 import { HEIGHT } from '../constants/constants';
@@ -29,9 +29,6 @@ export default class Dashboard extends Component {
   render() {
     const { info } = this.state;
 
-    // TODO: Refactor content of Dashboard into new component ScheduleInfo
-    // This component will be presentational, with countdown logic
-    // and mod calculations in this component
     return (
       <ParallaxScrollView
         parallaxHeaderHeight={HEIGHT * 0.35}
@@ -41,7 +38,7 @@ export default class Dashboard extends Component {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-        {info.map(item => <DashboardInfo key={item.title} {...item} />)}
+        {info.map(item => <DashboardBlock key={item.title} {...item} />)}
       </ParallaxScrollView>
     );
   }

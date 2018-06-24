@@ -10,7 +10,6 @@ export default class UserBackground extends PureComponent {
   }
 
   render() {
-    // TODO: Reset back to school picture
     const { blurRef } = this.state;
     const profilePhotoObj = { uri: this.props.profilePhoto };
 

@@ -4,7 +4,6 @@ import { load } from 'react-native-cheerio';
 
 import processSchedule from '../util/processSchedule';
 import { SCHEDULES } from '../constants/constants';
-
 import {
   SET_LOGIN_ERROR,
   SET_USER_INFO,
@@ -41,6 +40,8 @@ const logOut = createActionCreator(LOG_OUT);
 // Function returns false on failed login
 const fetchUserInfo = (username, password) => async (dispatch) => {
   try {
+    // TODO: Migrate login action to express server
+
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
     const timeout = 6000;
 
@@ -105,11 +106,16 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
   }
 };
 
-const fetchSpecialDates = () => {
-  // TODO: Finish up calendar scraping
-  // May decide to parse PDFs instead of
-  // relying solely on school calendars
-  // for more stable sources
+const fetchSpecialDates = () => async (dispatch) => {
+  try {
+    // Connect to express server which does the heavy lifting
+    const specialDatesResponse = await fetch('https://whs-server.herokuapp.com/specialDates');
+    const json = await specialDatesResponse.json();
+    dispatch(setSpecialDates(json));
+  } catch (error) {
+    // TODO: Better error reporting
+    throw error;
+  }
 };
 
 export {

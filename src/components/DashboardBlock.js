@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { List, ListItem } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-const DashboardInfo = ({ title, value }) => (
+const DashboardBlock = ({ title, value }) => (
   <List style={styles.infoContainer}>
     <ListItem noIndent style={styles.item}>
       <Text style={styles.value}>{value}</Text>
@@ -11,7 +11,7 @@ const DashboardInfo = ({ title, value }) => (
     </ListItem>
   </List>
 );
-export default DashboardInfo;
+export default DashboardBlock;
 
 const styles = EStyleSheet.create({
   infoContainer: { width: '80%' },

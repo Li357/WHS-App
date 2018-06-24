@@ -22,7 +22,7 @@ const initialState = {
   daySchedule: [],
   profilePhoto: null,
   schoolPicture: null,
-  dates: [],
+  dates: {},
 };
 
 const WHSApp = (state = initialState, {
