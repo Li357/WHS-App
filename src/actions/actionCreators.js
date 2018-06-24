@@ -1,9 +1,8 @@
 import { AsyncStorage } from 'react-native';
 import fetch from 'react-native-fetch-polyfill';
-import { load } from 'react-native-cheerio';
 
 import processSchedule from '../util/processSchedule';
-import { SCHEDULES } from '../constants/constants';
+import { REQUEST_TIMEOUT, SCHEDULES } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
   SET_USER_INFO,
@@ -37,31 +36,32 @@ const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDaySchedule = createActionCreator(SET_DAY_SCHEDULE, 'daySchedule');
 const logOut = createActionCreator(LOG_OUT);
 
-// Function returns false on failed login
+/**
+ * Function returns false on failed login
+ * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
+ * different from the client-side XMLHttpRequest
+ */
 const fetchUserInfo = (username, password) => async (dispatch) => {
   try {
-    // TODO: Migrate login action to express server
-
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
-    const timeout = 6000;
 
     // First request clears the user from previous signin
     await fetch(loginURL, {
       method: 'POST',
-      timeout,
+      timeout: REQUEST_TIMEOUT,
     });
 
-    const user = await fetch(loginURL, {
+    const userpageResponse = await fetch(loginURL, {
       method: 'POST',
-      timeout,
+      timeout: REQUEST_TIMEOUT,
     });
-    const userpageHTML = await user.text();
+    const userpageHTML = await userpageResponse.text();
     const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
     const name = $('title').text().split('|')[0].trim();
 
     if (error !== '') { // If error exists
-      dispatch(setLoginError(!!error)); // Convert error to boolean
+      dispatch(setLoginError(true)); // Specifically 401 Unauthorized
       return false;
     }
 
@@ -90,7 +90,7 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
 
     const processedSchedule = processSchedule(schedule);
 
-    // This prevents the erasure of profile photos on a user info fetch
+    // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
     // fetchSpecialDates is called separately by Login to decouple the two
@@ -105,13 +105,20 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
   }
 };
 
+// Function returns false on failed fetch of dates
 const fetchSpecialDates = () => async (dispatch) => {
   try {
     // Connect to express server which does the heavy lifting
-    // Must pass {} as second argument due to https://github.com/robinpowered/react-native-fetch-polyfill/issues/8
-    const specialDatesResponse = await fetch('https://whs-server.herokuapp.com/specialDates', {});
-    const json = await specialDatesResponse.json();
-    dispatch(setSpecialDates(json));
+    const specialDatesResponse = await fetch(
+      'https://whs-server.herokuapp.com/specialDates',
+      { timeout: REQUEST_TIMEOUT },
+    );
+    if (specialDatesResponse.ok) {
+      const json = await specialDatesResponse.json();
+      dispatch(setSpecialDates(json));
+      return true;
+    }
+    return false;
   } catch (error) {
     // TODO: Better error reporting
     throw error;
