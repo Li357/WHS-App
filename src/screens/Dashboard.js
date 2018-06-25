@@ -18,8 +18,6 @@ const mapStateToProps = ({
   ...rest,
 });
 
-const isDuringMod = currentMod => currentMod >= 0 && currentMod <= 14;
-
 /**
  * Default info to display:
  * - During mod:
@@ -35,37 +33,32 @@ const isDuringMod = currentMod => currentMod >= 0 && currentMod <= 14;
 @withHamburger
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
-  state = { info: [] }
-
-  componentDidMount() {
+  constructor() {
+    super();
     const now = moment();
     const currentMod = this.getCurrentMod(now);
     const nextClass = this.getNextClass(currentMod, now);
 
+    let info;
     if (currentMod > PASSING_PERIOD_FACTOR) {
       if (currentMod === BEFORE_SCHOOL) {
-        this.setState({
-          info: this.getBeforeSchoolInfo(),
-        });
-        return;
-      }
-      this.setState({
-        info: currentMod === AFTER_SCHOOL
+        info = this.getBeforeSchoolInfo();
+      } else {
+        info = currentMod === AFTER_SCHOOL
           ? this.getAfterSchoolInfo()
-          : this.getDuringPassingPeriodInfo(nextClass),
-      });
+          : this.getDuringPassingPeriodInfo(nextClass);
+      }
     } else {
-      this.setState({
-        info: this.getDuringModInfo(currentMod, nextClass),
-      });
+      info = this.getDuringModInfo(currentMod, nextClass);
     }
     // TODO: End of day countdown
+    this.state = { info };
   }
 
   getDuringModInfo = (currentMod, nextClass) => [
     {
       title: 'Current Mod',
-      value: currentMod
+      value: currentMod,
     },
     {
       title: 'Next Class',
@@ -75,12 +68,12 @@ export default class Dashboard extends Component {
     // TODO: Until mod over countdown
   ]
 
-  getDuringPassingPeriodInfo = (nextClass) => [
+  getDuringPassingPeriodInfo = nextClass => [
     {
       title: 'Next Class',
       value: nextClass.title,
       subtitle: nextClass.body,
-    }
+    },
     // TODO: Until passing period over countdown
   ]
 
@@ -111,7 +104,7 @@ export default class Dashboard extends Component {
 
       const lastMod = array[index - 1];
       if (lastMod) {
-        const lastModEnd = moment(`${lastMod[1]}:00`, `kk:mm:ss`);
+        const lastModEnd = moment(`${lastMod[1]}:00`, 'kk:mm:ss');
         const isPassingPeriod = date.isBefore(modStart) && date.isAfter(lastModEnd);
 
         return isPassingPeriod

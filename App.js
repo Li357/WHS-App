@@ -130,7 +130,7 @@ export default class App extends Component {
             activeTintColor: 'red',
             inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
           },
-        }
+        },
       );
 
       Navigator = createSwitchNavigator(
@@ -138,7 +138,7 @@ export default class App extends Component {
           Login: { screen: Login },
           Drawer: { screen: Drawer },
         },
-        { initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login' }
+        { initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login' },
       );
     }
 
