@@ -35,7 +35,9 @@ export default class UserInfo extends PureComponent {
   }
 
   render() {
-    const { name, classOf, profilePhoto } = this.props;
+    const {
+      name, classOf, profilePhoto, counselor, homeroom, dean, id
+    } = this.props;
     const profilePhotoObj = { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
 
@@ -62,7 +64,12 @@ export default class UserInfo extends PureComponent {
             <Text style={styles.classOf}>{classOf}</Text>
           </View>
           <View style={styles.slide}>
-            {/* TODO: ID, mentor info */}
+            <View>
+              <Text>Dean: {dean}</Text>
+              <Text>Counselor: {counselor}</Text>
+              <Text>Homeroom: {homeroom}</Text>
+              <Text>ID: {id}</Text>
+            </View>
           </View>
         </Carousel>
       </View>
@@ -81,6 +88,8 @@ const styles = EStyleSheet.create({
   slide: {
     width: WIDTH,
     height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bulletsContainer: {
     bottom: 0,

@@ -8,7 +8,7 @@ const DashboardBlock = ({ title, subtitle, value }) => (
     <ListItem noIndent style={styles.item}>
       <Text style={styles.value}>{value}</Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-      <Text style={styles.title}>{title}</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
     </ListItem>
   </List>
 );

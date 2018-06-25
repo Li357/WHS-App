@@ -10,6 +10,7 @@ import UserBackground from '../components/UserBackground';
 import DashboardBlock from '../components/DashboardBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
+import { getCurrentMod, getNextClass } from '../util/querySchedule';
 import { HEIGHT, PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL } from '../constants/constants';
 
 const mapStateToProps = ({
@@ -17,6 +18,30 @@ const mapStateToProps = ({
 }) => ({
   ...rest,
 });
+
+// NOTE: This is decoupled for future modularity
+const getDuringModInfo = (currentMod, nextClass) => [
+  {
+    title: 'Current Mod',
+    value: currentMod,
+  },
+  {
+    title: 'Next Class',
+    value: nextClass.title,
+    subtitle: nextClass.body,
+  },
+  // TODO: Until mod over countdown
+];
+const getDuringPassingPeriodInfo = nextClass => [
+  {
+    title: 'Next Class',
+    value: nextClass.title,
+    subtitle: nextClass.body,
+  },
+  // TODO: Until passing period over countdown
+];
+const getBeforeSchoolInfo = () => [/* TODO: Before school countdown */];
+const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }];
 
 /**
  * Default info to display:
@@ -33,105 +58,76 @@ const mapStateToProps = ({
 @withHamburger
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     const now = moment();
-    const currentMod = this.getCurrentMod(now);
-    const nextClass = this.getNextClass(currentMod, now);
+    const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
+    const { start, end } = props.dayInfo;
 
-    let info;
-    if (currentMod > PASSING_PERIOD_FACTOR) {
-      if (currentMod === BEFORE_SCHOOL) {
-        info = this.getBeforeSchoolInfo();
-      } else {
-        info = currentMod === AFTER_SCHOOL
-          ? this.getAfterSchoolInfo()
-          : this.getDuringPassingPeriodInfo(nextClass);
-      }
-    } else {
-      info = this.getDuringModInfo(currentMod, nextClass);
-    }
-    // TODO: End of day countdown
-    this.state = { info };
+    // TODO: Add mod end countdown
+    this.state = {
+      currentMod,
+      nextClass,
+      untilDayStart: now.diff(start),
+      untilDayEnd: now.diff(end),
+    };
   }
 
-  getDuringModInfo = (currentMod, nextClass) => [
-    {
-      title: 'Current Mod',
-      value: currentMod,
-    },
-    {
-      title: 'Next Class',
-      value: nextClass.title,
-      subtitle: nextClass.body,
-    },
-    // TODO: Until mod over countdown
-  ]
-
-  getDuringPassingPeriodInfo = nextClass => [
-    {
-      title: 'Next Class',
-      value: nextClass.title,
-      subtitle: nextClass.body,
-    },
-    // TODO: Until passing period over countdown
-  ]
-
-  getBeforeSchoolInfo = () => [/* TODO: Before school countdown */]
-
-  getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }]
-
-  /**
-   * Get current mod based on passed date, defaults to now
-   */
-  getCurrentMod = (date = moment()) => {
-    const { dayInfo: { start, end, schedule } } = this.props;
-
-    if (date.isAfter(end)) {
-      return AFTER_SCHOOL;
-    } else if (date.isBefore(start)) {
-      return BEFORE_SCHOOL;
+  componentDidMount() {
+    const { untilDayStart, untilDayEnd } = this.state;
+    if (untilDayStart >= 0 && untilDayEnd >= 0) {
+      this.createCountdown('untilDayEnd');
+      // TODO: Add mod end countdown
+    } else if (untilDayStart < 0) {
+      this.createCountdown('untilDayStart');
     }
-
-    return schedule.reduce((currentMod, timePair, index, array) => {
-      const [modStart, modEnd] = timePair.map(time => moment(`${time}:00`, 'kk:mm:ss'));
-      const modNumber = index + (date.day() === 3 ? 1 : 0);
-      const isBetween = date.isAfter(modStart) && date.isBefore(modEnd);
-
-      if (isBetween) {
-        return modNumber;
-      }
-
-      const lastMod = array[index - 1];
-      if (lastMod) {
-        const lastModEnd = moment(`${lastMod[1]}:00`, 'kk:mm:ss');
-        const isPassingPeriod = date.isBefore(modStart) && date.isAfter(lastModEnd);
-
-        return isPassingPeriod
-          ? PASSING_PERIOD_FACTOR + modNumber
-          : currentMod;
-      }
-      return currentMod;
-    }, 0);
   }
 
-  /**
-   * Get next class based on next mod
-   */
-  getNextClass = (currentMod, date = moment()) => {
-    const { schedule } = this.props;
-    const normalizedDay = date.day() - 1;
-    const userDaySchedule = schedule[normalizedDay];
-    return currentMod > PASSING_PERIOD_FACTOR
-      ? userDaySchedule[currentMod - PASSING_PERIOD_FACTOR]
-      : userDaySchedule[currentMod + 1];
+  calculateScheduleInfo = ({ dayInfo, schedule }, now = moment()) => {
+    const currentMod = getCurrentMod(dayInfo, now);
+    const nextClass = getNextClass(schedule, currentMod, now);
+
+    return {
+      currentMod,
+      nextClass,
+    };
+  }
+
+  createCountdown = (key, shouldRecalculateInfo = true) => {
+    const id = setInterval(() => {
+      if (this.state[key] === 0) {
+        clearInterval(id);
+        if (shouldRecalculateInfo) {
+          this.setState(this.calculateScheduleInfo(this.props));
+        }
+        return;
+      }
+      this.setState(prevState => ({
+        [key]: prevState[key] - 1,
+      }));
+    }, 1000);
   }
 
   renderForeground = () => <UserInfo {...this.props} />
   renderBackground = () => <UserBackground {...this.props} />
 
   render() {
-    const { info } = this.state;
+    const {
+      currentMod, nextClass, untilDayStart, untilDayEnd
+    } = this.state;
+
+    let info;
+    if (currentMod > PASSING_PERIOD_FACTOR) {
+      if (currentMod === BEFORE_SCHOOL) {
+        info = getBeforeSchoolInfo(untilDayStart);
+      } else {
+        info = currentMod === AFTER_SCHOOL
+          ? getAfterSchoolInfo()
+          : getDuringPassingPeriodInfo(nextClass, untilDayEnd);
+      }
+    } else {
+      info = getDuringModInfo(currentMod, nextClass, untilDayEnd);
+    }
 
     return (
       <ParallaxScrollView
@@ -142,7 +138,7 @@ export default class Dashboard extends Component {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-        {info.map(item => <DashboardBlock key={item.title} {...item} />)}
+        {info.map(item => <DashboardBlock key={item.title || item.value} {...item} />)}
       </ParallaxScrollView>
     );
   }
