@@ -34,6 +34,7 @@
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-extended-stylesheet": "^0.8.1",
     "react-native-fetch-polyfill": "^1.1.2",
+    "react-native-looped-carousel": "^0.1.13",
     "react-native-parallax-scroll-view": "^0.21.3",
     "react-native-photo-upload": "git+https://github.com/Li357/react-native-photo-upload.git",
     "react-native-progress": "git+https://github.com/Li357/react-native-progress.git",

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Alert, AsyncStorage, View, Text, StyleSheet } from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
+import Carousel from 'react-native-looped-carousel';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
@@ -40,16 +41,30 @@ export default class UserInfo extends PureComponent {
 
     return (
       <View style={styles.studentProfile}>
-        <PhotoUpload
-          onPhotoSelect={this.saveProfilePhoto}
-          customButtons={customButtons}
-          onTapCustomButton={this.handleReset}
-          containerStyle={StyleSheet.flatten(styles.photoUploader)}
+        <Carousel
+          autoplay={false}
+          bullets
+          style={styles.studentProfile}
+          bulletStyle={styles.bullet}
+          chosenBulletStyle={styles.bullet}
+          bulletsContainerStyle={styles.bulletsContainer}
         >
-          <Thumbnail source={profilePhotoObj} style={styles.profilePhoto} />
-        </PhotoUpload>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.classOf}>{classOf}</Text>
+          <View style={styles.slide}>
+            <PhotoUpload
+              onPhotoSelect={this.saveProfilePhoto}
+              customButtons={customButtons}
+              onTapCustomButton={this.handleReset}
+              containerStyle={StyleSheet.flatten(styles.photoUploader)}
+            >
+              <Thumbnail source={profilePhotoObj} style={styles.profilePhoto} />
+            </PhotoUpload>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.classOf}>{classOf}</Text>
+          </View>
+          <View style={styles.slide}>
+            {/* TODO: ID, mentor info */}
+          </View>
+        </Carousel>
       </View>
     );
   }
@@ -58,9 +73,24 @@ export default class UserInfo extends PureComponent {
 const styles = EStyleSheet.create({
   $profilePhotoSize: HEIGHT / 5.5,
   $studentInfoHeight: '35%',
+  $bulletSize: 8,
   studentProfile: {
     width: '100%',
     height: '100%',
+  },
+  slide: {
+    width: WIDTH,
+    height: '100%',
+  },
+  bulletsContainer: {
+    bottom: 0,
+    height: 25,
+  },
+  bullet: {
+    margin: 2.5,
+    marginHorizontal: 5,
+    width: '$bulletSize',
+    height: '$bulletSize',
   },
   photoUploader: {
     marginTop: '$studentInfoHeight - 32%',
