@@ -1,15 +1,18 @@
 import { AsyncStorage } from 'react-native';
+import { load } from 'react-native-cheerio';
 import fetch from 'react-native-fetch-polyfill';
+import moment from 'moment';
 
 import processSchedule from '../util/processSchedule';
-import { REQUEST_TIMEOUT, SCHEDULES } from '../constants/constants';
+import selectSchedule from '../util/selectSchedule';
+import { REQUEST_TIMEOUT } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
   SET_USER_INFO,
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
-  SET_DAY_SCHEDULE,
+  SET_DAY_INFO,
   LOG_OUT,
 } from './actions';
 
@@ -33,7 +36,7 @@ const setCredentials = createActionCreator(
 );
 const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
-const setDaySchedule = createActionCreator(SET_DAY_SCHEDULE, 'daySchedule');
+const setDayInfo = createActionCreator(SET_DAY_INFO, 'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate');
 const logOut = createActionCreator(LOG_OUT);
 
 /**
@@ -41,7 +44,7 @@ const logOut = createActionCreator(LOG_OUT);
  * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
  * different from the client-side XMLHttpRequest
  */
-const fetchUserInfo = (username, password) => async (dispatch) => {
+const fetchUserInfo = (username, password) => async (dispatch, getState) => {
   try {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
@@ -93,8 +96,19 @@ const fetchUserInfo = (username, password) => async (dispatch) => {
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
-    // fetchSpecialDates is called separately by Login to decouple the two
-    dispatch(setDaySchedule(SCHEDULES.REGULAR));
+    // Directly call fetchSpecialDates here for setDaySchedule
+    await fetchSpecialDates()(dispatch);
+
+    // Set day info in user info fetch
+    const { specialDates } = getState();
+    const date = moment();
+    const daySchedule = selectSchedule(specialDates, date);
+    const range = [
+      daySchedule[0][0].split(':'),
+      daySchedule.slice(-1)[0][1].split(':'),
+    ].map(time => moment(time, 'kk:mm'));
+
+    dispatch(setDayInfo(...range, daySchedule, date));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
     dispatch(setCredentials(username, password));
 
@@ -128,7 +142,7 @@ const fetchSpecialDates = () => async (dispatch) => {
 export {
   setUserInfo,
   setProfilePhoto,
-  setDaySchedule,
+  setDayInfo,
   logOut,
   fetchUserInfo,
   fetchSpecialDates,

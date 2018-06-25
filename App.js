@@ -17,13 +17,13 @@ import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
-import { setProfilePhoto, setDaySchedule } from './src/actions/actionCreators';
+import { setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
 import selectSchedule from './src/util/selectSchedule';
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['profilePhoto', 'loginError', 'daySchedule'],
+  blacklist: ['profilePhoto', 'loginError'],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
 const store = createStore(
@@ -46,10 +46,7 @@ const hasLoggedIn = () => {
 };
 
 export default class App extends Component {
-  state = {
-    loaded: false,
-    lastUpdate: moment(),
-  }
+  state = { loaded: false }
 
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
@@ -64,13 +61,15 @@ export default class App extends Component {
      * This handler handles the case where the user does not quit the app but
      * has it in the background, in which case the app must do some updates
      */
-    const { lastUpdate } = this.state;
+    const { dayInfo } = store.getState();
     const now = moment();
+    const today = now.day();
     if (
       newStatus === 'active'
-      && lastUpdate.day() !== now.day() // Only update if not updated in one day
+      && dayInfo.lastUpdated.day() !== today // Only update if not updated in one day
+      && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
-      this.updateSchedule(now);
+      this.updateDayInfo(now); // Pass already created instance
     }
   }
 
@@ -92,10 +91,14 @@ export default class App extends Component {
     this.setState({ loaded: true });
   }
 
-  updateSchedule = (date = moment()) => {
+  updateDayInfo = (date = moment()) => {
     const { specialDates } = store.getState();
-    store.dispatch(setDaySchedule(selectSchedule(specialDates, date)));
-    this.setState({ lastUpdate: date });
+    const schedule = selectSchedule(specialDates, date);
+    const range = [
+      schedule[0][0].split(':'),
+      schedule.slice(-1)[0][1].split(':'),
+    ].map(time => moment(time, 'kk:mm'));
+    store.dispatch(setDayInfo(...range, schedule, date));
   }
 
   updateProfilePhoto = async () => {

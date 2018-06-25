@@ -11,9 +11,9 @@ import withHamburger from '../util/withHamburger';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
 const mapStateToProps = ({
-  schedule, daySchedule, specialDates,
+  schedule, dayInfo, specialDates,
 }) => ({
-  schedule, daySchedule, specialDates,
+  schedule, dayInfo, specialDates,
 });
 
 @waitForAnimation
@@ -21,9 +21,9 @@ const mapStateToProps = ({
 @connect(mapStateToProps)
 export default class Schedule extends Component {
   renderItem = ({ item }) => {
-    const { daySchedule, specialDates } = this.props;
+    const { dayInfo, specialDates } = this.props;
     return (
-      <ScheduleCard content={item} daySchedule={daySchedule} specialDates={specialDates} />
+      <ScheduleCard content={item} dayInfo={dayInfo} specialDates={specialDates} />
     );
   }
 

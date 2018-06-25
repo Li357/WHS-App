@@ -11,22 +11,18 @@ import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
 export default class ScheduleCard extends Component {
   render() {
-    const { content, daySchedule, specialDates } = this.props;
+    const { content, dayInfo, specialDates } = this.props;
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
     const date = moment();
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
 
-    const cardSchedule = isCurrentDay ? daySchedule : selectSchedule(specialDates, date);
+    const { start, end, schedule } = dayInfo;
+    const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, date);
     let progress;
     if (isCurrentDay) {
-      const startOfDay = cardSchedule[0][0].split(':');
-      const endOfDay = cardSchedule.slice(-1)[0][1].split(':');
-      const [first, last] = [startOfDay, endOfDay].map(([hours, minutes]) => (
-        moment().hours(hours).minutes(minutes)
-      ));
-      const currentDiff = date.diff(first);
+      const currentDiff = date.diff(start);
 
-      progress = currentDiff > 0 ? currentDiff / last.diff(first) : 1;
+      progress = currentDiff > 0 ? currentDiff / end.diff(start) : 1;
     }
 
     return (

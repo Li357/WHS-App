@@ -4,7 +4,7 @@ import {
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
-  SET_DAY_SCHEDULE,
+  SET_DAY_INFO,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -19,10 +19,20 @@ const initialState = {
   dean: null,
   id: '',
   schedule: [],
-  daySchedule: [],
   profilePhoto: null,
   schoolPicture: null,
-  dates: {},
+  dayInfo: {
+    start: null,
+    end: null,
+    schedule: [],
+    lastUpdate: null,
+  },
+  specialDates: {
+    semesterOneStart: '',
+    semesterTwoStart: '',
+    lastDay: '',
+    noSchoolDates: [],
+  },
 };
 
 const WHSApp = (state = initialState, {
@@ -31,10 +41,13 @@ const WHSApp = (state = initialState, {
   username,
   password,
   schedule,
-  daySchedule,
   profilePhoto,
   schoolPicture,
-  dates,
+  dayStart,
+  dayEnd,
+  daySchedule,
+  lastDayInfoUpdate,
+  specialDates,
   ...userInfo
 }) => {
   switch (type) {
@@ -59,17 +72,22 @@ const WHSApp = (state = initialState, {
     case SET_SPECIAL_DATES:
       return {
         ...state,
-        dates,
+        specialDates,
       };
     case SET_PROFILE_PHOTO:
       return {
         ...state,
         profilePhoto,
       };
-    case SET_DAY_SCHEDULE:
+    case SET_DAY_INFO:
       return {
         ...state,
-        daySchedule,
+        dayInfo: {
+          start: dayStart,
+          end: dayEnd,
+          schedule: daySchedule,
+          lastUpdate: lastDayInfoUpdate,
+        },
       };
     case LOG_OUT:
       return WHSApp(undefined, {});
