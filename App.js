@@ -10,6 +10,7 @@ import { createLogger } from 'redux-logger';
 import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
+import momentDurationFormat from 'moment-duration-format';
 
 import WHSApp from './src/reducers/reducer';
 import Login from './src/screens/Login';
@@ -39,6 +40,7 @@ const persistor = persistStore(store);
 moment.updateLocale('en', {
   week: { dow: 1 },
 });
+momentDurationFormat(moment);
 
 const hasLoggedIn = () => {
   const { username, password } = store.getState();
@@ -96,8 +98,8 @@ export default class App extends Component {
     const { specialDates } = store.getState();
     const schedule = selectSchedule(specialDates, date);
     const range = [
-      schedule[0][0].split(':'),
-      schedule.slice(-1)[0][1].split(':'),
+      schedule[0][0],
+      schedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'kk:mm:ss'));
     store.dispatch(setDayInfo(...range, schedule, date));
   }

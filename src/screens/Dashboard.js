@@ -20,39 +20,47 @@ const mapStateToProps = ({
 });
 
 // NOTE: This is decoupled for future modularity
-const getDuringModInfo = (currentMod, nextClass) => [
+const getDuringModInfo = (currentMod, nextClass, untilModEnd, untilDayEnd) => [
   {
-    title: 'Current Mod',
+    title: 'Current mod',
     value: currentMod,
   },
   {
-    title: 'Next Class',
-    value: nextClass.title,
-    subtitle: nextClass.body,
+    title: 'Until mod ends',
+    value: moment.duration(untilModEnd).format('h:m:s'),
   },
-  // TODO: Until mod over countdown
-];
-const getDuringPassingPeriodInfo = nextClass => [
   {
-    title: 'Next Class',
+    title: 'Next class',
     value: nextClass.title,
     subtitle: nextClass.body,
   },
-  // TODO: Until passing period over countdown
+  {
+    title: 'Until day ends',
+    value: moment.duration(untilDayEnd).format('h:m:s'),
+  },
 ];
-const getBeforeSchoolInfo = () => [/* TODO: Before school countdown */];
+const getDuringPassingPeriodInfo = (nextClass, untilPassingPeriodEnd, untilDayEnd) => [
+  {
+    title: 'Next class',
+    value: nextClass.title,
+    subtitle: nextClass.body,
+  },
+  {
+    title: 'Until passing period ends',
+    value: moment.duration(untilPassingPeriodEnd).format('h:m:s'),
+  },
+  {
+    title: 'Until day ends',
+    value: moment.duration(untilDayEnd).format('h:m:s'),
+  },
+];
+const getBeforeSchoolInfo = untilDayStart => [
+  {
+    title: 'Until school day starts',
+    value: moment.duration(untilDayStart).format('h:m:s'),
+  },
+];
 const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }];
-
-/**
- * Default info to display:
- * - During mod:
- *    - Current (half) mod
- *    - Until (half) mod is over
- *    - Next (half) mod
- * - Passing Period
- *    - Until passing period is over
- *    - Next (half) mod
- */
 
 @waitForAnimation
 @withHamburger
@@ -60,25 +68,19 @@ const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }];
 export default class Dashboard extends Component {
   constructor(props) {
     super(props);
-    const now = moment();
-    const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
-    const { start, end } = props.dayInfo;
-
-    // TODO: Add mod end countdown
-    this.state = {
-      currentMod,
-      nextClass,
-      untilDayStart: now.diff(start),
-      untilDayEnd: now.diff(end),
-    };
+    this.updateCountdowns(props, true);
   }
 
   componentDidMount() {
-    const { untilDayStart, untilDayEnd } = this.state;
-    if (untilDayStart >= 0 && untilDayEnd >= 0) {
+    const { currentMod, untilDayStart, untilDayEnd } = this.state;
+    if (untilDayStart < 0 && untilDayEnd >= 0) {
       this.createCountdown('untilDayEnd');
-      // TODO: Add mod end countdown
-    } else if (untilDayStart < 0) {
+      if (currentMod < PASSING_PERIOD_FACTOR) {
+        this.createCountdown('untilModEnd');
+        return;
+      }
+      this.createCountdown('untilPassingPeriodEnd');
+    } else if (untilDayStart >= 0) {
       this.createCountdown('untilDayStart');
     }
   }
@@ -93,13 +95,41 @@ export default class Dashboard extends Component {
     };
   }
 
-  createCountdown = (key, shouldRecalculateInfo = true) => {
+  updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
+    const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
+    const { start, end, schedule } = props.dayInfo;
+    const isDuringMod = currentMod < PASSING_PERIOD_FACTOR;
+    const isPassingPeriod = currentMod > PASSING_PERIOD_FACTOR && currentMod < BEFORE_SCHOOL;
+
+    const untilModEnd = isDuringMod
+      ? moment(`${schedule[currentMod][1]}:ss`, 'kk:mm:ss').diff(now)
+      : 0;
+
+    const untilPassingPeriodEnd = isPassingPeriod
+      ? moment(`${schedule[currentMod - PASSING_PERIOD_FACTOR][0]}:ss`, 'kk:mm:ss').diff(now)
+      : 0;
+
+    const newState = {
+      currentMod,
+      nextClass,
+      untilDayStart: now.diff(start),
+      untilDayEnd: end.diff(now),
+      untilModEnd,
+      untilPassingPeriodEnd,
+    };
+
+    if (firstTimeSet) {
+      this.state = newState;
+      return;
+    }
+    this.setState(newState);
+  }
+
+  createCountdown = key => {
     const id = setInterval(() => {
       if (this.state[key] === 0) {
         clearInterval(id);
-        if (shouldRecalculateInfo) {
-          this.setState(this.calculateScheduleInfo(this.props));
-        }
+        this.updateCountdowns(this.props);
         return;
       }
       this.setState(prevState => ({
@@ -113,8 +143,9 @@ export default class Dashboard extends Component {
 
   render() {
     const {
-      currentMod, nextClass, untilDayStart, untilDayEnd
+      currentMod, nextClass, untilDayStart, untilDayEnd, untilModEnd, untilPassingPeriodEnd,
     } = this.state;
+    console.log(this.state);
 
     let info;
     if (currentMod > PASSING_PERIOD_FACTOR) {
@@ -123,10 +154,10 @@ export default class Dashboard extends Component {
       } else {
         info = currentMod === AFTER_SCHOOL
           ? getAfterSchoolInfo()
-          : getDuringPassingPeriodInfo(nextClass, untilDayEnd);
+          : getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
       }
     } else {
-      info = getDuringModInfo(currentMod, nextClass, untilDayEnd);
+      info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
     }
 
     return (

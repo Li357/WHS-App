@@ -2,11 +2,11 @@ import moment from 'moment';
 
 import { SCHEDULES } from '../constants/constants';
 
-const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
-  const formattedDate = date.format('MMMM D');
-  const firstFinalsDay = moment(secondFinalsDay, 'MMMM D').subtract(1, 'd').format('MMMM D');
+const selectSchedule = ({ lastDay }, date = moment()) => {
+  const secondFinalsDay = moment(lastDay, 'MMMM D');
+  const firstFinalsDay = secondFinalsDay.clone().subtract(1, 'd');
 
-  if (formattedDate === secondFinalsDay || formattedDate === firstFinalsDay) {
+  if (date.isSame(secondFinalsDay, 'month') || date.isSame(firstFinalsDay, 'month')) {
     return SCHEDULES.FINALS;
   } else if (date.day() === 3) {
     // TODO: Handle late start Wednesday here
