@@ -36,7 +36,7 @@ export default class Login extends PureComponent {
     this.setState({ loggingIn: true });
 
     Animated.timing(this.state.loginWidth, {
-      easing: Easing.sin, toValue: WIDTH * 0.2 * 0.75, duration: 250,
+      easing: Easing.sin, toValue: 50, duration: 250,
     }).start(() => {
       this.setState({ loginAnimDone: true });
     });

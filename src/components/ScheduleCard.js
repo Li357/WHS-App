@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { Switch, View, Text, ScrollView } from 'react-native';
 import { Card, CardItem } from 'native-base';
 import { VerticalBar } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -10,19 +10,36 @@ import selectSchedule from '../util/selectSchedule';
 import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
 export default class ScheduleCard extends Component {
+  state = { showTimes: false }
+
+  handleSwitch = (showTimes) => {
+    this.setState({ showTimes });
+  }
+
   render() {
-    const { content, dayInfo, specialDates } = this.props;
+    const { content, dayInfo: { start, end, schedule }, specialDates } = this.props;
+    const { showTimes } = this.state;
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
     const date = moment();
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
 
-    const { start, end, schedule } = dayInfo;
     const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, date);
+    const scheduleToShow = showTimes
+      ? cardSchedule.map((timePair, index) => ({
+          title: timePair.join(' - '),
+          length: 1,
+          startMod: index,
+          endMod: index + 1,
+          sourceId: index,
+        }))
+      : content;
     let progress;
     if (isCurrentDay) {
-      const currentDiff = date.diff(start);
-
-      progress = currentDiff > 0 ? currentDiff / end.diff(start) : 1;
+      if (date.isBefore(start)) {
+        progress = 0;
+      } else {
+        progress = date.diff(start) / end.diff(start);
+      }
     }
 
     return (
@@ -30,6 +47,11 @@ export default class ScheduleCard extends Component {
         <CardItem header bordered style={styles.header}>
           <Text style={styles.day}>{date.weekday(day - 1).format('dddd')} </Text>
           <Text style={styles.date}>{date.format('MMM DD')}</Text>
+          <Switch
+            value={this.state.showTimes}
+            onValueChange={this.handleSwitch}
+            style={styles.timeSwitch}
+          />
         </CardItem>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
@@ -45,8 +67,8 @@ export default class ScheduleCard extends Component {
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
-                content.map(({ sourceId, ...item }) => (
-                  <ScheduleItem key={sourceId} {...item} cardSchedule={cardSchedule} />
+                scheduleToShow.map(({ sourceId, ...item }) => (
+                  <ScheduleItem key={sourceId} {...item} />
                 ))
               }
             </View>
@@ -59,7 +81,10 @@ export default class ScheduleCard extends Component {
 
 const styles = EStyleSheet.create({
   container: { flex: 1 },
-  header: { width: '100%' },
+  header: {
+    flexDirection: 'row',
+  },
+  timeSwitch: { marginLeft: 'auto' },
   day: {
     fontFamily: '$fontRegular',
     fontSize: 18,

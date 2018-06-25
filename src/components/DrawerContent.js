@@ -19,8 +19,8 @@ const mapStateToProps = (state, ownProps) => ({
 @connect(mapStateToProps)
 export default class DrawerContent extends Component {
   handleLogout = () => {
-    const { dispatch, navigation } = this.props;
-    navigation.navigate('Login');
+    const { dispatch, navigation: { navigate } } = this.props;
+    navigate('Login');
     dispatch(logOut());
   }
 
@@ -77,18 +77,20 @@ const styles = EStyleSheet.create({
     borderBottomWidth: 1,
   },
   logout: {
-    marginHorizontal: 16,
+    paddingHorizontal: 16,
+    width: '100%',
+    justifyContent: 'flex-start',
   },
   icon: {
     fontSize: 20,
     marginLeft: 0,
     marginRight: 20,
     paddingLeft: 4,
-    color: 'rgba(0, 0, 0, 0.4)',
+    color: 'rgba(0, 0, 0, 0.5)',
   },
   text: {
     fontWeight: 'bold',
     marginHorizontal: 16,
-    color: 'rgba(0, 0, 0, 0.4)',
+    color: 'rgba(0, 0, 0, 0.5)',
   },
 });

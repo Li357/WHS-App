@@ -106,7 +106,7 @@ const fetchUserInfo = (username, password) => async (dispatch, getState) => {
     const range = [
       daySchedule[0][0].split(':'),
       daySchedule.slice(-1)[0][1].split(':'),
-    ].map(time => moment(time, 'kk:mm'));
+    ].map(time => moment(`${time}:00`, 'kk:mm:ss'));
 
     dispatch(setDayInfo(...range, daySchedule, date));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
@@ -125,7 +125,7 @@ const fetchSpecialDates = () => async (dispatch) => {
     // Connect to express server which does the heavy lifting
     const specialDatesResponse = await fetch(
       'https://whs-server.herokuapp.com/specialDates',
-      { timeout: REQUEST_TIMEOUT },
+      { /* timeout: REQUEST_TIMEOUT */ }, // TODO: Adjust timeout
     );
     if (specialDatesResponse.ok) {
       const json = await specialDatesResponse.json();

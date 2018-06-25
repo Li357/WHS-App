@@ -3,28 +3,20 @@ import { View, Text } from 'react-native';
 import { CardItem } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { sum } from 'lodash';
-import moment from 'moment';
 
 import { getMods } from '../util/processSchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
 
-
 const ScheduleItem = ({
-  title, body, length, cardSchedule, ...scheduleItem
+  title, body, length, ...scheduleItem
 }) => {
   const classMods = getMods(scheduleItem);
   const modHeights = classMods.map(modNumber => (
     MOD_ITEM_HEIGHT / (isHalfMod(modNumber) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
-
-  const unformattedStart = cardSchedule[classMods[0]][0];
-  const unformattedEnd = cardSchedule[classMods.slice(-1)[0]][1];
-  const [classStart, classEnd] = [unformattedStart, unformattedEnd].map(time => (
-    moment(time, 'H:mm').format('h:mm')
-  ));
 
   return (
     <CardItem bordered style={{ height: scheduleItemHeight }}>
@@ -37,9 +29,9 @@ const ScheduleItem = ({
           ))
         }
       </View>
+      <View style={styles.separator} />
       <View style={styles.info}>
-        <Text style={styles.timeText}>{classStart} - {classEnd}</Text>
-        <View style={styles.classInfoContainer}>
+        <View style={styles.textContainer}>
           <Text style={styles.titleText}>{title}</Text>
           {body && <Text style={styles.bodyText}>{body}</Text>}
         </View>
@@ -50,28 +42,28 @@ const ScheduleItem = ({
 export default ScheduleItem;
 
 const styles = EStyleSheet.create({
-  modIndicator: { width: '10%' },
+  modIndicator: { width: '12.5%' },
   modNumber: {
     width: '100%',
     justifyContent: 'center',
   },
+  separator: {
+    height: '90%',
+    borderLeftColor: 'lightgrey',
+    borderLeftWidth: 1,
+    marginRight: 15,
+  },
   info: {
-    width: '90%',
-    height: '100%',
+    flexGrow: 1,
     alignItems: 'center',
+    alignSelf: 'center',
   },
-  timeText: {
-    position: 'absolute',
-    fontFamily: '$fontLight',
-    alignSelf: 'flex-end',
-  },
-  classInfoContainer: {
+  textContainer: {
+    width: '85%',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: '100%',
   },
   titleText: {
+    textAlign: 'center',
     fontFamily: '$fontRegular',
     fontSize: 16,
   },

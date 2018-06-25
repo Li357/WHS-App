@@ -20,12 +20,7 @@ const mapStateToProps = ({
 @withHamburger
 @connect(mapStateToProps)
 export default class Schedule extends Component {
-  renderItem = ({ item }) => {
-    const { dayInfo, specialDates } = this.props;
-    return (
-      <ScheduleCard content={item} dayInfo={dayInfo} specialDates={specialDates} />
-    );
-  }
+  renderItem = ({ item }) => <ScheduleCard content={item} {...this.props} />
 
   render() {
     // Monday is 0, Friday is 4

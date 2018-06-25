@@ -35,19 +35,19 @@ Rewrite Roadmap:
     - [ ] Customizable information to be shown on dashboard
     - [x] Upload own photo
     - [x] Option to reset to school photo
-  - [ ] Schedule
+  - [x] Schedule
     - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
     - [x] Wait for drawer animation to finish to reduce choppiness
     - [x] Vertical progress bar to signify relative position in day
-    - [ ] Better approach to showing time tables for mods
+    - [x] Better approach to showing time tables for mods
   - [ ] Settings
     - [ ] Options to change drawer banner image
     - [ ] Make manual refresh more prominent and user friendly
     - [ ] Customize information to shown on dashboard via drag and drop lists
-  - [ ] Drawer
+  - [x] Drawer
     - [x] Banner to show current date for better look
     - [x] Icons for different screens (and tint colors)
-    - [ ] Logout span full width with same style as screens
+    - [x] Logout span full width with same style as screens
 
 ## To Do List
 

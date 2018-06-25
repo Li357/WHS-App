@@ -61,12 +61,12 @@ export default class App extends Component {
      * This handler handles the case where the user does not quit the app but
      * has it in the background, in which case the app must do some updates
      */
-    const { dayInfo } = store.getState();
+    const { dayInfo: { lastUpdated } } = store.getState();
     const now = moment();
     const today = now.day();
     if (
       newStatus === 'active'
-      && dayInfo.lastUpdated.day() !== today // Only update if not updated in one day
+      && lastUpdated.isSame(now, 'day') // Only update if not updated in one day
       && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
       this.updateDayInfo(now); // Pass already created instance
@@ -77,14 +77,15 @@ export default class App extends Component {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
-        this.updateSchedule();
+        this.updateDayInfo();
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {
         Alert.alert(
-          'Error', `${error}`,
+          'Error', `${error} Please try restarting the app.`,
           [{ text: 'OK' }],
         );
+        return;
         // TODO: Alert error & better error reporting
       }
     }
@@ -97,7 +98,7 @@ export default class App extends Component {
     const range = [
       schedule[0][0].split(':'),
       schedule.slice(-1)[0][1].split(':'),
-    ].map(time => moment(time, 'kk:mm'));
+    ].map(time => moment(`${time}:00`, 'kk:mm:ss'));
     store.dispatch(setDayInfo(...range, schedule, date));
   }
 
@@ -116,30 +117,29 @@ export default class App extends Component {
     const { loaded } = this.state;
     let Navigator;
     if (loaded) {
-      const Drawer = createDrawerNavigator({
-        Dashboard: { screen: Dashboard },
-        Schedule: { screen: Schedule },
-        Settings: { screen: Settings },
-      }, {
-        initialRouteName: 'Dashboard',
-        contentComponent: DrawerContent,
-        contentOptions: {
-          activeTintColor: 'red',
-          inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
+      const Drawer = createDrawerNavigator(
+        {
+          Dashboard: { screen: Dashboard },
+          Schedule: { screen: Schedule },
+          Settings: { screen: Settings },
         },
-      });
+        {
+          initialRouteName: 'Schedule',
+          contentComponent: DrawerContent,
+          contentOptions: {
+            activeTintColor: 'red',
+            inactiveTintColor: 'rgba(0, 0, 0, 0.5)',
+          },
+        }
+      );
 
-      Navigator = createSwitchNavigator({
-        Login: { screen: Login },
-        Drawer: { screen: Drawer },
-      }, {
-        initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login',
-        navigationOptions: {
-          header: null,
-          gesturesEnabled: false,
+      Navigator = createSwitchNavigator(
+        {
+          Login: { screen: Login },
+          Drawer: { screen: Drawer },
         },
-        cardStyle: { backgroundColor: 'white' },
-      });
+        { initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login' }
+      );
     }
 
     return (
