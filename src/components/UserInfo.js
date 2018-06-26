@@ -36,7 +36,7 @@ export default class UserInfo extends PureComponent {
 
   render() {
     const {
-      name, classOf, profilePhoto, counselor, homeroom, dean, id
+      name, classOf, profilePhoto, counselor, homeroom, dean, id,
     } = this.props;
     const profilePhotoObj = { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];

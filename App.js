@@ -63,12 +63,12 @@ export default class App extends Component {
      * This handler handles the case where the user does not quit the app but
      * has it in the background, in which case the app must do some updates
      */
-    const { dayInfo: { lastUpdated } } = store.getState();
+    const { dayInfo: { lastUpdate } } = store.getState();
     const now = moment();
     const today = now.day();
     if (
       newStatus === 'active'
-      && lastUpdated.isSame(now, 'day') // Only update if not updated in one day
+      && lastUpdate.isSame(now, 'day') // Only update if not updated in one day
       && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
       this.updateDayInfo(now); // Pass already created instance

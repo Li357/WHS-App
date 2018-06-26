@@ -1,24 +1,56 @@
 import React, { Component } from 'react';
-import { Switch, View, Text, ScrollView } from 'react-native';
+import { AppState, Switch, View, Text, ScrollView } from 'react-native';
 import { Card, CardItem } from 'native-base';
 import { VerticalBar } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
 import selectSchedule from '../util/selectSchedule';
 import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
+@withNavigation
 export default class ScheduleCard extends Component {
-  state = { showTimes: false }
+  constructor(props) {
+    super(props);
+    this.focusSubscriber = this.props.navigation.addListener('didFocus', this.updateProgress);
+    AppState.addEventListener('change', this.handleAppStateChange);
+
+    const { dayInfo: { start, end } } = this.props;
+    const date = moment();
+    this.state = {
+      showTimes: false,
+      progress: date.isBefore(start) ? 0 : date.diff(start) / end.diff(start),
+    };
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this.handleAppStateChange);
+    this.focusSubscriber.remove();
+  }
+
+  handleAppStateChange = (newStatus) => {
+    if (newStatus === 'active') {
+      this.updateProgress();
+    }
+  }
+
+  updateProgress = () => {
+    const date = moment();
+    const { dayInfo: { start, end } } = this.props;
+    this.setState({
+      progress: date.isBefore(start) ? 0 : date.diff(start) / end.diff(start),
+    });
+  }
 
   handleSwitch = (showTimes) => {
     this.setState({ showTimes });
   }
 
   render() {
-    const { content, dayInfo: { start, end, schedule }, specialDates } = this.props;
-    const { showTimes } = this.state;
+    const { content, dayInfo: { schedule }, specialDates } = this.props;
+    const { showTimes, progress } = this.state;
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
     const date = moment();
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
@@ -33,14 +65,6 @@ export default class ScheduleCard extends Component {
           sourceId: index,
         }))
       : content;
-    let progress;
-    if (isCurrentDay) {
-      if (date.isBefore(start)) {
-        progress = 0;
-      } else {
-        progress = date.diff(start) / end.diff(start);
-      }
-    }
 
     return (
       <Card style={styles.container}>

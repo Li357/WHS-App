@@ -41,6 +41,7 @@
     "react-native-progress": "git+https://github.com/Li357/react-native-progress.git",
     "react-native-snap-carousel": "^3.7.2",
     "react-navigation": "^2.5.2",
+    "react-navigation-drawer": "git+https://github.com/Li357/react-navigation-drawer.git",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
