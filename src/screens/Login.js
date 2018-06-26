@@ -121,10 +121,9 @@ export default class Login extends PureComponent {
               style={styles.loginButton}
             >
               {
-                loggingIn ?
-                  <CircleSnail color="white" size={25} />
-                :
-                  <Text style={styles.loginText}>Login</Text>
+                loggingIn
+                  ? <CircleSnail color="white" size={25} />
+                  : <Text style={styles.loginText}>Login</Text>
               }
             </Button>
           </Animated.View>

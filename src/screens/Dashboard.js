@@ -13,6 +13,7 @@ import DashboardBlock from '../components/DashboardBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 import { getCurrentMod, getNextClass } from '../util/querySchedule';
+import { getBeforeSchoolInfo, getAfterSchoolInfo } from '../util/dashboardInfoGetters';
 import { HEIGHT, PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL } from '../constants/constants';
 
 const mapStateToProps = ({
@@ -21,49 +22,6 @@ const mapStateToProps = ({
   ...rest,
   ...ownProps,
 });
-
-// NOTE: This is decoupled for future modularity
-const getDuringModInfo = (currentMod, nextClass, untilModEnd, untilDayEnd) => [
-  {
-    title: 'Current mod',
-    value: currentMod,
-  },
-  {
-    title: 'Until mod ends',
-    value: moment.duration(untilModEnd).format('h:*mm:ss'),
-  },
-  {
-    title: 'Next class',
-    value: nextClass.title,
-    subtitle: nextClass.body,
-  },
-  {
-    title: 'Until day ends',
-    value: moment.duration(untilDayEnd).format('h:*mm:ss'),
-  },
-];
-const getDuringPassingPeriodInfo = (nextClass, untilPassingPeriodEnd, untilDayEnd) => [
-  {
-    title: 'Next class',
-    value: nextClass.title,
-    subtitle: nextClass.body,
-  },
-  {
-    title: 'Until passing period ends',
-    value: moment.duration(untilPassingPeriodEnd).format('h:*mm:ss'),
-  },
-  {
-    title: 'Until day ends',
-    value: moment.duration(untilDayEnd).format('h:*mm:ss'),
-  },
-];
-const getBeforeSchoolInfo = untilDayStart => [
-  {
-    title: 'Until school day starts',
-    value: moment.duration(untilDayStart).format('h:*mm:ss'),
-  },
-];
-const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }];
 
 @waitForAnimation
 @withHamburger
@@ -111,6 +69,7 @@ export default class Dashboard extends Component {
 
   createCountdown = (key) => {
     const id = setInterval(() => {
+      // Need to floor because differences are not in exact 1000 increments
       if (Math.floor(this.state[key] / 1000) === 0) {
         clearInterval(id);
         this.updateCountdowns(this.props);
@@ -184,17 +143,17 @@ export default class Dashboard extends Component {
       currentMod, nextClass, untilDayStart, untilDayEnd, untilModEnd, untilPassingPeriodEnd,
     } = this.state;
 
-    let info;
+    let info = [];
     if (currentMod > PASSING_PERIOD_FACTOR) {
       if (currentMod === BEFORE_SCHOOL) {
         info = getBeforeSchoolInfo(untilDayStart);
       } else {
         info = currentMod === AFTER_SCHOOL
           ? getAfterSchoolInfo()
-          : getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
+          : []//getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
       }
     } else {
-      info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
+      //info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
     }
 
     return (

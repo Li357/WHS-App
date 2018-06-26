@@ -5,6 +5,7 @@ import {
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
+  SET_SETTINGS,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -33,6 +34,17 @@ const initialState = {
     lastDay: '',
     noSchoolDates: [],
   },
+  settings: {
+    errorReporting: true,
+    dashboard: {
+      showDuringMod: [
+        'CURRENTMOD', 'UNTILMODENDS', 'NEXTCLASS', 'UNTILDAYENDS',
+      ],
+      showDuringPassingPeriod: [
+        'UNTILPASSINGPERIODENDS', 'NEXTCLASS', 'UNTILDAYENDS',
+      ],
+    },
+  }
 };
 
 const WHSApp = (state = initialState, {
@@ -48,6 +60,7 @@ const WHSApp = (state = initialState, {
   daySchedule,
   lastDayInfoUpdate,
   specialDates,
+  settings,
   ...userInfo
 }) => {
   switch (type) {
@@ -88,6 +101,11 @@ const WHSApp = (state = initialState, {
           schedule: daySchedule,
           lastUpdate: lastDayInfoUpdate,
         },
+      };
+    case SET_SETTINGS:
+      return {
+        ...state,
+        settings,
       };
     case LOG_OUT:
       return WHSApp(undefined, {});

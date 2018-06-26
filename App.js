@@ -126,7 +126,7 @@ export default class App extends Component {
           Settings: { screen: Settings },
         },
         {
-          initialRouteName: 'Dashboard',
+          initialRouteName: 'Settings',
           contentComponent: DrawerContent,
           contentOptions: {
             activeTintColor: 'red',

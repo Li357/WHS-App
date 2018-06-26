@@ -30,7 +30,6 @@ Rewrite Roadmap:
     - [x] Better UI for login failure
     - [ ] Keyboard avoiding view for all phone sizes
   - [ ] Dashboard
-    - [ ] Revamp or remove user info carousel (show mentor info somewhere else)
     - [x] Parallax scroll view
     - [ ] Customizable information to be shown on dashboard
     - [x] Upload own photo

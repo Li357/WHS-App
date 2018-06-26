@@ -13,6 +13,7 @@ import {
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
+  SET_SETTINGS,
   LOG_OUT,
 } from './actions';
 
@@ -37,6 +38,7 @@ const setCredentials = createActionCreator(
 const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDayInfo = createActionCreator(SET_DAY_INFO, 'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate');
+const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const logOut = createActionCreator(LOG_OUT);
 
 /**
@@ -125,7 +127,7 @@ const fetchSpecialDates = () => async (dispatch) => {
     // Connect to express server which does the heavy lifting
     const specialDatesResponse = await fetch(
       'https://whs-server.herokuapp.com/specialDates',
-      { /* timeout: REQUEST_TIMEOUT */ }, // TODO: Adjust timeout
+      { timeout: REQUEST_TIMEOUT },
     );
     if (specialDatesResponse.ok) {
       const json = await specialDatesResponse.json();
