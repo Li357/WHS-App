@@ -101,7 +101,7 @@ export default class Dashboard extends Component {
      * Since getCurrentMod returns index + 1 (to give correct mod number for display),
      * but since arrays are 0-based, it must be decremented by 1 for array access
      */
-    const modNumber = currentMod - (now.day() === 3 ? 1 : 0);
+    const modNumber = currentMod - Number(now.day() === 3);
     const isDuringMod = modNumber < PASSING_PERIOD_FACTOR;
     const isPassingPeriod = modNumber > PASSING_PERIOD_FACTOR && modNumber < BEFORE_SCHOOL;
 

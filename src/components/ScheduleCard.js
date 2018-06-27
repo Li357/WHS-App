@@ -8,7 +8,7 @@ import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
 import { selectSchedule } from '../util/querySchedule';
-import { MOD_ITEMS_HEIGHT } from '../constants/constants';
+import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT } from '../constants/constants';
 
 @withNavigation
 export default class ScheduleCard extends Component {
@@ -54,25 +54,29 @@ export default class ScheduleCard extends Component {
     const { day } = content[0]; // Pick day from first element, is 1-based so must -1
     const date = moment();
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
+    const isWednesday = day === 3;
+    const cardDate = date.clone().weekday(day - 1);
 
-    const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, date);
+    const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, cardDate);
     /* eslint-disable indent */
     const scheduleToShow = showTimes
       ? cardSchedule.map((timePair, index) => ({
           title: timePair.join(' - '),
           length: 1,
-          startMod: index,
-          endMod: index + 1,
+          // Shift mod numbers +1 on Wednesdays (no homeroom)
+          startMod: index + Number(isWednesday),
+          endMod: index + 1 + Number(isWednesday),
           sourceId: index,
         }))
-      : content;
+      // Don't show No Homeroom on ScheduleCard
+      : content.filter(({ title }) => title !== 'No Homeroom');
     /* eslint-enable indent */
 
     return (
       <Card style={styles.container}>
         <CardItem header bordered style={styles.header}>
-          <Text style={styles.day}>{date.weekday(day - 1).format('dddd')} </Text>
-          <Text style={styles.date}>{date.format('MMM DD')}</Text>
+          <Text style={styles.day}>{cardDate.format('dddd')} </Text>
+          <Text style={styles.date}>{cardDate.format('MMM DD')}</Text>
           <Switch
             value={this.state.showTimes}
             onValueChange={this.handleSwitch}
@@ -86,7 +90,7 @@ export default class ScheduleCard extends Component {
                 <View style={styles.barContainer}>
                   <VerticalBar
                     progress={progress}
-                    height={MOD_ITEMS_HEIGHT - 20}
+                    height={MOD_ITEMS_HEIGHT - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0)}
                     style={styles.bar}
                   />
                 </View>

@@ -14,7 +14,7 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
 
   return schedule.reduce((currentMod, timePair, index, array) => {
     const [modStart, modEnd] = timePair.map(time => moment(`${time}:00`, 'kk:mm:ss'));
-    const modNumber = index + (date.day() === 3 ? 1 : 0);
+    const modNumber = index + Number(date.day() === 3);
     const isBetween = date.isAfter(modStart) && date.isBefore(modEnd);
 
     if (isBetween) {
