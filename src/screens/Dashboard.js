@@ -5,6 +5,7 @@ import { Icon } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
+import { round } from 'lodash';
 import moment from 'moment';
 
 import UserInfo from '../components/UserInfo';
@@ -74,15 +75,21 @@ export default class Dashboard extends Component {
 
   createCountdown = (key) => {
     const id = setInterval(() => {
-      // Need to floor because differences are not in exact 1000 increments
-      if (Math.floor(this.state[key] / 1000) === 0) {
-        clearInterval(id);
-        this.updateCountdowns(this.props);
+      if (this.state[key] > 0) {
+        /**
+         * This is inevitably a little inaccurate because
+         * 1. React Native's layer of abstraction causes a slight delay of interval callback
+         * 2. This countdown may start in the middle of a second in which case it will be
+         *    less than a second behind the current clock (handling this with an additional
+         *    setTimeout is too much complexity for little gain)
+         */
+        this.setState(prevState => ({
+          [key]: prevState[key] - 1000,
+        }));
         return;
       }
-      this.setState(prevState => ({
-        [key]: prevState[key] - 1000,
-      }));
+      clearInterval(id);
+      this.updateCountdowns(this.props);
     }, 1000);
     this.intervalIds.push(id);
   }
@@ -90,15 +97,20 @@ export default class Dashboard extends Component {
   updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
     const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
     const { start, end, schedule } = props.dayInfo;
-    const isDuringMod = currentMod < PASSING_PERIOD_FACTOR;
-    const isPassingPeriod = currentMod > PASSING_PERIOD_FACTOR && currentMod < BEFORE_SCHOOL;
+    /**
+     * Since getCurrentMod returns index + 1 (to give correct mod number for display),
+     * but since arrays are 0-based, it must be decremented by 1 for array access
+     */
+    const modNumber = currentMod - (now.day() === 3 ? 1 : 0);
+    const isDuringMod = modNumber < PASSING_PERIOD_FACTOR;
+    const isPassingPeriod = modNumber > PASSING_PERIOD_FACTOR && modNumber < BEFORE_SCHOOL;
 
     const untilModEnd = isDuringMod
-      ? moment(`${schedule[currentMod][1]}:ss`, 'kk:mm:ss').diff(now)
+      ? moment(`${schedule[modNumber][1]}:00`, 'kk:mm:ss').diff(now)
       : 0;
 
     const untilPassingPeriodEnd = isPassingPeriod
-      ? moment(`${schedule[currentMod - PASSING_PERIOD_FACTOR][0]}:ss`, 'kk:mm:ss').diff(now)
+      ? moment(`${schedule[modNumber - PASSING_PERIOD_FACTOR][0]}:00`, 'kk:mm:ss').diff(now)
       : 0;
 
     const untilDayStart = start.diff(now);
@@ -118,6 +130,7 @@ export default class Dashboard extends Component {
     } else {
       this.setState(newState);
     }
+    this.clearCountdowns();
     this.startCountdowns(currentMod, untilDayStart, untilDayEnd);
   }
 

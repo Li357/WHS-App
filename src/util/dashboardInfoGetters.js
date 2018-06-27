@@ -24,7 +24,7 @@ const getDuringModInfo = (currentMod, { title, body }, untilModEnd, untilDayEnd)
 
 const getDuringPassingPeriodInfo = ({ title, body }, untilPassingPeriodEnd, untilDayEnd) => [
   {
-    title: 'Next class',
+    title: 'Next mod',
     value: title,
     subtitle: body,
   },

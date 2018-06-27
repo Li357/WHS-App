@@ -21,10 +21,10 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
       return modNumber;
     }
 
-    const lastMod = array[index - 1];
-    if (lastMod) {
-      const lastModEnd = moment(`${lastMod[1]}:00`, 'kk:mm:ss');
-      const isPassingPeriod = date.isBefore(modStart) && date.isAfter(lastModEnd);
+    const prevMod = array[index - 1];
+    if (prevMod) {
+      const prevModEnd = moment(`${prevMod[1]}:00`, 'kk:mm:ss');
+      const isPassingPeriod = date.isBefore(modStart) && date.isAfter(prevModEnd);
 
       return isPassingPeriod
         ? PASSING_PERIOD_FACTOR + modNumber
@@ -39,6 +39,7 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
  * Returns N/A when there is no next class
  */
 const getNextClass = (schedule, currentMod, date = moment()) => {
+  // Since arrays are 0-based and the days start at 1 (for Monday), need to -1
   const normalizedDay = date.day() - 1;
   const userDaySchedule = schedule[normalizedDay];
 

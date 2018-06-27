@@ -13,10 +13,10 @@ Rewrite Roadmap:
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting
   - [x] Refactor components and screens for less file congestion and more reuse
-  - [ ] Better error handling for server request exceptions
-  - [ ] Better error reporting for AsyncStorage accesses
+  - [x] Better error handling for server request exceptions
+  - [x] Better error reporting for AsyncStorage accesses
   - [ ] Consistent typing and explicit code
-  - [ ] Consistent actions and action creators
+  - [x] Consistent actions and action creators
   - [x] Use ESLint
 - [ ] Unit testing with Jest
   - [ ] Login system
@@ -32,7 +32,7 @@ Rewrite Roadmap:
     - [ ] [NEEDS ANDROID TESTS] Keyboard avoiding view for all phone sizes
   - [ ] Dashboard
     - [x] Parallax scroll view
-    - [ ] [UNDER CONSTRUCTION] Customizable information to be shown on dashboard
+    - [ ] [POSTPONED] Customizable information to be shown on dashboard
     - [x] Upload own photo
     - [x] Option to reset to school photo
   - [x] Schedule
@@ -42,14 +42,11 @@ Rewrite Roadmap:
     - [x] Better approach to showing time tables for mods
   - [ ] Settings
     - [x] Make manual refresh more prominent and user friendly
-    - [ ] [UNDER CONSTRUCTION] Customize information to shown on dashboard via drag and drop lists
+    - [ ] [POSTPONED] Customize information to shown on dashboard via drag and drop lists
   - [x] Drawer
     - [x] Banner to show current date for better look
     - [x] Icons for different screens (and tint colors)
     - [x] Logout span full width with same style as screens
-
-Server things to fix/add:
-- [ ] Add caching for special date requests to prevent timeouts
 
 ## To Do List
 

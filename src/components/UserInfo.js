@@ -142,7 +142,7 @@ const styles = EStyleSheet.create({
   },
   infoLeft: { alignItems: 'flex-end' },
   separator: {
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: 'black',
     height: '40%',
     marginHorizontal: 10,
