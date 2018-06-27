@@ -14,6 +14,7 @@ import {
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
   SET_SETTINGS,
+  SET_REFRESHED,
   LOG_OUT,
 } from './actions';
 
@@ -39,6 +40,7 @@ const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDayInfo = createActionCreator(SET_DAY_INFO, 'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate');
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
+const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
 const logOut = createActionCreator(LOG_OUT);
 
 /**
@@ -46,7 +48,7 @@ const logOut = createActionCreator(LOG_OUT);
  * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
  * different from the client-side XMLHttpRequest
  */
-const fetchUserInfo = (username, password) => async (dispatch, getState) => {
+const fetchUserInfo = (username, password, beforeStartRefresh = false) => async (dispatch, getState) => {
   try {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
@@ -102,7 +104,7 @@ const fetchUserInfo = (username, password) => async (dispatch, getState) => {
     await fetchSpecialDates()(dispatch);
 
     // Set day info in user info fetch
-    const { specialDates } = getState();
+    const { specialDates, specialDates: { semesterOneStart, semesterOneEnd } } = getState();
     const date = moment();
     const daySchedule = selectSchedule(specialDates, date);
     const range = [
@@ -112,6 +114,13 @@ const fetchUserInfo = (username, password) => async (dispatch, getState) => {
 
     dispatch(setDayInfo(...range, daySchedule, date));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
+
+    if (date.isAfter(semesterTwoStart) && date.isBefore(lastDay)) {
+      dispatch(setRefreshed(true, true));
+    } else if (date.isAfter(semesterOneStart) && date.isBefore(semesterTwoStart) || beforeStartRefresh) {
+      dispatch(setRefreshed(true, false));
+    }
+
     dispatch(setCredentials(username, password));
 
     return true;
@@ -145,6 +154,7 @@ export {
   setUserInfo,
   setProfilePhoto,
   setDayInfo,
+  setRefreshed,
   logOut,
   fetchUserInfo,
   fetchSpecialDates,

@@ -120,7 +120,7 @@ export default class Settings extends Component {
                 : <Icon type="MaterialIcons" name="refresh" />
               }
             </Left>
-            <Body><Text>Refresh Information</Text></Body>
+            <Body><Text>Refresh Your Information</Text></Body>
           </ListItem>
           <ListItem icon last>
             <Left><Icon type="MaterialIcons" name="warning" style={styles.errorReporting} /></Left>

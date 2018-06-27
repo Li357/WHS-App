@@ -18,7 +18,7 @@ import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
-import { setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
+import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
 import selectSchedule from './src/util/selectSchedule';
 
 const persistConfig = {
@@ -60,8 +60,8 @@ export default class App extends Component {
 
   handleAppStateChange = (newStatus) => {
     /**
-     * This handler handles the case where the user does not quit the app but
-     * has it in the background, in which case the app must do some updates
+     * This handler handles the case where the user does not quit the app but has it in the
+     * background, in which case the app does some updates when they refocus the app
      */
     const { dayInfo: { lastUpdate } } = store.getState();
     const now = moment();
@@ -79,7 +79,32 @@ export default class App extends Component {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
-        this.updateDayInfo();
+        const {
+          specialDates: { semesterOneStart, semesterTwoStart },
+          refreshedSemesterOne,
+          refreshedSemesterTwo,
+          username,
+          password,
+        } = store.getState();
+        const now = moment();
+
+        if (now.isAfter(semesterTwoStart) && now.isBefore(lastDay) && !refreshedSemesterTwo) {
+          // If in semester two and has not refreshed, refresh info
+          dispatch(fetchUserInfo(username, password));
+        } else if (now.isAfter(semesterOneStart) && now.isBefore(semesterTwoStart) && !refreshedSemesterOne) {
+          // If in semester one and has not refreshed, refresh info
+          dispatch(fetchUserInfo(username, password));
+        } else if (now.isAfter(lastDay.clone().add(2, 'months'))) {
+          /**
+           * If two months after last day, refresh
+           * The third argument bypasses the semesterOneStart < now < semesterTwoStart check
+           * because if someone opens up the app >two months after last school year's last day
+           * (i.e. August 1st) and it refreshes, it should not refresh on the first day
+           */
+          dispatch(fetchUserInfo(username, password, true));
+        }
+
+        this.updateDayInfo(now);
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {

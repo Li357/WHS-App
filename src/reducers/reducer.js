@@ -6,6 +6,7 @@ import {
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
   SET_SETTINGS,
+  SET_REFRESHED,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -29,9 +30,9 @@ const initialState = {
     lastUpdate: null,
   },
   specialDates: {
-    semesterOneStart: '',
-    semesterTwoStart: '',
-    lastDay: '',
+    semesterOneStart: null,
+    semesterTwoStart: null,
+    lastDay: null,
     noSchoolDates: [],
   },
   settings: {
@@ -44,7 +45,9 @@ const initialState = {
         'UNTILPASSINGPERIODENDS', 'NEXTCLASS', 'UNTILDAYENDS',
       ],
     },
-  }
+  },
+  refreshedSemesterOne: false,
+  refreshedSemesterTwo: false,
 };
 
 const WHSApp = (state = initialState, {
@@ -61,6 +64,8 @@ const WHSApp = (state = initialState, {
   lastDayInfoUpdate,
   specialDates,
   settings,
+  refreshedSemesterOne,
+  refreshedSemesterTwo,
   ...userInfo
 }) => {
   switch (type) {
@@ -106,6 +111,12 @@ const WHSApp = (state = initialState, {
       return {
         ...state,
         settings,
+      };
+    case SET_REFRESHED:
+      return {
+        ...state,
+        refreshedSemesterOne,
+        refreshedSemesterTwo,
       };
     case LOG_OUT:
       return WHSApp(undefined, {});
