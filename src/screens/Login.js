@@ -52,6 +52,7 @@ export default class Login extends PureComponent {
         return;
       }
     } catch (error) {
+      console.log(error);
       const { settings: { errorReporting } } = this.props;
       reportError(
         'Something went wrong while logging in. Please check your internet conection.',

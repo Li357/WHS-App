@@ -113,7 +113,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const range = [
       daySchedule[0][0],
       daySchedule.slice(-1)[0][1],
-    ].map(time => moment(`${time}:00`, 'kk:mm:ss'));
+    ].map(time => moment(`${time}:00`, 'k:mm:ss'));
 
     dispatch(setDayInfo(...range, daySchedule, date));
     dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
@@ -136,42 +136,17 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
 const fetchSpecialDates = () => async (dispatch) => {
   // Connect to express server which gets school calendar PDF
   const specialDatesResponse = await fetch(
-    'https://whs-server.herokuapp.com/specialDates?e=32342342342',
-    { timeout: REQUEST_TIMEOUT },
+    'https://whs-server.herokuapp.com/specialDates',
+    { timeout: 2 * REQUEST_TIMEOUT },
   );
   if (specialDatesResponse.ok) {
-    const {
-      noSchoolDates, semOneDate, semTwoDate, lastDayDate, startOfSchoolYear,
-    } = await specialDatesResponse.json();
-
-    const expandedDates = noSchoolDates.reduce((expanded, string) => {
-      if (string.includes('-')) {
-        const parts = string.split('-');
-        // Handles cases like December 20 - January 4
-        if (parts[1].match(/[A-Za-z]+/)) {
-          // Assumes this only happens with spring or winter break
-          const [firstDate, lastDate] = parts.map(part => part.trim().split(' '));
-
-          return [
-            ...expanded,
-            ...rangeOfDates(...firstDate, 31), // December and March have 31 days
-            ...rangeOfDates(lastDate[0], 1, lastDate[1]),
-          ];
-        }
-        // Handles cases like March 18-22
-        const [month, dayRange] = string.split(' ');
-        return [...expanded, ...rangeOfDates(month, ...dayRange.split('-'))];
-      }
-      return [...expanded, string];
-    }, []);
-
-    const schoolStartNextYear = Number(startOfSchoolYear) + 1;
-    const toMoment = (date, year) => moment(`${date} ${year}`, 'MMMM D YYYY');
+    const { semOneDate, semTwoDate, lastDayDate, noSchoolDates } = await specialDatesResponse.json();
+    const toMoment = date => moment(date, 'MMMM D');
     dispatch(setSpecialDates({
-      semesterOneStart: toMoment(semOneDate, startOfSchoolYear),
-      semesterTwoStart: toMoment(semTwoDate, schoolStartNextYear),
-      lastDay: toMoment(lastDayDate, schoolStartNextYear),
-      noSchoolDates: expandedDates,
+      noSchoolDates: noSchoolDates.map(toMoment),
+      semesterOneStart: toMoment(semOneDate),
+      semesterTwoStart: toMoment(semTwoDate),
+      lastDay: toMoment(lastDayDate),
     }));
     return true;
   }

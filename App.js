@@ -147,7 +147,7 @@ export default class App extends Component {
     const range = [
       schedule[0][0],
       schedule.slice(-1)[0][1],
-    ].map(time => moment(`${time}:00`, 'kk:mm:ss'));
+    ].map(time => moment(`${time}:00`, 'k:mm:ss'));
     store.dispatch(setDayInfo(...range, schedule, date));
   }
 

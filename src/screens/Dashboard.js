@@ -106,11 +106,11 @@ export default class Dashboard extends Component {
     const isPassingPeriod = modNumber > PASSING_PERIOD_FACTOR && modNumber < BEFORE_SCHOOL;
 
     const untilModEnd = isDuringMod
-      ? moment(`${schedule[modNumber][1]}:00`, 'kk:mm:ss').diff(now)
+      ? moment(`${schedule[modNumber][1]}:00`, 'k:mm:ss').diff(now)
       : 0;
 
     const untilPassingPeriodEnd = isPassingPeriod
-      ? moment(`${schedule[modNumber - PASSING_PERIOD_FACTOR][0]}:00`, 'kk:mm:ss').diff(now)
+      ? moment(`${schedule[modNumber - PASSING_PERIOD_FACTOR][0]}:00`, 'k:mm:ss').diff(now)
       : 0;
 
     const untilDayStart = start.diff(now);

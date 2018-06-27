@@ -3,6 +3,7 @@ import { AppState, Alert, Switch, View, Text } from 'react-native';
 import { List, ListItem, Right, Left, Body, Icon } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 
 import waitForAnimation from '../util/waitForAnimation';
@@ -12,12 +13,13 @@ import { fetchUserInfo, setSettings } from '../actions/actionCreators';
 
 const mapStateToProps = ({
   username, password, settings,
-}) => ({
-  username, password, settings,
+}, ownProps) => ({
+  username, password, settings, ...ownProps,
 });
 
 @waitForAnimation
 @withHamburger
+@withNavigation
 @connect(mapStateToProps)
 export default class Settings extends Component {
   constructor(props) {

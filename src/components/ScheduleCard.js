@@ -58,10 +58,11 @@ export default class ScheduleCard extends Component {
     const cardDate = date.clone().weekday(day - 1);
 
     const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, cardDate);
+    const format = time => moment(time, 'k:mm').format('h:mm');
     /* eslint-disable indent */
     const scheduleToShow = showTimes
       ? cardSchedule.map((timePair, index) => ({
-          title: timePair.join(' - '),
+          title: timePair.map(format).join(' - '),
           length: 1,
           // Shift mod numbers +1 on Wednesdays (no homeroom)
           startMod: index + Number(isWednesday),

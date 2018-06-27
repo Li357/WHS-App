@@ -13,7 +13,7 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
   }
 
   return schedule.reduce((currentMod, timePair, index, array) => {
-    const [modStart, modEnd] = timePair.map(time => moment(`${time}:00`, 'kk:mm:ss'));
+    const [modStart, modEnd] = timePair.map(time => moment(`${time}:00`, 'k:mm:ss'));
     const modNumber = index + Number(date.day() === 3);
     const isBetween = date.isAfter(modStart) && date.isBefore(modEnd);
 
@@ -23,7 +23,7 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
 
     const prevMod = array[index - 1];
     if (prevMod) {
-      const prevModEnd = moment(`${prevMod[1]}:00`, 'kk:mm:ss');
+      const prevModEnd = moment(`${prevMod[1]}:00`, 'k:mm:ss');
       const isPassingPeriod = date.isBefore(modStart) && date.isAfter(prevModEnd);
 
       return isPassingPeriod
@@ -73,11 +73,4 @@ const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
   return SCHEDULES.REGULAR;
 };
 
-/**
- * Returns array of dates as strings in the form "January 4"
- */
-const rangeOfDates = (month, first, last) => (
-  Array(last - first).fill().map((_, i) => `${month} ${i + Number(first)}`)
-);
-
-export { getCurrentMod, getNextClass, selectSchedule, rangeOfDates };
+export { getCurrentMod, getNextClass, selectSchedule };
