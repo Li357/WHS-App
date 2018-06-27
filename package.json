@@ -40,7 +40,6 @@
     "react-native-photo-upload": "git+https://github.com/Li357/react-native-photo-upload.git",
     "react-native-progress": "git+https://github.com/Li357/react-native-progress.git",
     "react-native-snap-carousel": "^3.7.2",
-    "react-native-sortable-listview": "^0.2.8",
     "react-navigation": "^2.5.2",
     "react-navigation-drawer": "git+https://github.com/Li357/react-navigation-drawer.git",
     "react-redux": "^5.0.7",

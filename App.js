@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
@@ -20,6 +20,7 @@ import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
 import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
 import { selectSchedule } from './src/util/querySchedule';
+import reportError from './src/util/reportError';
 
 // This transform is needed to rehydrate dates as moment objects
 const transformMoments = createTransform(
@@ -128,12 +129,13 @@ export default class App extends Component {
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {
-        Alert.alert(
-          'Error', `${error} Please try restarting the app.`,
-          [{ text: 'OK' }],
+        const { settings: { errorReporting } } = store.getState();
+        reportError(
+          'Something went wrong reloading your information. Please try restarting the app.',
+          error,
+          errorReporting,
         );
         return;
-        // TODO: Alert error & better error reporting
       }
     }
     this.setState({ loaded: true });

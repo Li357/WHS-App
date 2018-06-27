@@ -1,15 +1,16 @@
 import React, { PureComponent } from 'react';
-import { Animated, Alert, KeyboardAvoidingView, Image, Text, Easing } from 'react-native';
+import { Animated, KeyboardAvoidingView, Image, Text, Easing } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
+import reportError from '../util/reportError';
 import { fetchUserInfo } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
-const mapStateToProps = ({ loginError }) => ({ loginError });
+const mapStateToProps = ({ loginError, settings }) => ({ loginError, settings });
 
 @connect(mapStateToProps)
 export default class Login extends PureComponent {
@@ -42,20 +43,21 @@ export default class Login extends PureComponent {
     });
 
     try {
-      const { dispatch, navigation } = this.props;
+      const { dispatch, navigation: { navigate } } = this.props;
       const { username, password } = this.state;
 
       const success = await dispatch(fetchUserInfo(username, password));
       if (success) {
-        navigation.navigate('Dashboard');
+        navigate('Dashboard');
         return;
       }
     } catch (error) {
-      Alert.alert(
-        'Error', `${error}`,
-        [{ text: 'OK' }],
+      const { settings: { errorReporting } } = this.props;
+      reportError(
+        'Something went wrong while logging in. Please check your internet conection.',
+        error,
+        errorReporting,
       );
-      // TODO: Better error reporting
     }
 
     // Reverse animation if login failure

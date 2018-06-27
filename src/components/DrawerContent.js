@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, ImageBackground, Text } from 'react-native';
 import { Container, Button, Icon } from 'native-base';
-import { DrawerItems, withNavigation } from 'react-navigation';
+import { DrawerItems } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -15,7 +15,6 @@ const mapStateToProps = (state, ownProps) => ({
   ...ownProps,
 });
 
-@withNavigation
 @connect(mapStateToProps)
 export default class DrawerContent extends Component {
   handleLogout = () => {

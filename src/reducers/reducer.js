@@ -35,17 +35,7 @@ const initialState = {
     lastDay: null,
     noSchoolDates: [],
   },
-  settings: {
-    errorReporting: true,
-    dashboard: {
-      showDuringMod: [
-        'CURRENTMOD', 'UNTILMODENDS', 'NEXTCLASS', 'UNTILDAYENDS',
-      ],
-      showDuringPassingPeriod: [
-        'UNTILPASSINGPERIODENDS', 'NEXTCLASS', 'UNTILDAYENDS',
-      ],
-    },
-  },
+  settings: { errorReporting: true },
   refreshedSemesterOne: false,
   refreshedSemesterTwo: false,
 };

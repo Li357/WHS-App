@@ -1,15 +1,20 @@
 import React, { PureComponent } from 'react';
-import { Alert, AsyncStorage, View, Text, StyleSheet } from 'react-native';
+import { AsyncStorage, View, Text, StyleSheet } from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import Carousel from 'react-native-looped-carousel';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
+import reportError from '../util/reportError';
 import { setProfilePhoto } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
-@connect()
+const mapStateToProps = ({
+  loginError, schedule, dayInfo, specialDates, refreshedSemesterOne, refreshedSemesterTwo, ...info
+}) => info;
+
+@connect(mapStateToProps)
 export default class UserInfo extends PureComponent {
   saveProfilePhoto = async (newPhoto, reset = false) => {
     if (newPhoto) {
@@ -20,11 +25,12 @@ export default class UserInfo extends PureComponent {
         await AsyncStorage.setItem(`${username}:profilePhoto`, photo); // Set in AsyncStorage
         dispatch(setProfilePhoto(photo)); // Also set in state for current app session
       } catch (error) {
-        Alert.alert(
-          'Error', `${error}`,
-          [{ text: 'OK' }],
+        const { settings: { errorReporting } } = this.props;
+        reportError(
+          'Something went wrong while saving your profile photo. Please try again.',
+          error,
+          errorReporting,
         );
-        // TODO: Alert error & better error reporting
       }
     }
   }

@@ -1,25 +1,20 @@
 import React, { Component } from 'react';
-import { Alert, Switch, View, Text } from 'react-native';
-import { List, ListItem, Radio, Right, Left, Body, Icon } from 'native-base';
+import { AppState, Alert, Switch, View, Text } from 'react-native';
+import { List, ListItem, Right, Left, Body, Icon } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
-import SortableListView from 'react-native-sortable-listview';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
-import { fetchUserInfo } from '../actions/actionCreators';
+import reportError from '../util/reportError';
+import { fetchUserInfo, setSettings } from '../actions/actionCreators';
 
-const mapStateToProps = ({ username, password, settings }) => ({
+const mapStateToProps = ({
+  username, password, settings,
+}) => ({
   username, password, settings,
 });
-
-const DraggableItem = ({ row: { text } }) => (
-  <ListItem>
-    <Body><Text>{text}</Text></Body>
-    <Right><Radio selected={false} /></Right>
-  </ListItem>
-);
 
 @waitForAnimation
 @withHamburger
@@ -28,27 +23,18 @@ export default class Settings extends Component {
   constructor(props) {
     super(props);
 
-    this.duringModData = {
-      CURRENTMOD: { text: 'Current mod' },
-      UNTILMODENDS: { text: 'Until mod ends' },
-      NEXTCLASS: { text: 'Next class' },
-      UNTILDAYENDS: { text: 'Until day ends' },
-    };
-    this.duringPassingPeriodData = {
-      UNTILPASSINGPERIODENDS: { text: 'Until passing period ends' },
-      NEXTCLASS: { text: 'Next class' },
-      UNTILDAYENDS: { text: 'Until day ends' },
-    };
-
-    const { settings: { errorReporting, dashboard } } = props;
+    const { navigation, settings: { errorReporting } } = props;
+    this.blurSubscriber = navigation.addListener('willBlur', this.saveSettings);
+    AppState.addEventListener('change', this.saveSettings);
     this.state = {
       refreshing: false,
       errorReporting,
-      duringMod: dashboard.showDuringMod,
-      duringPassingPeriod: dashboard.showDuringPassingPeriod,
-      duringModOrder: Object.keys(this.duringModData),
-      duringPassingPeriodOrder: Object.keys(this.duringPassingPeriodData),
     };
+  }
+
+  componentWillUnmount() {
+    this.blurSubscriber.remove();
+    AppState.removeEventListener('change', this.saveSettings);
   }
 
   handleRefresh = async () => {
@@ -60,21 +46,24 @@ export default class Settings extends Component {
       const success = await dispatch(fetchUserInfo(username, password));
       if (success) {
         Alert.alert(
-          'Success', 'Your information was refreshed.',
+          'Success',
+          'Your information was refreshed.',
           [{ text: 'OK' }],
         );
       } else {
         Alert.alert(
-          'Error', 'Something went wrong. Your login information may have changed.',
+          'Error',
+          'Something went wrong while refreshing. Your login information may have changed.',
           [{ text: 'OK' }],
         );
       }
     } catch (error) {
-      Alert.alert(
-        'Error', `${error}`,
-        [{ text: 'OK' }],
+      const { settings: { errorReporting } } = this.props;
+      reportError(
+        'Something went wrong while refreshing. Please check your internet conection.',
+        error,
+        errorReporting,
       );
-      // TODO: Better error reporting
     }
 
     this.setState({ refreshing: false });
@@ -84,27 +73,15 @@ export default class Settings extends Component {
     this.setState({ errorReporting: selected });
   }
 
-  saveSettings = () => {
-
-  }
-
-  handleRowChange = orderKey => (event) => {
-    this.setState((prevState) => {
-      const copy = prevState[orderKey].slice();
-      copy.splice(event.to, 0, copy.splice(event.from, 1)[0]);
-      return { orderKey: copy };
-    });
+  saveSettings = (newStatus = 'inactive') => {
+    if (newStatus === 'inactive') {
+      const { refreshing, ...settings } = this.state;
+      this.props.dispatch(setSettings(settings));
+    }
   }
 
   render() {
-    const {
-      refreshing,
-      errorReporting,
-      duringMod,
-      duringPassingPeriod,
-      duringModOrder,
-      duringPassingPeriodOrder,
-    } = this.state;
+    const { refreshing, errorReporting } = this.state;
 
     return (
       <View style={styles.container}>
@@ -127,16 +104,6 @@ export default class Settings extends Component {
             <Body><Text>Error Reporting</Text></Body>
             <Right><Switch value={errorReporting} onValueChange={this.handleSwitch} /></Right>
           </ListItem>
-          <ListItem itemHeader>
-            <Text style={styles.header}>Dashboard</Text>
-          </ListItem>
-          <SortableListView
-            data={this.duringModData}
-            order={duringModOrder}
-            scrollEnabled={false}
-            onRowMoved={this.handleRowChange('duringModOrder')}
-            renderRow={row => <DraggableItem row={row} />}
-          />
         </List>
       </View>
     );
