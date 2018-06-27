@@ -82,11 +82,13 @@ const processSchedule = schedule => (
   _(schedule)
     .groupBy('day')
     .values()
+    /* eslint-disable function-paren-newline */
     .map(dayArray => interpolateOpenMods(
       interpolateCrossSectionedMods(
         sortBy(dayArray, ['startMod', 'length']),
       ),
     ))
+    /* eslint-enable function-paren-newline */
     .value()
 );
 

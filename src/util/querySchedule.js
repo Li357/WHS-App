@@ -43,11 +43,13 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   const userDaySchedule = schedule[normalizedDay];
 
   return userDaySchedule.find(item => (
+    /* eslint-disable function-paren-newline */
     getMods(item).includes(
       currentMod > PASSING_PERIOD_FACTOR
         ? currentMod - PASSING_PERIOD_FACTOR
         : currentMod + 1,
     )
+    /* eslint-enable function-paren-newline */
   )) || { title: 'N/A' };
 };
 

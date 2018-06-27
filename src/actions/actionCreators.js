@@ -69,7 +69,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
       const name = $('title').text().split('|')[0].trim();
 
       if (error !== '') { // If error exists
-        dispatch(setLoginError(true)); // Specifically 401 Unauthorized
+        dispatch(setLoginError(true));
         return false;
       }
 

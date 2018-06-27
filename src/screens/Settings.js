@@ -89,7 +89,7 @@ export default class Settings extends Component {
   }
 
   handleRowChange = orderKey => (event) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const copy = prevState[orderKey].slice();
       copy.splice(event.to, 0, copy.splice(event.from, 1)[0]);
       return { orderKey: copy };

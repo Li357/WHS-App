@@ -63,12 +63,21 @@ export default class UserInfo extends PureComponent {
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.classOf}>{classOf}</Text>
           </View>
-          <View style={styles.slide}>
-            <View>
-              <Text>Dean: {dean}</Text>
-              <Text>Counselor: {counselor}</Text>
-              <Text>Homeroom: {homeroom}</Text>
-              <Text>ID: {id}</Text>
+          <View style={styles.infoSlide}>
+            <View style={styles.infoLeft}>
+              {
+                ['Dean', 'Counselor', 'Homeroom', 'ID'].map(key => (
+                  <Text key={key} style={styles.keyText}>{key}</Text>
+                ))
+              }
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.infoRight}>
+              {
+                [dean, counselor, homeroom, id].map(value => (
+                  <Text key={value} style={styles.valueText}>{value}</Text>
+                ))
+              }
             </View>
           </View>
         </Carousel>
@@ -77,6 +86,12 @@ export default class UserInfo extends PureComponent {
   }
 }
 
+const slide = {
+  width: WIDTH,
+  height: '100%',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 const styles = EStyleSheet.create({
   $profilePhotoSize: HEIGHT / 5.5,
   $studentInfoHeight: '35%',
@@ -85,11 +100,10 @@ const styles = EStyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  slide: {
-    width: WIDTH,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+  slide,
+  infoSlide: {
+    ...slide,
+    flexDirection: 'row',
   },
   bulletsContainer: {
     bottom: 0,
@@ -120,4 +134,16 @@ const styles = EStyleSheet.create({
     fontFamily: '$fontLight',
     marginBottom: '$studentInfoHeight - 32%',
   },
+  infoLeft: { alignItems: 'flex-end' },
+  separator: {
+    borderWidth: 1,
+    borderColor: 'black',
+    height: '40%',
+    marginHorizontal: 10,
+  },
+  keyText: {
+    fontFamily: '$fontBold',
+    lineHeight: 19,
+  },
+  valueText: { fontFamily: '$fontRegular' },
 });

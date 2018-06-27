@@ -56,6 +56,7 @@ export default class ScheduleCard extends Component {
     const isCurrentDay = date.day() === day; // Since day() assigns Monday to 1, no -1
 
     const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, date);
+    /* eslint-disable indent */
     const scheduleToShow = showTimes
       ? cardSchedule.map((timePair, index) => ({
           title: timePair.join(' - '),
@@ -65,6 +66,7 @@ export default class ScheduleCard extends Component {
           sourceId: index,
         }))
       : content;
+    /* eslint-enable indent */
 
     return (
       <Card style={styles.container}>

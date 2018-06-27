@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Alert, AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { PersistGate } from 'redux-persist/integration/react';
 import thunk from 'redux-thunk';
@@ -21,10 +21,27 @@ import DrawerContent from './src/components/DrawerContent';
 import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
 import { selectSchedule } from './src/util/querySchedule';
 
+// This transform is needed to rehydrate dates as moment objects
+const transformMoments = createTransform(
+  inboundState => inboundState,
+  (outboundState) => {
+    const copy = { ...outboundState };
+    Object.keys(copy).forEach((key) => {
+      const value = copy[key];
+      /* eslint-disable-next-line no-underscore-dangle */
+      if (!Array.isArray(value) && moment(value)._isValid) {
+        copy[key] = moment(value);
+      }
+    });
+    return copy;
+  },
+  { whitelist: ['specialDates', 'dayInfo'] },
+);
 const persistConfig = {
   key: 'root',
   storage,
   blacklist: ['profilePhoto', 'loginError'],
+  transforms: [transformMoments],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
 const store = createStore(
@@ -154,7 +171,7 @@ export default class App extends Component {
           Settings: { screen: Settings },
         },
         {
-          initialRouteName: 'Settings',
+          initialRouteName: 'Dashboard',
           contentComponent: DrawerContent,
           contentOptions: {
             activeTintColor: 'red',

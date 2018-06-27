@@ -33,6 +33,7 @@ const mapStateToProps = ({
 @withNavigation
 @connect(mapStateToProps)
 export default class Dashboard extends Component {
+  /* eslint-disable-next-line react/sort-comp */
   intervalIds = []
 
   constructor(props) {
@@ -40,7 +41,6 @@ export default class Dashboard extends Component {
     // This needs to be in the constructor for it to be registered by React Navigation
     this.blurSubscriber = this.props.navigation.addListener('willBlur', this.clearCountdowns);
     AppState.addEventListener('change', this.handleAppStateChange);
-
     this.updateCountdowns(props, true);
   }
 
