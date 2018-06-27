@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { getMods } from './processSchedule';
-import { PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL } from '../constants/constants';
+import { PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, SCHEDULES } from '../constants/constants';
 
 /**
  * Get current mod based on passed date, defaults to now
@@ -51,4 +51,30 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   )) || { title: 'N/A' };
 };
 
-export { getCurrentMod, getNextClass };
+/**
+ * This selects the schedule of the day
+ */
+const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
+  const firstFinalsDay = secondFinalsDay.clone().subtract(1, 'd');
+
+  if (date.isSame(secondFinalsDay, 'month') || date.isSame(firstFinalsDay, 'month')) {
+    return SCHEDULES.FINALS;
+  } else if (date.day() === 3) {
+    // TODO: Handle late start Wednesday here
+
+    return SCHEDULES.WEDNESDAY;
+  }
+
+  // TODO: Handle assembly, late start, and early dismissal days
+
+  return SCHEDULES.REGULAR;
+};
+
+/**
+ * Returns array of dates as strings in the form "January 4"
+ */
+const rangeOfDates = (month, first, last) => (
+  Array(last - first).fill().map((_, i) => `${month} ${i + Number(first)}`)
+);
+
+export { getCurrentMod, getNextClass, selectSchedule, rangeOfDates };

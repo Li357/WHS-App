@@ -19,7 +19,7 @@ import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
 import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
-import selectSchedule from './src/util/selectSchedule';
+import { selectSchedule } from './src/util/querySchedule';
 
 const persistConfig = {
   key: 'root',
@@ -80,7 +80,7 @@ export default class App extends Component {
     if (hasLoggedIn()) {
       try {
         const {
-          specialDates: { semesterOneStart, semesterTwoStart },
+          specialDates: { semesterOneStart, semesterTwoStart, lastDay },
           refreshedSemesterOne,
           refreshedSemesterTwo,
           username,
@@ -90,10 +90,13 @@ export default class App extends Component {
 
         if (now.isAfter(semesterTwoStart) && now.isBefore(lastDay) && !refreshedSemesterTwo) {
           // If in semester two and has not refreshed, refresh info
-          dispatch(fetchUserInfo(username, password));
-        } else if (now.isAfter(semesterOneStart) && now.isBefore(semesterTwoStart) && !refreshedSemesterOne) {
+          store.dispatch(fetchUserInfo(username, password));
+        } else if (
+          now.isAfter(semesterOneStart) && now.isBefore(semesterTwoStart)
+          && !refreshedSemesterOne
+        ) {
           // If in semester one and has not refreshed, refresh info
-          dispatch(fetchUserInfo(username, password));
+          store.dispatch(fetchUserInfo(username, password));
         } else if (now.isAfter(lastDay.clone().add(2, 'months'))) {
           /**
            * If two months after last day, refresh
@@ -101,7 +104,7 @@ export default class App extends Component {
            * because if someone opens up the app >two months after last school year's last day
            * (i.e. August 1st) and it refreshes, it should not refresh on the first day
            */
-          dispatch(fetchUserInfo(username, password, true));
+          store.dispatch(fetchUserInfo(username, password, true));
         }
 
         this.updateDayInfo(now);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Switch, View, Text, TouchableHighlight } from 'react-native';
+import { Alert, Switch, View, Text } from 'react-native';
 import { List, ListItem, Radio, Right, Left, Body, Icon } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import SortableListView from 'react-native-sortable-listview';
@@ -58,7 +58,7 @@ export default class Settings extends Component {
       const { dispatch, username, password } = this.props;
 
       const success = await dispatch(fetchUserInfo(username, password));
-      if(success) {
+      if (success) {
         Alert.alert(
           'Success', 'Your information was refreshed.',
           [{ text: 'OK' }],
@@ -80,7 +80,7 @@ export default class Settings extends Component {
     this.setState({ refreshing: false });
   }
 
-  handleSwitch = selected => {
+  handleSwitch = (selected) => {
     this.setState({ errorReporting: selected });
   }
 

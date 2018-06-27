@@ -47,4 +47,4 @@ const getBeforeSchoolInfo = untilDayStart => [
 
 const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day' }];
 
-export { getBeforeSchoolInfo, getAfterSchoolInfo };
+export { getBeforeSchoolInfo, getAfterSchoolInfo, getDuringPassingPeriodInfo, getDuringModInfo };

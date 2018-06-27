@@ -7,7 +7,7 @@ import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
-import selectSchedule from '../util/selectSchedule';
+import { selectSchedule } from '../util/querySchedule';
 import { MOD_ITEMS_HEIGHT } from '../constants/constants';
 
 @withNavigation

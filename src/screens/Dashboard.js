@@ -13,7 +13,12 @@ import DashboardBlock from '../components/DashboardBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 import { getCurrentMod, getNextClass } from '../util/querySchedule';
-import { getBeforeSchoolInfo, getAfterSchoolInfo } from '../util/dashboardInfoGetters';
+import {
+  getBeforeSchoolInfo,
+  getAfterSchoolInfo,
+  getDuringPassingPeriodInfo,
+  getDuringModInfo,
+} from '../util/dashboardInfoGetters';
 import { HEIGHT, PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL } from '../constants/constants';
 
 const mapStateToProps = ({
@@ -130,7 +135,7 @@ export default class Dashboard extends Component {
   }
 
   clearCountdowns = () => {
-    this.intervalIds.forEach(id => {
+    this.intervalIds.forEach((id) => {
       clearInterval(id);
     });
   }
@@ -150,10 +155,10 @@ export default class Dashboard extends Component {
       } else {
         info = currentMod === AFTER_SCHOOL
           ? getAfterSchoolInfo()
-          : []//getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
+          : getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
       }
     } else {
-      //info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
+      info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
     }
 
     return (
