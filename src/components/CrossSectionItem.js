@@ -1,24 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import EStyleSheet from 'react-native-extended-stylesheet';
 import { CardItem } from 'native-base';
+import { sum } from 'lodash';
 
-import { getMods } from '../util/processSchedule';
+import { isHalfMod } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const CrossSectionItem = ({
-  modOccupiedMatrix
-}) => (
-  const classMods = getMods(scheduleItem);
-  const modHeights = classMods.map(modNumber => (
+  occupiedMods, crossSectionedColumns,
+}) => {
+  const modHeights = occupiedMods.map(modNumber => (
     MOD_ITEM_HEIGHT / (isHalfMod(modNumber) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
 
   return (
-    <CardItem bordered style={{ height: scheduleItemHeight }}>
+    <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
       <View style={styles.modIndicator}>
         {
-          classMods.map((modNumber, index) => (
+          occupiedMods.map((modNumber, index) => (
             <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
               <Text style={styles.bodyText}>{modNumber !== 0 ? modNumber : 'HR'}</Text>
             </View>
@@ -28,18 +29,57 @@ const CrossSectionItem = ({
       <View style={styles.separator} />
       <View style={styles.info}>
         {
-          // TODO: Finish cross-section display
-          // This maps each occupied mod horizontally
-          modOccupiedMatrix.map(crossSectionedMod => (
-            <View>
+          /**
+           * This maps each occupied mod horizontally
+           * Subtract 20 to account for padding (10 for top and bottom)
+           */
+          /* eslint-disable react/no-array-index-key */
+          crossSectionedColumns.map((column, colIndex, { length: colLength }) => (
+            <View
+              key={colIndex}
+              style={[styles.column, {
+                width: `${87.5 / colLength}%`,
+                borderRightColor: colIndex !== colLength - 1 ? 'lightgrey' : 'white',
+                borderRightWidth: Number(colIndex !== colLength - 1),
+              }]}
+            >
               {
+                /* eslint-enable react/no-array-index-key */
                 /**
                  * This array has true / false values based on if the row (occupied mod)
                  * and column (current cross sectioned class being mapped) is occupied
                  */
-                crossSectionedMod.map(isOccupied => (
-                  <View />
-                ))
+                column.map(({
+                  sourceId, length, startMod, endMod, title, body,
+                }, index, array) => {
+                  const nextItem = array[index + 1];
+                  const prevItem = array[index - 1];
+                  const ratio = nextItem ? nextItem.startMod - endMod : 0;
+
+                  return (
+                    <View key={sourceId} style={{ flex: ratio + length }}>
+                      {
+                        /**
+                         * This pads the column if the first item in the column does not start at
+                         * beginning of cross sectioned block
+                         */
+                        !prevItem && startMod !== occupiedMods[0] &&
+                          <View style={[styles.empty, { flex: startMod - occupiedMods[0] }]} />
+                      }
+                      <View style={[styles.modItem, { flex: length }]}>
+                        <Text style={styles.titleText}>{title}</Text>
+                        <Text style={styles.bodyText}>{body}</Text>
+                      </View>
+                      {
+                        /**
+                         * This pads the column after, handling cases where there's a gap or until
+                         * the end of the cross sectioned block
+                         */
+                      }
+                      <View style={[styles.empty, { flex: ratio }]} />
+                    </View>
+                  );
+                })
               }
             </View>
           ))
@@ -47,22 +87,40 @@ const CrossSectionItem = ({
       </View>
     </CardItem>
   );
-);
+};
 export default CrossSectionItem;
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
+  item: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingRight: 0,
+  },
   modIndicator: { width: '12.5%' },
   modNumber: {
     width: '100%',
     justifyContent: 'center',
   },
   separator: {
-    height: '90%',
+    height: '100%',
     borderLeftColor: 'lightgrey',
     borderLeftWidth: 1,
-    marginRight: 15,
   },
   info: {
     flexDirection: 'row',
-  }
+    height: '100%',
+  },
+  column: { flexGrow: 1 },
+  modItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 5,
+  },
+  titleText: {
+    textAlign: 'center',
+    fontFamily: '$fontRegular',
+    fontSize: 16,
+  },
+  bodyText: { fontFamily: '$fontLight' },
+  empty: { backgroundColor: 'rgba(0, 0, 0, 0.05)' },
 });

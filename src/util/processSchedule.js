@@ -36,7 +36,7 @@ const interpolateOpenMods = scheduleItems => (
 );
 
 const interpolateCrossSectionedMods = scheduleItems => (
-  scheduleItems.reduce((withCrossSections, { endMod, sourceId }, index, array) => {
+  scheduleItems.slice().reduce((withCrossSections, { endMod, sourceId }, index, array) => {
     const newArray = [...withCrossSections, array[index]];
     const next = array[index + 1];
     if (next && endMod > next.startMod) {
@@ -44,17 +44,28 @@ const interpolateCrossSectionedMods = scheduleItems => (
         const nextItem = arr[i + 1];
         return nextItem && item.endMod > nextItem.startMod;
       });
+      array.splice(index, crossSectioned.length); // Skip over cross-sectioned mods
       const occupiedMods = getOccupiedMods(crossSectioned);
-      // TODO: Make schedule items UNIFORM w/ TS and update UI
+
+      const groupedByColumn = crossSectioned.reduce((grouped, item) => {
+        const availableColumn = grouped.findIndex(sub => (
+          sub.find(subItem => subItem.endMod < item.startMod)
+        ));
+        if (availableColumn) {
+          grouped[availableColumn].push(item);
+          return grouped;
+        }
+        grouped.push([item]);
+        return grouped;
+      }, []);
+
       return [
         ...newArray,
         {
           sourceId: sourceId + 2000,
           crossSectionBlock: true,
-          modOccupiedMatrix: occupiedMods.map(modNumber => (
-            crossSectioned.map(item => getMods(item).includes(modNumber))
-          )),
-          crossSectionedMods: crossSectioned,
+          crossSectionedColumns: groupedByColumn,
+          occupiedMods,
         },
       ];
     }

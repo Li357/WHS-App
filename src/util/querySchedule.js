@@ -43,6 +43,7 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   const normalizedDay = date.day() - 1;
   const userDaySchedule = schedule[normalizedDay];
 
+  // TODO: Handle cross-sectioned mods here
   return userDaySchedule.find(item => (
     /* eslint-disable function-paren-newline */
     getMods(item).includes(
@@ -73,4 +74,7 @@ const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
   return SCHEDULES.REGULAR;
 };
 
-export { getCurrentMod, getNextClass, selectSchedule };
+const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
+const transpose = array => array[0].map((col, index) => array.map(row => row[index]));
+
+export { getCurrentMod, getNextClass, selectSchedule, isHalfMod, transpose };

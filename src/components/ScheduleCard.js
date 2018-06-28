@@ -7,6 +7,7 @@ import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
+import CrossSectionItem from './CrossSectionItem';
 import { selectSchedule } from '../util/querySchedule';
 import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT } from '../constants/constants';
 
@@ -98,8 +99,10 @@ export default class ScheduleCard extends Component {
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
-                scheduleToShow.map(({ sourceId, ...item }) => (
-                  <ScheduleItem key={sourceId} {...item} />
+                scheduleToShow.map(({ sourceId, crossSectionBlock, ...item }) => (
+                  crossSectionBlock
+                    ? <CrossSectionItem key={sourceId} {...item} />
+                    : <ScheduleItem key={sourceId} {...item} />
                 ))
               }
             </View>

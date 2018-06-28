@@ -4,7 +4,7 @@ import fetch from 'react-native-fetch-polyfill';
 import moment from 'moment';
 
 import processSchedule from '../util/processSchedule';
-import { selectSchedule, rangeOfDates } from '../util/querySchedule';
+import { selectSchedule } from '../util/querySchedule';
 import { REQUEST_TIMEOUT } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
@@ -140,7 +140,9 @@ const fetchSpecialDates = () => async (dispatch) => {
     { timeout: 2 * REQUEST_TIMEOUT },
   );
   if (specialDatesResponse.ok) {
-    const { semOneDate, semTwoDate, lastDayDate, noSchoolDates } = await specialDatesResponse.json();
+    const {
+      semOneDate, semTwoDate, lastDayDate, noSchoolDates,
+    } = await specialDatesResponse.json();
     const toMoment = date => moment(date, 'MMMM D');
     dispatch(setSpecialDates({
       noSchoolDates: noSchoolDates.map(toMoment),

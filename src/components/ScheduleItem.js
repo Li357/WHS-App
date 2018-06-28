@@ -5,9 +5,8 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { sum } from 'lodash';
 
 import { getMods } from '../util/processSchedule';
+import { isHalfMod } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
-
-const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
 
 const ScheduleItem = ({
   title, body, length, ...scheduleItem
@@ -19,7 +18,7 @@ const ScheduleItem = ({
   const scheduleItemHeight = sum(modHeights);
 
   return (
-    <CardItem bordered style={{ height: scheduleItemHeight }}>
+    <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
       <View style={styles.modIndicator}>
         {
           classMods.map((modNumber, index) => (

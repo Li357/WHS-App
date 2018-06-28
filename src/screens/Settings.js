@@ -62,7 +62,7 @@ export default class Settings extends Component {
     } catch (error) {
       const { settings: { errorReporting } } = this.props;
       reportError(
-        'Something went wrong while refreshing. Please check your internet conection.',
+        'Something went wrong while refreshing. Please check your internet connection.',
         error,
         errorReporting,
       );

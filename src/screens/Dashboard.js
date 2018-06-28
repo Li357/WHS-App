@@ -5,7 +5,6 @@ import { Icon } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
-import { round } from 'lodash';
 import moment from 'moment';
 
 import UserInfo from '../components/UserInfo';

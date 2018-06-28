@@ -8,7 +8,11 @@ with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2
 Complete rewrite and redesign with NativeBase. Getting rid of CodePush for app version uniformity.
 Making the app less crappy and bug prone, with linting and  testing (I hope). Less sloppy code.
 
-Rewrite Roadmap:
+### Rewrite Roadmap:
+
+Next up:
+- [ ] :warning: :exclamation: Reduce login time!
+- [ ] Handle different types of dates (need to manually add in meantime)
 
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting
@@ -32,17 +36,17 @@ Rewrite Roadmap:
     - [ ] [NEEDS ANDROID TESTS] Keyboard avoiding view for all phone sizes
   - [ ] Dashboard
     - [x] Parallax scroll view
-    - [ ] [POSTPONED] Customizable information to be shown on dashboard
     - [x] Upload own photo
     - [x] Option to reset to school photo
+    - [ ] Display cross-sectioned warning
   - [x] Schedule
     - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
     - [x] Wait for drawer animation to finish to reduce choppiness
     - [x] Vertical progress bar to signify relative position in day
     - [x] Better approach to showing time tables for mods
-  - [ ] Settings
+    - [x] Display cross-sectioned mods
+  - [x] Settings
     - [x] Make manual refresh more prominent and user friendly
-    - [ ] [POSTPONED] Customize information to shown on dashboard via drag and drop lists
   - [x] Drawer
     - [x] Banner to show current date for better look
     - [x] Icons for different screens (and tint colors)
