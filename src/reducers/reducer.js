@@ -28,6 +28,8 @@ const initialState = {
     end: null,
     schedule: [],
     lastUpdate: null,
+    isSummer: false,
+    isBreak: false,
   },
   specialDates: {
     semesterOneStart: null,
@@ -51,6 +53,8 @@ const WHSApp = (state = initialState, {
   dayStart,
   dayEnd,
   daySchedule,
+  dayIsSummer,
+  dayIsBreak,
   lastDayInfoUpdate,
   specialDates,
   settings,
@@ -95,6 +99,8 @@ const WHSApp = (state = initialState, {
           end: dayEnd,
           schedule: daySchedule,
           lastUpdate: lastDayInfoUpdate,
+          isSummer: dayIsSummer,
+          isBreak: dayIsBreak,
         },
       };
     case SET_SETTINGS:

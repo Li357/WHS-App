@@ -63,7 +63,7 @@ const interpolateCrossSectionedMods = scheduleItems => (
         ...newArray,
         {
           sourceId: sourceId + 2000,
-          crossSectionBlock: true,
+          crossSectionedBlock: true,
           crossSectionedColumns: groupedByColumn,
           occupiedMods,
         },

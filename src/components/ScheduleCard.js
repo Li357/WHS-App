@@ -99,8 +99,8 @@ export default class ScheduleCard extends Component {
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
-                scheduleToShow.map(({ sourceId, crossSectionBlock, ...item }) => (
-                  crossSectionBlock
+                scheduleToShow.map(({ sourceId, crossSectionedBlock, ...item }) => (
+                  crossSectionedBlock
                     ? <CrossSectionItem key={sourceId} {...item} />
                     : <ScheduleItem key={sourceId} {...item} />
                 ))

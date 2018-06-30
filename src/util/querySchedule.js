@@ -35,6 +35,13 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
 };
 
 /**
+ * Internal function that is intended to be used as a callback
+ * in finding the class in the user's schedule that has mods
+ * containing the current mod, i.e. startMod < currentMod < endMod
+ */
+const findClassWithMod = (item, currentMod) => getMods(item).includes(currentMod);
+
+/**
  * Get next class based on next mod
  * Returns N/A when there is no next class
  */
@@ -42,17 +49,38 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   // Since arrays are 0-based and the days start at 1 (for Monday), need to -1
   const normalizedDay = date.day() - 1;
   const userDaySchedule = schedule[normalizedDay];
+  const nextMod = currentMod > PASSING_PERIOD_FACTOR
+    ? currentMod - PASSING_PERIOD_FACTOR
+    : currentMod + 1;
 
-  // TODO: Handle cross-sectioned mods here
-  return userDaySchedule.find(item => (
-    /* eslint-disable function-paren-newline */
-    getMods(item).includes(
-      currentMod > PASSING_PERIOD_FACTOR
-        ? currentMod - PASSING_PERIOD_FACTOR
-        : currentMod + 1,
-    )
-    /* eslint-enable function-paren-newline */
-  )) || { title: 'N/A' };
+  const nextClass = userDaySchedule.find(item => findClassWithMod(item, nextMod));
+
+  if (!nextClass) {
+    return { title: 'N/A' };
+  }
+
+  if (nextClass.crossSectionedBlock) {
+    /**
+     * In a cross-sectioned situation, find the list of current cross sectioned mods
+     * and display as a separate component on the dashboard
+     */
+    const { crossSectionedColumns, sourceId } = nextClass;
+    const currentCrossSectioned = crossSectionedColumns.reduce((current, column) => {
+      // Since this is by column, it can be assumed there is either 0 or 1 in each column
+      const currentInColumn = column.find(item => findClassWithMod(item, nextMod));
+      if (currentInColumn) {
+        current.push(currentInColumn);
+      }
+      return current;
+    }, []);
+
+    return {
+      crossSectionedBlock: true,
+      currentCrossSectioned,
+      sourceId,
+    };
+  }
+  return nextClass;
 };
 
 /**
@@ -75,6 +103,5 @@ const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
 };
 
 const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
-const transpose = array => array[0].map((col, index) => array.map(row => row[index]));
 
-export { getCurrentMod, getNextClass, selectSchedule, isHalfMod, transpose };
+export { getCurrentMod, getNextClass, selectSchedule, isHalfMod };

@@ -38,7 +38,10 @@ const setCredentials = createActionCreator(
 );
 const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
-const setDayInfo = createActionCreator(SET_DAY_INFO, 'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate');
+const setDayInfo = createActionCreator(
+  SET_DAY_INFO,
+  'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate', 'dayIsSummer', 'dayIsBreak',
+);
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
 const logOut = createActionCreator(LOG_OUT);
@@ -96,7 +99,6 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
      */
 
     const processedSchedule = processSchedule(schedule);
-
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));

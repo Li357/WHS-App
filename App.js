@@ -30,7 +30,7 @@ const transformMoments = createTransform(
     Object.keys(copy).forEach((key) => {
       const value = copy[key];
       /* eslint-disable-next-line no-underscore-dangle */
-      if (!Array.isArray(value) && moment(value)._isValid) {
+      if (value && !Array.isArray(value) && moment(value)._isValid) {
         copy[key] = moment(value);
       }
     });
@@ -148,7 +148,8 @@ export default class App extends Component {
       schedule[0][0],
       schedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'k:mm:ss'));
-    store.dispatch(setDayInfo(...range, schedule, date));
+    // TODO: Implement break/summer checking here (last 2 args to setDayInfo)
+    store.dispatch(setDayInfo(...range, schedule, date, false, false));
   }
 
   updateProfilePhoto = async () => {

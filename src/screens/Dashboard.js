@@ -10,9 +10,10 @@ import moment from 'moment';
 import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
 import DashboardBlock from '../components/DashboardBlock';
+import CrossSectionBlock from '../components/CrossSectionBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
-import { getCurrentMod, getNextClass } from '../util/querySchedule';
+import { getCurrentMod, getNextClass, isHalfMod } from '../util/querySchedule';
 import {
   getBeforeSchoolInfo,
   getAfterSchoolInfo,
@@ -165,12 +166,20 @@ export default class Dashboard extends Component {
       if (currentMod === BEFORE_SCHOOL) {
         info = getBeforeSchoolInfo(untilDayStart);
       } else {
+        /* eslint-disable function-paren-newline, indent */
         info = currentMod === AFTER_SCHOOL
           ? getAfterSchoolInfo()
-          : getDuringPassingPeriodInfo(nextClass, untilPassingPeriodEnd, untilDayEnd);
+          : getDuringPassingPeriodInfo(
+              nextClass, untilPassingPeriodEnd, untilDayEnd,
+              isHalfMod(currentMod - PASSING_PERIOD_FACTOR),
+            );
+        /* eslint-enable indent */
       }
     } else {
-      info = getDuringModInfo(currentMod, nextClass, untilModEnd, untilDayEnd);
+      info = getDuringModInfo(
+        currentMod, nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
+      );
+      /* eslint-enable function-paren-newline */
     }
 
     return (
@@ -182,7 +191,13 @@ export default class Dashboard extends Component {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-        {info.map(item => <DashboardBlock key={item.title || item.value} {...item} />)}
+        {
+          info.map(({ crossSectionedBlock, sourceId, ...item }) => (
+            crossSectionedBlock
+              ? <CrossSectionBlock key={sourceId} {...item} />
+              : <DashboardBlock key={item.title || item.value} {...item} />
+          ))
+        }
       </ParallaxScrollView>
     );
   }
