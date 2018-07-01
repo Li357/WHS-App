@@ -50,5 +50,16 @@ const getBeforeSchoolInfo = untilDayStart => [
 ];
 
 const getAfterSchoolInfo = () => [{ value: 'You\'re done for the day!' }];
+const getDuringWeekendInfo = () => [{ value: 'Enjoy your weekend!' }];
+const getDuringBreakInfo = isSummer => [
+  { value: `Enjoy your ${isSummer ? 'summer' : 'break'}!` },
+];
 
-export { getBeforeSchoolInfo, getAfterSchoolInfo, getDuringPassingPeriodInfo, getDuringModInfo };
+export {
+  getBeforeSchoolInfo,
+  getAfterSchoolInfo,
+  getDuringPassingPeriodInfo,
+  getDuringModInfo,
+  getDuringWeekendInfo,
+  getDuringBreakInfo,
+};

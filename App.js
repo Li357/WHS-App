@@ -22,6 +22,12 @@ import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/action
 import { selectSchedule } from './src/util/querySchedule';
 import reportError from './src/util/reportError';
 
+// Update locale before using it in transform
+moment.updateLocale('en', {
+  week: { dow: 1 },
+});
+momentDurationFormat(moment);
+
 // This transform is needed to rehydrate dates as moment objects
 const transformMoments = createTransform(
   inboundState => inboundState,
@@ -29,9 +35,12 @@ const transformMoments = createTransform(
     const copy = { ...outboundState };
     Object.keys(copy).forEach((key) => {
       const value = copy[key];
-      /* eslint-disable-next-line no-underscore-dangle */
-      if (value && !Array.isArray(value) && moment(value)._isValid) {
-        copy[key] = moment(value);
+
+      // If either string or array, then convert to moment object
+      if (['string', 'array'].includes(typeof value)) {
+        copy[key] = Array.isArray(value)
+          ? value.map(date => moment(date))
+          : moment(value);
       }
     });
     return copy;
@@ -53,12 +62,6 @@ const store = createStore(
   ),
 );
 const persistor = persistStore(store);
-
-// Set global moment locale
-moment.updateLocale('en', {
-  week: { dow: 1 },
-});
-momentDurationFormat(moment);
 
 const hasLoggedIn = () => {
   const { username, password } = store.getState();
@@ -142,14 +145,26 @@ export default class App extends Component {
   }
 
   updateDayInfo = (date = moment()) => {
-    const { specialDates } = store.getState();
+    const {
+      specialDates,
+      specialDates: { noSchoolDates, lastDay, semesterOneStart },
+    } = store.getState();
     const schedule = selectSchedule(specialDates, date);
     const range = [
       schedule[0][0],
       schedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'k:mm:ss'));
-    // TODO: Implement break/summer checking here (last 2 args to setDayInfo)
-    store.dispatch(setDayInfo(...range, schedule, date, false, false));
+
+    //const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
+    /**
+     * This check either checks if it is after the last day, because around two months after
+     * last day, dates are refreshed and lastDay is next year, so then can check if date is before
+     * the date of semester one's start
+     */
+    const isSummer = date.isAfter(lastDay)
+      || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart));
+
+    store.dispatch(setDayInfo(...range, schedule, date, isSummer, false));
   }
 
   updateProfilePhoto = async () => {

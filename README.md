@@ -26,7 +26,6 @@ Next up:
   - [ ] Login system
   - [ ] Dashboard date handling/operations
   - [ ] Schedule display of cross-sectioned mods and other irregularities
-  - [ ] Setting display for customization options
 - [x] Redo refreshing system
 - [ ] UI Redesign with Native Base
   - [ ] Login
@@ -34,7 +33,7 @@ Next up:
     - [x] Vector icon for loading animation
     - [x] Better UI for login failure
     - [ ] [NEEDS ANDROID TESTS] Keyboard avoiding view for all phone sizes
-  - [ ] Dashboard
+  - [x] Dashboard
     - [x] Parallax scroll view
     - [x] Upload own photo
     - [x] Option to reset to school photo

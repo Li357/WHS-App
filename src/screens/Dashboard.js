@@ -19,8 +19,13 @@ import {
   getAfterSchoolInfo,
   getDuringPassingPeriodInfo,
   getDuringModInfo,
-} from '../util/dashboardInfoGetters';
-import { HEIGHT, PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL } from '../constants/constants';
+  getDuringWeekendInfo,
+  getDuringBreakInfo,
+} from '../util/dashboardInfo';
+import {
+  HEIGHT,
+  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK,
+} from '../constants/constants';
 
 const mapStateToProps = ({
   loginError, dates, ...rest
@@ -42,6 +47,22 @@ export default class Dashboard extends Component {
     // This needs to be in the constructor for it to be registered by React Navigation
     this.blurSubscriber = this.props.navigation.addListener('willBlur', this.clearCountdowns);
     AppState.addEventListener('change', this.handleAppStateChange);
+
+    // If it is either Summer or a break, there is no need to calculate countdowns
+    const { isBreak, isSummer } = this.props;
+    if (isBreak || isSummer) {
+      this.state = {
+        currentMod: BREAK,
+        nextClass: null,
+        untilDayStart: 0,
+        untilDayEnd: 0,
+        untilModEnd: 0,
+        untilPassingPeriodEnd: 0,
+        isBreak,
+        isSummer,
+      };
+      return;
+    }
     this.updateCountdowns(props, true);
   }
 
@@ -96,10 +117,10 @@ export default class Dashboard extends Component {
 
   updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
     const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
-    const { start, end, schedule } = props.dayInfo;
+    const { start, end, schedule, isBreak, isSummer } = props.dayInfo;
     /**
-     * Since getCurrentMod returns index + 1 (to give correct mod number for display),
-     * but since arrays are 0-based, it must be decremented by 1 for array access
+     * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
+     * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays
      */
     const modNumber = currentMod - Number(now.day() === 3);
     const isDuringMod = modNumber < PASSING_PERIOD_FACTOR;
@@ -123,13 +144,20 @@ export default class Dashboard extends Component {
       untilDayEnd,
       untilModEnd,
       untilPassingPeriodEnd,
+      isBreak,
+      isSummer,
     };
 
+    // This handles the initial state set in constructor
     if (firstTimeSet) {
       this.state = newState;
     } else {
       this.setState(newState);
     }
+    /**
+     * Clear and restart all countdowns on update, all countdowns will be updated when one
+     * gets to 0, maintaining the inevitable countdown offset between counters
+     */
     this.clearCountdowns();
     this.startCountdowns(currentMod, untilDayStart, untilDayEnd);
   }
@@ -153,34 +181,57 @@ export default class Dashboard extends Component {
     });
   }
 
+  selectInfo = () => {
+    const {
+      currentMod,
+      nextClass,
+      untilDayStart,
+      untilDayEnd,
+      untilModEnd,
+      untilPassingPeriodEnd,
+      isBreak,
+      isSummer,
+    } = this.state;
+
+    /**
+     * This condition should be first so that even on weekends during the summer, the summer
+     * message is shown
+     */
+    if (isSummer || isBreak) {
+      return getDuringBreakInfo(isSummer);
+    }
+
+    const today = moment().day();
+    if (today < 1 || today > 5) {
+      return getDuringWeekendInfo();
+    }
+
+    /* eslint-disable function-paren-newline */
+    if (currentMod <= PASSING_PERIOD_FACTOR) {
+      return getDuringModInfo(
+        currentMod, nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
+      );
+    }
+
+    if (currentMod === BEFORE_SCHOOL) {
+      return getBeforeSchoolInfo(untilDayStart);
+    }
+
+    /* eslint-disable indent */
+    return currentMod === AFTER_SCHOOL
+      ? getAfterSchoolInfo()
+      : getDuringPassingPeriodInfo(
+          nextClass, untilPassingPeriodEnd, untilDayEnd,
+          isHalfMod(currentMod - PASSING_PERIOD_FACTOR),
+        );
+    /* eslint-enable function-paren-newline, indent */
+  }
+
   renderForeground = () => <UserInfo {...this.props} />
   renderBackground = () => <UserBackground {...this.props} />
 
   render() {
-    const {
-      currentMod, nextClass, untilDayStart, untilDayEnd, untilModEnd, untilPassingPeriodEnd,
-    } = this.state;
-
-    let info = [];
-    if (currentMod > PASSING_PERIOD_FACTOR) {
-      if (currentMod === BEFORE_SCHOOL) {
-        info = getBeforeSchoolInfo(untilDayStart);
-      } else {
-        /* eslint-disable function-paren-newline, indent */
-        info = currentMod === AFTER_SCHOOL
-          ? getAfterSchoolInfo()
-          : getDuringPassingPeriodInfo(
-              nextClass, untilPassingPeriodEnd, untilDayEnd,
-              isHalfMod(currentMod - PASSING_PERIOD_FACTOR),
-            );
-        /* eslint-enable indent */
-      }
-    } else {
-      info = getDuringModInfo(
-        currentMod, nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
-      );
-      /* eslint-enable function-paren-newline */
-    }
+    const info = this.selectInfo();
 
     return (
       <ParallaxScrollView
