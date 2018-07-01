@@ -1,21 +1,18 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { List, ListItem } from 'native-base';
+import { ListItem } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 const DashboardBlock = ({ title, subtitle, value }) => (
-  <List style={styles.infoContainer}>
-    <ListItem noIndent style={styles.item}>
-      <Text style={styles.value}>{value}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-      {title && <Text style={styles.title}>{title}</Text>}
-    </ListItem>
-  </List>
+  <ListItem noIndent style={styles.item}>
+    <Text style={styles.value}>{value}</Text>
+    {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+    {title && <Text style={styles.title}>{title}</Text>}
+  </ListItem>
 );
 export default DashboardBlock;
 
 const styles = EStyleSheet.create({
-  infoContainer: { width: '80%' },
   item: {
     flexDirection: 'column',
     paddingTop: 30,

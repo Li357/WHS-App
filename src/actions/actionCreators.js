@@ -30,7 +30,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
 const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
 const setUserInfo = createActionCreator(
   SET_USER_INFO,
-  'name', 'classOf', 'homeroom', 'counselor', 'dean', 'id', 'schedule', 'schoolPicture',
+  'name', 'classOf', 'homeroom', 'counselor', 'dean', 'id', 'schedule', 'schoolPicture', 'isTeacher',
 );
 const setCredentials = createActionCreator(
   SET_CREDENTIALS,
@@ -53,6 +53,7 @@ const logOut = createActionCreator(LOG_OUT);
  */
 const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
   async (dispatch, getState) => {
+    console.time('fetching user');
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
     // First request clears the user from previous signin
@@ -66,6 +67,8 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
       timeout: REQUEST_TIMEOUT,
     });
     const userpageHTML = await userpageResponse.text();
+    console.timeEnd('fetching user');
+    console.time('process user html');
     const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
     const name = $('title').text().split('|')[0].trim();
@@ -86,25 +89,30 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const studentPicture = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
 
     // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
-    const studentInfo = nameSubtitle !== 'Teacher'
+    const isTeacher = nameSubtitle === 'Teacher';
+    const studentInfo = !isTeacher
       ? infoCard
         .find('.card-subtitle a, .card-text:last-child')
         .contents()
         .map((index, { data }) => data.split(':').slice(-1)[0].trim())
       : [null, null, null];
+    console.timeEnd('process user html');
 
     /**
      *  Do all heavy lifting before setting credentials in case user interrupts user info fetching
      *  so they're technically not logged in and refetch can happen as necessary
      */
-
+    console.time('process schedule');
     const processedSchedule = processSchedule(schedule);
+    console.timeEnd('process schedule');
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
     // Directly call fetchSpecialDates here for setDaySchedule
+    console.time('fetch dates');
     await fetchSpecialDates()(dispatch);
-
+    console.timeEnd('fetch dates');
+    console.time('process day info');
     // Set day info in user info fetch
     const {
       specialDates,
@@ -116,9 +124,12 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
       daySchedule[0][0],
       daySchedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'k:mm:ss'));
-
+    console.timeEnd('process day info');
+    console.time('dispatch');
     dispatch(setDayInfo(...range, daySchedule, date));
-    dispatch(setUserInfo(name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture));
+    dispatch(setUserInfo(
+      name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,
+    ));
 
     if (date.isAfter(semesterTwoStart) && date.isBefore(lastDay)) {
       dispatch(setRefreshed(true, true));
@@ -130,6 +141,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     }
 
     dispatch(setCredentials(username, password));
+    console.timeEnd('dispatch');
     return true;
   }
 );
@@ -139,7 +151,7 @@ const fetchSpecialDates = () => async (dispatch) => {
   // Connect to express server which gets school calendar PDF
   const specialDatesResponse = await fetch(
     'https://whs-server.herokuapp.com/specialDates',
-    { timeout: 2 * REQUEST_TIMEOUT },
+    { timeout: REQUEST_TIMEOUT },
   );
   if (specialDatesResponse.ok) {
     const {

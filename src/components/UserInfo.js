@@ -42,7 +42,7 @@ export default class UserInfo extends PureComponent {
 
   render() {
     const {
-      name, classOf, profilePhoto, counselor, homeroom, dean, id,
+      name, classOf, profilePhoto, counselor, homeroom, dean, id, isTeacher,
     } = this.props;
     const profilePhotoObj = { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
@@ -69,23 +69,26 @@ export default class UserInfo extends PureComponent {
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.classOf}>{classOf}</Text>
           </View>
-          <View style={styles.infoSlide}>
-            <View style={styles.infoLeft}>
-              {
-                ['Dean', 'Counselor', 'Homeroom', 'ID'].map(key => (
-                  <Text key={key} style={styles.keyText}>{key}</Text>
-                ))
-              }
-            </View>
-            <View style={styles.separator} />
-            <View style={styles.infoRight}>
-              {
-                [dean, counselor, homeroom, id].map(value => (
-                  <Text key={value} style={styles.valueText}>{value}</Text>
-                ))
-              }
-            </View>
-          </View>
+          {
+            !isTeacher &&
+              <View style={styles.infoSlide}>
+                <View style={styles.infoLeft}>
+                  {
+                    ['Dean', 'Counselor', 'Homeroom', 'ID'].map(key => (
+                      <Text key={key} style={styles.keyText}>{key}</Text>
+                    ))
+                  }
+                </View>
+                <View style={styles.separator} />
+                <View style={styles.infoRight}>
+                  {
+                    [dean, counselor, homeroom, id].map(value => (
+                      <Text key={value} style={styles.valueText}>{value}</Text>
+                    ))
+                  }
+                </View>
+              </View>
+          }
         </Carousel>
       </View>
     );

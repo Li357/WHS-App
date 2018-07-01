@@ -38,7 +38,7 @@ Next up:
     - [x] Parallax scroll view
     - [x] Upload own photo
     - [x] Option to reset to school photo
-    - [ ] Display cross-sectioned warning
+    - [x] Display cross-sectioned warning
   - [x] Schedule
     - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
     - [x] Wait for drawer animation to finish to reduce choppiness

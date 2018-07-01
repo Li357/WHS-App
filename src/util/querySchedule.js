@@ -48,6 +48,11 @@ const findClassWithMod = (item, currentMod) => getMods(item).includes(currentMod
 const getNextClass = (schedule, currentMod, date = moment()) => {
   // Since arrays are 0-based and the days start at 1 (for Monday), need to -1
   const normalizedDay = date.day() - 1;
+
+  if (normalizedDay < 0 || normalizedDay > 4) {
+    return null;
+  }
+
   const userDaySchedule = schedule[normalizedDay];
   const nextMod = currentMod > PASSING_PERIOD_FACTOR
     ? currentMod - PASSING_PERIOD_FACTOR

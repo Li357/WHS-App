@@ -86,7 +86,7 @@ export default class App extends Component {
     const today = now.day();
     if (
       newStatus === 'active'
-      && lastUpdate.isSame(now, 'day') // Only update if not updated in one day
+      && lastUpdate && lastUpdate.isSame(now, 'day') // Only update if not updated in one day
       && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
       this.updateDayInfo(now); // Pass already created instance

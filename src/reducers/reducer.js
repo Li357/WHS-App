@@ -20,6 +20,7 @@ const initialState = {
   counselor: null,
   dean: null,
   id: '',
+  isTeacher: false,
   schedule: [],
   profilePhoto: null,
   schoolPicture: null,

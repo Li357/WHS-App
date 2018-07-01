@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 
 const reportError = (message, error, shouldReportError) => {
+  console.log(error);
   if (shouldReportError) {
     // TODO: Post error to database
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AppState } from 'react-native';
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
-import { Icon } from 'native-base';
+import { List, Icon } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
@@ -191,13 +191,15 @@ export default class Dashboard extends Component {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-        {
-          info.map(({ crossSectionedBlock, sourceId, ...item }) => (
-            crossSectionedBlock
-              ? <CrossSectionBlock key={sourceId} {...item} />
-              : <DashboardBlock key={item.title || item.value} {...item} />
-          ))
-        }
+        <List style={styles.infoContainer}>
+          {
+            info.map(({ crossSectionedBlock, sourceId, ...item }) => (
+              crossSectionedBlock
+                ? <CrossSectionBlock key={sourceId} {...item} />
+                : <DashboardBlock key={item.title || item.value} {...item} />
+            ))
+          }
+        </List>
       </ParallaxScrollView>
     );
   }
@@ -213,4 +215,5 @@ Dashboard.navigationOptions = {
 const styles = EStyleSheet.create({
   container: { alignItems: 'center' },
   icon: { fontSize: 20 },
+  infoContainer: { width: '80%' },
 });

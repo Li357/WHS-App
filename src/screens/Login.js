@@ -145,7 +145,7 @@ const styles = EStyleSheet.create({
   },
   logo: {
     width: '48%',
-    height: '22% + 20',
+    height: '22%',
   },
   text: {
     fontSize: 40,
