@@ -11,7 +11,6 @@ Making the app less crappy and bug prone, with linting and  testing (I hope). Le
 ### Rewrite Roadmap:
 
 Next up:
-- [ ] :warning: :exclamation: Reduce login time!
 - [ ] Handle different types of dates (need to manually add in meantime)
 
 - [x] Update dependencies and React/React Native

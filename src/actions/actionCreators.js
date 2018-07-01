@@ -53,7 +53,6 @@ const logOut = createActionCreator(LOG_OUT);
  */
 const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
   async (dispatch, getState) => {
-    console.time('fetching user');
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
     // First request clears the user from previous signin
@@ -67,8 +66,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
       timeout: REQUEST_TIMEOUT,
     });
     const userpageHTML = await userpageResponse.text();
-    console.timeEnd('fetching user');
-    console.time('process user html');
+
     const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
     const name = $('title').text().split('|')[0].trim();
@@ -96,23 +94,20 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
         .contents()
         .map((index, { data }) => data.split(':').slice(-1)[0].trim())
       : [null, null, null];
-    console.timeEnd('process user html');
 
     /**
      *  Do all heavy lifting before setting credentials in case user interrupts user info fetching
      *  so they're technically not logged in and refetch can happen as necessary
      */
-    console.time('process schedule');
+
     const processedSchedule = processSchedule(schedule);
-    console.timeEnd('process schedule');
+
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
     // Directly call fetchSpecialDates here for setDaySchedule
-    console.time('fetch dates');
     await fetchSpecialDates()(dispatch);
-    console.timeEnd('fetch dates');
-    console.time('process day info');
+
     // Set day info in user info fetch
     const {
       specialDates,
@@ -124,8 +119,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
       daySchedule[0][0],
       daySchedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'k:mm:ss'));
-    console.timeEnd('process day info');
-    console.time('dispatch');
+
     dispatch(setDayInfo(...range, daySchedule, date));
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
@@ -141,9 +135,8 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     ) {
       dispatch(setRefreshed(true, false));
     }
-
     dispatch(setCredentials(username, password));
-    console.timeEnd('dispatch');
+
     return true;
   }
 );
