@@ -117,7 +117,9 @@ export default class Dashboard extends Component {
 
   updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
     const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
-    const { start, end, schedule, isBreak, isSummer } = props.dayInfo;
+    const {
+      start, end, schedule, isBreak, isSummer,
+    } = props.dayInfo;
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
      * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays

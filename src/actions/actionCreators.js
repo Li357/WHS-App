@@ -127,9 +127,11 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     console.timeEnd('process day info');
     console.time('dispatch');
     dispatch(setDayInfo(...range, daySchedule, date));
+    /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,
     ));
+    /* eslint-enable function-paren-newline */
 
     if (date.isAfter(semesterTwoStart) && date.isBefore(lastDay)) {
       dispatch(setRefreshed(true, true));

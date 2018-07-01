@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { List, ListItem, Left, Right } from 'native-base';
 
 const CrossSectionBlock = ({ currentCrossSectioned }) => (
   <ListItem noIndent style={styles.itemContainer}>
-    <Text style={styles.headerText}>You're cross sectioned with these classes next mod:</Text>
+    <Text style={styles.headerText}>You&apos;re cross sectioned with these classes next mod:</Text>
     <List style={styles.modList}>
       {
-        currentCrossSectioned.map(({ title, body }, index, { length }) => (
+        currentCrossSectioned.map(({ title, body }) => (
           <ListItem noIndent style={styles.modItem}>
             <Left><Text style={styles.modText}>{title}</Text></Left>
             <Right><Text style={styles.modText}>{body}</Text></Right>
@@ -45,5 +45,5 @@ const styles = EStyleSheet.create({
     width: '100%',
     textAlign: 'center',
     paddingVertical: 5,
-  }
+  },
 });

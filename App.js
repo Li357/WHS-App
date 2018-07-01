@@ -37,7 +37,7 @@ const transformMoments = createTransform(
       const value = copy[key];
 
       // If either string or array, then convert to moment object
-      if (['string', 'array'].includes(typeof value)) {
+      if (['string', 'object'].includes(typeof value)) {
         copy[key] = Array.isArray(value)
           ? value.map(date => moment(date))
           : moment(value);
@@ -155,7 +155,7 @@ export default class App extends Component {
       schedule.slice(-1)[0][1],
     ].map(time => moment(`${time}:00`, 'k:mm:ss'));
 
-    //const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
+    const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
     /**
      * This check either checks if it is after the last day, because around two months after
      * last day, dates are refreshed and lastDay is next year, so then can check if date is before
@@ -164,7 +164,7 @@ export default class App extends Component {
     const isSummer = date.isAfter(lastDay)
       || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart));
 
-    store.dispatch(setDayInfo(...range, schedule, date, isSummer, false));
+    store.dispatch(setDayInfo(...range, schedule, date, isSummer, isBreak));
   }
 
   updateProfilePhoto = async () => {
