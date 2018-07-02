@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Image, View, findNodeHandle, StyleSheet } from 'react-native';
+import { Image, View, findNodeHandle, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'react-native-blur';
 
 export default class UserBackground extends PureComponent {
@@ -24,7 +24,7 @@ export default class UserBackground extends PureComponent {
         <BlurView
           viewRef={blurRef}
           blurType="light"
-          blurAmount={5}
+          blurAmount={10}
           style={styles.blur}
         />
       </View>

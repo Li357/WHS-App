@@ -1,5 +1,8 @@
 import React, { PureComponent } from 'react';
-import { Animated, KeyboardAvoidingView, Image, Text, Easing } from 'react-native';
+import {
+  Animated, Easing, Platform,
+  KeyboardAvoidingView, Image, Text,
+} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
@@ -81,9 +84,13 @@ export default class Login extends PureComponent {
     } = this.state;
     const { loginError } = this.props;
 
-    // TODO: Test keyboard offset on Android & make more dynamic
+    const keyboardOffset = -HEIGHT * Platform.select({
+      ios: 0.1,
+      android: 0.5,
+    });
+
     return (
-      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={-HEIGHT * 0.1} style={styles.container}>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={keyboardOffset} style={styles.container}>
         <Animated.View style={[styles.container, { opacity }]}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.text}>Login to WHS</Text>
