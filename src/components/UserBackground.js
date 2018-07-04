@@ -24,7 +24,7 @@ export default class UserBackground extends PureComponent {
         <BlurView
           viewRef={blurRef}
           blurType="light"
-          blurAmount={10}
+          blurAmount={5}
           style={styles.blur}
         />
       </View>

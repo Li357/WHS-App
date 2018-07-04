@@ -34,7 +34,7 @@ export default class DrawerContent extends Component {
             <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
           </View>
         </ImageBackground>
-        <DrawerItems {...this.props} />
+        <DrawerItems {...this.props} itemsContainerStyle={styles.items} />
         <View style={styles.separator} />
         <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
           <Icon name="md-log-out" style={styles.icon} />
@@ -46,9 +46,7 @@ export default class DrawerContent extends Component {
 }
 
 const styles = EStyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   header: {
     alignSelf: 'stretch',
     width: null,
@@ -70,6 +68,7 @@ const styles = EStyleSheet.create({
     color: 'white',
     fontFamily: '$fontLight',
   },
+  items: { paddingVertical: 0 },
   separator: {
     marginHorizontal: 18,
     borderBottomColor: 'lightgrey',

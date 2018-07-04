@@ -44,25 +44,17 @@ export default class Dashboard extends Component {
 
   constructor(props) {
     super(props);
+
+    const { navigation } = this.props;
     // This needs to be in the constructor for it to be registered by React Navigation
-    this.blurSubscriber = this.props.navigation.addListener('willBlur', this.clearCountdowns);
+    this.blurSubscriber = navigation.addListener('willBlur', this.clearCountdowns);
+    // Start countdowns back when user navigates back to dashboard
+    this.focusSubscriber = navigation.addListener('didFocus', () => {
+      // Use this.props NOT props (to access latest props)
+      this.updateCountdowns(this.props);
+    });
     AppState.addEventListener('change', this.handleAppStateChange);
 
-    // If it is either Summer or a break, there is no need to calculate countdowns
-    const { isBreak, isSummer } = this.props;
-    if (isBreak || isSummer) {
-      this.state = {
-        currentMod: BREAK,
-        nextClass: null,
-        untilDayStart: 0,
-        untilDayEnd: 0,
-        untilModEnd: 0,
-        untilPassingPeriodEnd: 0,
-        isBreak,
-        isSummer,
-      };
-      return;
-    }
     this.updateCountdowns(props, true);
   }
 
@@ -70,6 +62,7 @@ export default class Dashboard extends Component {
     this.clearCountdowns();
     AppState.removeEventListener('change', this.handleAppStateChange);
     this.blurSubscriber.remove();
+    this.focusSubscriber.remove();
   }
 
   handleAppStateChange = (newStatus) => {
@@ -120,6 +113,22 @@ export default class Dashboard extends Component {
     const {
       start, end, schedule, isBreak, isSummer,
     } = props.dayInfo;
+
+    // If it is either Summer or a break, there is no need to calculate countdowns
+    if (isBreak || isSummer) {
+      this.state = {
+        currentMod: BREAK,
+        nextClass: null,
+        untilDayStart: 0,
+        untilDayEnd: 0,
+        untilModEnd: 0,
+        untilPassingPeriodEnd: 0,
+        isBreak,
+        isSummer,
+      };
+      return;
+    }
+
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
      * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays
@@ -219,12 +228,14 @@ export default class Dashboard extends Component {
       return getBeforeSchoolInfo(untilDayStart);
     }
 
+    const nextMod = currentMod - PASSING_PERIOD_FACTOR;
     /* eslint-disable indent */
     return currentMod === AFTER_SCHOOL
       ? getAfterSchoolInfo()
       : getDuringPassingPeriodInfo(
+          nextMod,
           nextClass, untilPassingPeriodEnd, untilDayEnd,
-          isHalfMod(currentMod - PASSING_PERIOD_FACTOR),
+          isHalfMod(nextMod),
         );
     /* eslint-enable function-paren-newline, indent */
   }

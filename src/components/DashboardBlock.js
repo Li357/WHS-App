@@ -17,6 +17,7 @@ const styles = EStyleSheet.create({
     flexDirection: 'column',
     paddingTop: 30,
     paddingBottom: 30,
+    borderBottomWidth: 0,
   },
   title: {
     fontFamily: '$fontThin',

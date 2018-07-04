@@ -95,6 +95,8 @@ const styles = EStyleSheet.create({
     paddingTop: 0,
     paddingBottom: 0,
     paddingRight: 0,
+    borderBottomWidth: 0.5,
+    borderTopWidth: 0.5,
   },
   modIndicator: { width: '12.5%' },
   modNumber: {

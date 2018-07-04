@@ -1,10 +1,14 @@
 import moment from 'moment';
 
-const format = ms => moment.duration(ms).format('h:*mm:ss');
+/**
+ * Need Math.abs because sometimes may be negative due to decrementing by 1000 when ms may not
+ * necessarily be a multiple of 1000 and may end up negative
+ */
+const format = ms => moment.duration(Math.abs(ms)).format('h:*mm:ss');
 
 const getDuringModInfo = (currentMod, { title, body }, untilModEnd, untilDayEnd, isHalfMod) => [
   {
-    title: `Current ${isHalfMod ? 'half' : ''} mod`,
+    title: `Current${isHalfMod ? ' half' : ''} mod`,
     value: currentMod,
   },
   {
@@ -24,17 +28,21 @@ const getDuringModInfo = (currentMod, { title, body }, untilModEnd, untilDayEnd,
 
 /* eslint-disable function-paren-newline */
 const getDuringPassingPeriodInfo = (
-  { title, body }, untilPassingPeriodEnd, untilDayEnd, isNextHalfMod,
+  nextMod, { title, body }, untilPassingPeriodEnd, untilDayEnd, isNextHalfMod,
 ) => [
   /* eslint-enable function-paren-newline */
   {
-    title: `Next ${isNextHalfMod ? 'half' : ''} mod`,
+    title: 'Next class',
     value: title,
     subtitle: body,
   },
   {
     title: 'Until passing period ends',
     value: format(untilPassingPeriodEnd),
+  },
+  {
+    title: `Next${isNextHalfMod ? ' half' : ''} mod`,
+    value: nextMod,
   },
   {
     title: 'Until day ends',

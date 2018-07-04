@@ -49,8 +49,3 @@ Next up:
     - [x] Banner to show current date for better look
     - [x] Icons for different screens (and tint colors)
     - [x] Logout span full width with same style as screens
-
-## To Do List
-
-- [ ] v2.0.0 Rewrite
-- [ ] Notification system for mod ends

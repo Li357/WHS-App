@@ -152,7 +152,11 @@ const styles = EStyleSheet.create({
   },
   keyText: {
     fontFamily: '$fontBold',
-    lineHeight: 19,
+    fontSize: 15,
+    lineHeight: 20,
   },
-  valueText: { fontFamily: '$fontRegular' },
+  valueText: {
+    fontFamily: '$fontRegular',
+    fontSize: 15,
+  },
 });

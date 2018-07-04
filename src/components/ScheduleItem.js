@@ -41,6 +41,10 @@ const ScheduleItem = ({
 export default ScheduleItem;
 
 const styles = EStyleSheet.create({
+  item: {
+    borderBottomWidth: 0.5,
+    borderTopWidth: 0.5,
+  },
   modIndicator: { width: '12.5%' },
   modNumber: {
     width: '100%',

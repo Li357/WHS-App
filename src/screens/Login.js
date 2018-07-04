@@ -85,7 +85,7 @@ export default class Login extends PureComponent {
     const { loginError } = this.props;
 
     const keyboardOffset = -HEIGHT * Platform.select({
-      ios: 0.1,
+      ios: 0.175,
       android: 0.5,
     });
 
@@ -151,8 +151,8 @@ const styles = EStyleSheet.create({
     width: WIDTH,
   },
   logo: {
-    width: '48%',
-    height: '22%',
+    width: HEIGHT * 0.27,
+    height: '24%',
   },
   text: {
     fontSize: 40,
