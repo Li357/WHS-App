@@ -9,6 +9,7 @@ import moment from 'moment';
 import ScheduleItem from './ScheduleItem';
 import CrossSectionItem from './CrossSectionItem';
 import { selectSchedule } from '../util/querySchedule';
+import { mapToFinals, interpolateAssembly } from '../util/processSchedule';
 import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT } from '../constants/constants';
 
 @withNavigation
@@ -58,8 +59,24 @@ export default class ScheduleCard extends Component {
     const isWednesday = day === 3;
     const cardDate = date.clone().weekday(day - 1);
 
-    const cardSchedule = isCurrentDay ? schedule : selectSchedule(specialDates, cardDate);
+    const {
+      schedule: cardDateSchedule, hasAssembly, isFinals,
+    } = selectSchedule(specialDates, cardDate);
+    const isLastDay = isFinals && day === 5; // Is last day if finals day and Friday
+
+    const cardSchedule = isCurrentDay ? schedule : cardDateSchedule;
     const format = time => moment(time, 'k:mm').format('h:mm');
+
+    let userSchedule;
+    if (hasAssembly) {
+      userSchedule = interpolateAssembly(content);
+    } else if (isFinals) {
+      userSchedule = mapToFinals(content);
+    } else {
+      // Don't show No Homeroom on ScheduleCard
+      userSchedule = content.filter(({ title }) => title !== 'No Homeroom');
+    }
+
     /* eslint-disable indent */
     const scheduleToShow = showTimes
       ? cardSchedule.map((timePair, index) => ({
@@ -70,8 +87,7 @@ export default class ScheduleCard extends Component {
           endMod: index + 1 + Number(isWednesday),
           sourceId: index,
         }))
-      // Don't show No Homeroom on ScheduleCard
-      : content.filter(({ title }) => title !== 'No Homeroom');
+      : userSchedule;
     /* eslint-enable indent */
 
     return (
@@ -101,8 +117,9 @@ export default class ScheduleCard extends Component {
               {
                 scheduleToShow.map(({ sourceId, crossSectionedBlock, ...item }) => (
                   crossSectionedBlock
+                    // Cross-sectioning will never be a problem on the last day
                     ? <CrossSectionItem key={sourceId} {...item} />
-                    : <ScheduleItem key={sourceId} {...item} />
+                    : <ScheduleItem key={sourceId} {...item} isLastDay={isLastDay} />
                 ))
               }
             </View>

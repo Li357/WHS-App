@@ -18,8 +18,8 @@ import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
-import { fetchUserInfo, setProfilePhoto, setDayInfo } from './src/actions/actionCreators';
-import { selectSchedule } from './src/util/querySchedule';
+import { fetchUserInfo, setProfilePhoto, setDayInfo, logOut } from './src/actions/actionCreators';
+import { getDayInfo } from './src/util/querySchedule';
 import reportError from './src/util/reportError';
 
 // Update locale before using it in transform
@@ -89,7 +89,7 @@ export default class App extends Component {
     const today = now.day();
     if (
       newStatus === 'active'
-      && lastUpdate && lastUpdate.isSame(now, 'day') // Only update if not updated in one day
+      && lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
       && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
       this.updateDayInfo(now); // Pass already created instance
@@ -97,6 +97,13 @@ export default class App extends Component {
   }
 
   handleRehydrate = async () => {
+    const { dayInfo } = store.getState();
+    // Checks for typeof undefined because v1.x users will not have dayInfo in store
+    if (typeof dayInfo === 'undefined') {
+      // Log out and reset store on update to v2 if the user is previous v1.x user
+      store.dispatch(logOut());
+    }
+
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
@@ -145,26 +152,8 @@ export default class App extends Component {
   }
 
   updateDayInfo = (date = moment()) => {
-    const {
-      specialDates,
-      specialDates: { noSchoolDates, lastDay, semesterOneStart },
-    } = store.getState();
-    const schedule = selectSchedule(specialDates, date);
-    const range = [
-      schedule[0][0],
-      schedule.slice(-1)[0][1],
-    ].map(time => moment(`${time}:00`, 'k:mm:ss'));
-
-    const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
-    /**
-     * This check either checks if it is after the last day, because around two months after
-     * last day, dates are refreshed and lastDay is next year, so then can check if date is before
-     * the date of semester one's start
-     */
-    const isSummer = date.isAfter(lastDay)
-      || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart));
-
-    store.dispatch(setDayInfo(...range, schedule, date, isSummer, isBreak));
+    const { specialDates } = store.getState();
+    store.dispatch(setDayInfo(...getDayInfo(specialDates, date)));
   }
 
   updateProfilePhoto = async () => {

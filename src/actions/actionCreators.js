@@ -1,10 +1,11 @@
 import { AsyncStorage } from 'react-native';
 import { load } from 'react-native-cheerio';
 import fetch from 'react-native-fetch-polyfill';
+import { mapValues } from 'lodash';
 import moment from 'moment';
 
 import processSchedule from '../util/processSchedule';
-import { selectSchedule } from '../util/querySchedule';
+import { getDayInfo } from '../util/querySchedule';
 import { REQUEST_TIMEOUT } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
@@ -40,7 +41,8 @@ const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDayInfo = createActionCreator(
   SET_DAY_INFO,
-  'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate', 'dayIsSummer', 'dayIsBreak',
+  'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate',
+  'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsLast',
 );
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
@@ -108,19 +110,14 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     // Directly call fetchSpecialDates here for setDaySchedule
     await fetchSpecialDates()(dispatch);
 
-    // Set day info in user info fetch
     const {
       specialDates,
       specialDates: { semesterOneStart, semesterTwoStart, lastDay },
     } = getState();
     const date = moment();
-    const daySchedule = selectSchedule(specialDates, date);
-    const range = [
-      daySchedule[0][0],
-      daySchedule.slice(-1)[0][1],
-    ].map(time => moment(`${time}:00`, 'k:mm:ss'));
 
-    dispatch(setDayInfo(...range, daySchedule, date));
+    // Set day info in user info fetch
+    dispatch(setDayInfo(...getDayInfo(specialDates, date, isTeacher)));
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,
@@ -149,16 +146,11 @@ const fetchSpecialDates = () => async (dispatch) => {
     { timeout: REQUEST_TIMEOUT },
   );
   if (specialDatesResponse.ok) {
-    const {
-      semOneDate, semTwoDate, lastDayDate, noSchoolDates,
-    } = await specialDatesResponse.json();
-    const toMoment = date => moment(date, 'MMMM D');
-    dispatch(setSpecialDates({
-      noSchoolDates: noSchoolDates.map(toMoment),
-      semesterOneStart: toMoment(semOneDate),
-      semesterTwoStart: toMoment(semTwoDate),
-      lastDay: toMoment(lastDayDate),
-    }));
+    const json = await specialDatesResponse.json();
+    const toMoment = date => moment(date, 'MMMM D YYYY');
+    dispatch(setSpecialDates(mapValues(json, value => (
+      Array.isArray(value) ? value.map(toMoment) : toMoment(value)
+    ))));
     return true;
   }
   return false;

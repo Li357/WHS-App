@@ -86,7 +86,7 @@ const LATE_START_WEDNESDAY = [
   ['14:30', '14:50'],
 ];
 
-// TODO: Set assembly index in actual special date items
+// NOTE: Assumes assembly is always mod 3
 const ASSEMBLY = [
   ['8:00', '8:15'],
   ['8:20', '8:50'],
@@ -112,7 +112,6 @@ const FINALS = [
   ['9:15', '10:15'],
   ['10:20', '11:20'],
   ['11:25', '12:25'],
-  ['12:25', '16:00'],
 ];
 
 export default {

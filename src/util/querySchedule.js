@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import { getMods } from './processSchedule';
 import { PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, SCHEDULES } from '../constants/constants';
 
@@ -88,25 +89,67 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   return nextClass;
 };
 
+// Internal function to find item in array which is same date as target
+const hasDayMatch = (array, target) => array.some(day => day.isSame(target, 'day'));
+
 /**
- * This selects the schedule of the day
+ * This selects the schedule of the day, depending on specialDates in the store, which retrieves
+ * info from express server
  */
-const selectSchedule = ({ lastDay: secondFinalsDay }, date = moment()) => {
+const selectSchedule = ({
+  lastDay: secondFinalsDay, assemblyDates, lateStartDates, earlyDismissalDates,
+}, date) => {
+  let schedule;
   const firstFinalsDay = secondFinalsDay.clone().subtract(1, 'd');
+  const isLateStart = hasDayMatch(lateStartDates, date);
+  const isFinals = date.isSame(secondFinalsDay, 'day') || date.isSame(firstFinalsDay, 'day');
+  const hasAssembly = hasDayMatch(assemblyDates, date);
 
-  if (date.isSame(secondFinalsDay, 'month') || date.isSame(firstFinalsDay, 'month')) {
-    return SCHEDULES.FINALS;
+  if (isFinals) {
+    // Since teachers have an extra "mod" of grading on finals day
+    schedule = SCHEDULES.FINALS;
   } else if (date.day() === 3) {
-    // TODO: Handle late start Wednesday here
-
-    return SCHEDULES.WEDNESDAY;
+    schedule = SCHEDULES[isLateStart ? 'LATE_START_WEDNESDAY' : 'WEDNESDAY'];
+  } else if (isLateStart) {
+    schedule = SCHEDULES.LATE_START;
+  } else if (hasAssembly) {
+    schedule = SCHEDULES.ASSEMBLY;
+  } else {
+    schedule = SCHEDULES[hasDayMatch(earlyDismissalDates, date) ? 'EARLY_DISMISSAL' : 'REGULAR'];
   }
 
-  // TODO: Handle assembly, late start, and early dismissal days
-
-  return SCHEDULES.REGULAR;
+  return {
+    schedule,
+    isFinals,
+    hasAssembly,
+  };
 };
 
 const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
 
-export { getCurrentMod, getNextClass, selectSchedule, isHalfMod };
+/**
+ * Returns day info, i.e. the start and end times of current day,
+ * the schedule for the day, the last update time (current date) of
+ * the day info, if it's Summer or a break
+ */
+const getDayInfo = (specialDates, date) => {
+  const { semesterOneStart, lastDay, noSchoolDates } = specialDates;
+  const { schedule, isFinals, hasAssembly } = selectSchedule(specialDates, date);
+  const range = [
+    schedule[0][0],
+    schedule.slice(-1)[0][1],
+  ].map(time => moment(`${time}:00`, 'k:mm:ss'));
+
+  const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
+  /**
+   * This check either checks if it is after the last day, because around two months after
+   * last day, dates are refreshed and lastDay is next year, so then can check if date is before
+   * the date of semester one's start
+   */
+  const isSummer = date.isAfter(lastDay)
+    || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart));
+
+  return [...range, schedule, date, isSummer, isBreak, hasAssembly, isFinals];
+};
+
+export { getCurrentMod, getNextClass, selectSchedule, isHalfMod, getDayInfo };

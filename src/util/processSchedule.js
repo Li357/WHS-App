@@ -73,6 +73,21 @@ const interpolateCrossSectionedMods = scheduleItems => (
   }, [])
 );
 
+const interpolateAssembly = (content) => {
+  // TODO: Handle adding assembly to user schedule,
+  // Also handle cases where assembly cuts through classes or cross-sectioned blocks
+};
+
+const mapToFinals = content => [
+  content[0], // Homeroom info
+  ...Array(4).fill().map((item, index) => ({
+    title: 'Finals',
+    length: 1,
+    startMod: index + 1, // index + 1 because index starts at 0, and HR is already filled
+    endMod: index + 2,
+  })), // 4 final mods
+];
+
 /**
  * Schedule processing algorithm
  * If current startMod + length < next startMod, fill with open mod(s)
@@ -104,4 +119,4 @@ const processSchedule = schedule => (
 );
 
 export default processSchedule;
-export { getMods };
+export { getMods, mapToFinals, interpolateAssembly };

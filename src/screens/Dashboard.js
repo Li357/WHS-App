@@ -114,9 +114,14 @@ export default class Dashboard extends Component {
       start, end, schedule, isBreak, isSummer,
     } = props.dayInfo;
 
+    /**
+     * NOTE: If isBreak/isSummer status changes (i.e. after the last day), dayInfo is not updated
+     * until an app state change (just for less complexity)
+     */
+
     // If it is either Summer or a break, there is no need to calculate countdowns
     if (isBreak || isSummer) {
-      this.state = {
+      const newState = {
         currentMod: BREAK,
         nextClass: null,
         untilDayStart: 0,
@@ -126,6 +131,11 @@ export default class Dashboard extends Component {
         isBreak,
         isSummer,
       };
+      if (firstTimeSet) {
+        this.state = newState;
+      } else {
+        this.setState(newState);
+      }
       return;
     }
 

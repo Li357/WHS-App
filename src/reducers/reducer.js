@@ -31,6 +31,8 @@ const initialState = {
     lastUpdate: null,
     isSummer: false,
     isBreak: false,
+    isFinals: false,
+    hasAssembly: false,
   },
   specialDates: {
     semesterOneStart: null,
@@ -56,6 +58,8 @@ const WHSApp = (state = initialState, {
   daySchedule,
   dayIsSummer,
   dayIsBreak,
+  dayHasAssembly,
+  dayIsFinals,
   lastDayInfoUpdate,
   specialDates,
   settings,
@@ -102,6 +106,8 @@ const WHSApp = (state = initialState, {
           lastUpdate: lastDayInfoUpdate,
           isSummer: dayIsSummer,
           isBreak: dayIsBreak,
+          hasAssembly: dayHasAssembly,
+          isFinals: dayIsFinals,
         },
       };
     case SET_SETTINGS:
@@ -116,7 +122,7 @@ const WHSApp = (state = initialState, {
         refreshedSemesterTwo,
       };
     case LOG_OUT:
-      return WHSApp(undefined, {});
+      return initialState;
     default:
       return state;
   }
