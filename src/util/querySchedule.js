@@ -38,9 +38,24 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
 /**
  * Internal function that is intended to be used as a callback
  * in finding the class in the user's schedule that has mods
- * containing the current mod, i.e. startMod < currentMod < endMod
+ * containing the current mod, i.e. startMod <= currentMod < endMod
  */
 const findClassWithMod = (item, currentMod) => getMods(item).includes(currentMod);
+
+/**
+ * Internal function that gets current cross sectioned mods based on the passed currentMod
+ * by iterating through the columns and checking class mods
+ */
+const getCurrentCrossSectioned = ({ crossSectionedColumns }, currentMod) => (
+  crossSectionedColumns.reduce((current, column) => {
+    // Since this is by column, it can be assumed there is either 0 or 1 in each column
+    const currentInColumn = column.find(item => findClassWithMod(item, currentMod));
+    if (currentInColumn) {
+      current.push(currentInColumn);
+    }
+    return current;
+  }, [])
+);
 
 /**
  * Get next class based on next mod
@@ -71,14 +86,7 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
      * and display as a separate component on the dashboard
      */
     const { crossSectionedColumns, sourceId } = nextClass;
-    const currentCrossSectioned = crossSectionedColumns.reduce((current, column) => {
-      // Since this is by column, it can be assumed there is either 0 or 1 in each column
-      const currentInColumn = column.find(item => findClassWithMod(item, nextMod));
-      if (currentInColumn) {
-        current.push(currentInColumn);
-      }
-      return current;
-    }, []);
+    const currentCrossSectioned = getCurrentCrossSectioned(crossSectionedColumns, nextMod);
 
     return {
       crossSectionedBlock: true,
@@ -152,4 +160,8 @@ const getDayInfo = (specialDates, date) => {
   return [...range, schedule, date, isSummer, isBreak, hasAssembly, isFinals];
 };
 
-export { getCurrentMod, getNextClass, selectSchedule, isHalfMod, getDayInfo };
+export {
+  getCurrentMod, getNextClass,
+  selectSchedule, getDayInfo,
+  isHalfMod, findClassWithMod,
+};
