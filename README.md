@@ -11,7 +11,7 @@ Making the app less crappy and bug prone, with linting and  testing (I hope). Le
 ### Rewrite Roadmap:
 
 Next up:
-- [ ] Handle different types of dates (need to manually add in meantime)
+- [ ] [IN PROGRESS] Handle different types of dates (need to manually add in meantime)
 
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting
@@ -26,12 +26,12 @@ Next up:
   - [ ] Dashboard date handling/operations
   - [ ] Schedule display of cross-sectioned mods and other irregularities
 - [x] Redo refreshing system
-- [ ] UI Redesign with Native Base
+- [x] UI Redesign with Native Base
   - [ ] Login
     - [x] Native Base inputs and buttons
     - [x] Vector icon for loading animation
     - [x] Better UI for login failure
-    - [ ] [NEEDS ANDROID TESTS] Keyboard avoiding view for all phone sizes
+    - [x] Keyboard avoiding view for all phone sizes
   - [x] Dashboard
     - [x] Parallax scroll view
     - [x] Upload own photo
