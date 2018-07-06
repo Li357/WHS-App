@@ -224,8 +224,6 @@ export default class Dashboard extends Component {
       isSummer,
       hasAssembly,
     } = this.state;
-    // TODO: isGoingToBeAssembly if currentMod === ASSEMBLY_MOD + PPF
-    const isCurrentlyAssembly = hasAssembly && currentMod === ASSEMBLY_MOD;
 
     /**
      * This condition should be first so that even on weekends during the summer, the summer
@@ -240,12 +238,15 @@ export default class Dashboard extends Component {
       return getDuringWeekendInfo();
     }
 
+    const displayMod = currentMod === 0 ? 'Homeroom' : currentMod;
     /* eslint-disable function-paren-newline */
     if (currentMod <= PASSING_PERIOD_FACTOR) {
+      const isCurrentlyAssembly = hasAssembly && currentMod === ASSEMBLY_MOD;
+
       return getDuringModInfo(
         isCurrentlyAssembly
           ? 'Assembly'
-          : currentMod,
+          : displayMod,
         nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
       );
     }
@@ -255,12 +256,17 @@ export default class Dashboard extends Component {
     }
 
     const nextMod = currentMod - PASSING_PERIOD_FACTOR;
+    const isGoingToBeAssembly = hasAssembly &&
+      currentMod - PASSING_PERIOD_FACTOR === ASSEMBLY_MOD;
+
     /* eslint-disable indent */
     return currentMod === AFTER_SCHOOL
       ? getAfterSchoolInfo()
-      // TODO: Account for isGoingToBeAssembly
       : getDuringPassingPeriodInfo(
-          nextMod, nextClass, untilPassingPeriodEnd, untilDayEnd,
+          isGoingToBeAssembly
+            ? 'Assembly'
+            : displayMod,
+          nextClass, untilPassingPeriodEnd, untilDayEnd,
           isHalfMod(nextMod),
         );
     /* eslint-enable function-paren-newline, indent */
