@@ -124,9 +124,11 @@ export default class ScheduleCard extends Component {
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
                 scheduleToShow.map(({ sourceId, crossSectionedBlock, ...item }) => {
-                  const isAfterAssembly = crossSectionedBlock
-                    ? item.occupiedMods[0] > ASSEMBLY_MOD
-                    : item.startMod > ASSEMBLY_MOD;
+                  const isAfterAssembly = hasAssembly && (
+                    crossSectionedBlock
+                      ? item.occupiedMods[0] > ASSEMBLY_MOD
+                      : item.startMod > ASSEMBLY_MOD
+                  );
 
                   /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location */
                   return (
@@ -138,6 +140,7 @@ export default class ScheduleCard extends Component {
                         />
                       : <ScheduleItem
                           key={sourceId}
+                          isFinals={isFinals}
                           isLastDay={isLastDay}
                           isAfterAssembly={isAfterAssembly}
                           {...item}

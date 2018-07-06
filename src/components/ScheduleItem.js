@@ -9,11 +9,12 @@ import { isHalfMod } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const ScheduleItem = ({
-  isLastDay, isAfterAssembly, title, body, length, ...scheduleItem
+  isLastDay, isFinals, isAfterAssembly, title, body, length, ...scheduleItem
 }) => {
   const classMods = getMods(scheduleItem);
   const modHeights = classMods.map(modNumber => (
-    MOD_ITEM_HEIGHT / (isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
+    // On finals days, none are half mods
+    MOD_ITEM_HEIGHT / (!isFinals && isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
 

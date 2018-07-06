@@ -204,6 +204,8 @@ const onlyIfCurrentDay = fn => (content) => {
   return content;
 };
 const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
+  console.log(isFinals);
+
   if (!hasAssembly && !isFinals) {
     return schedule;
   }

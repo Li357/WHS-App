@@ -43,7 +43,7 @@ const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDayInfo = createActionCreator(
   SET_DAY_INFO,
   'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate',
-  'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsLast',
+  'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsFinals',
 );
 const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
@@ -119,7 +119,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const date = moment();
 
     // Set day info in user info fetch
-    dispatch(setDayInfo(...getDayInfo(specialDates, date, isTeacher)));
+    dispatch(setDayInfo(...getDayInfo(specialDates, date)));
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,

@@ -165,8 +165,8 @@ const getDayInfo = (specialDates, date) => {
    * last day, dates are refreshed and lastDay is next year, so then can check if date is before
    * the date of semester one's start
    */
-  const isSummer = date.isAfter(lastDay)
-    || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart));
+  const isSummer = date.isAfter(lastDay, 'day')
+    || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart, 'day'));
 
   return [...range, schedule, date, isSummer, isBreak, hasAssembly, isFinals];
 };
