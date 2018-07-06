@@ -4,6 +4,7 @@ import {
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
+  SET_SCHEDULE,
   SET_DAY_INFO,
   SET_SETTINGS,
   SET_REFRESHED,
@@ -109,6 +110,11 @@ const WHSApp = (state = initialState, {
           hasAssembly: dayHasAssembly,
           isFinals: dayIsFinals,
         },
+      };
+    case SET_SCHEDULE:
+      return {
+        ...state,
+        schedule,
       };
     case SET_SETTINGS:
       return {

@@ -1,6 +1,7 @@
 import _, { minBy, maxBy, sortBy } from 'lodash';
 
 import { findClassWithMod } from './querySchedule';
+import { ASSEMBLY_MOD } from '../constants/constants';
 
 // This function is exclusive
 const range = (start, end) => Array(end - start).fill().map((x, i) => i + start);
@@ -82,14 +83,14 @@ const shiftItem = ({ crossSectionedBlock, occupiedMods, startMod, endMod, ...sch
     crossSectionedBlock
       ? {
           // Shifts occupied mods by one
-          occupiedMods: occupiedMods.map(mod => mod + 1),
+          //occupiedMods: occupiedMods.map(mod => mod + 1),
           crossSectionedColumns: crossSectionedColumns.map(column => (
-            column.map(item => shiftItem(item, 1))
+            column.map(item => shiftItem(item, by))
           )),
         }
       : {
-          startMod: startMod + 1,
-          endMod: endMod + 1,
+          startMod: startMod,// + by,
+          endMod: endMod// + by,
         }
   ),
 });
@@ -105,13 +106,12 @@ const splitItem = (item, splitMod) => [
 ];
 
 const interpolateAssembly = (content) => {
-  const assemblyMod = 3;
   // This calculates the actual index of the assembly in relation the user's schedule
   const assemblyIndex = content.findIndex(({
     crossSectionedBlock, occupiedMods, ...scheduleItem,
   }) => (
-    (crossSectionedBlock && occupiedMods.includes(assemblyMod))
-    || (findClassWithMod(scheduleItem, assemblyMod))
+    (crossSectionedBlock && occupiedMods.includes(ASSEMBLY_MOD))
+    || (!crossSectionedBlock && findClassWithMod(scheduleItem, ASSEMBLY_MOD))
   ));
   const unshifted = content.slice(0, assemblyIndex);
   /**
@@ -125,43 +125,44 @@ const interpolateAssembly = (content) => {
   const assemblyItem = {
     title: 'Assembly',
     length: 1,
-    sourceId: sourceId + 30000,
-    startMod: assemblyMod,
-    endMod: assemblyMod + 1,
+    sourceId: afterAssemblyItem.sourceId + 30000,
+    startMod: ASSEMBLY_MOD,
+    endMod: ASSEMBLY_MOD + 1,
   };
 
   // Handles cross-section case (where assembly cuts through cross-section block)
   if (afterAssemblyItem.crossSectionedBlock) {
     const { crossSectionedColumns, occupiedMods, sourceId } = afterAssemblyItem;
-    const [before, after] = crossSectionedColumns.reduce((both, column) => (
-      //TODO: Finish this block
-      // Subtract 1 because we want all cross sectioned mods before assembly
-      column
-        .filter(item => findClassWithMod(item, assemblyMod - 1))
-        // This will split cross-sectioned mods that do overlap the assembly
-        .map(item => item.endMod !== assemblyMod ? splitItem(item, assemblyMod)[0] : item)
-    ), [[], []]);
+    const [before, after] = Array(2).fill(crossSectionedColumns).map((array, index) => (
+      array.map(column => (
+        // Subtract 1 because we want all cross sectioned mods before assembly
+        column
+          .filter(item => findClassWithMod(item, ASSEMBLY_MOD - 1))
+          // This will split cross-sectioned mods that do overlap the assembly
+          .map(item => item.endMod !== ASSEMBLY_MOD ? splitItem(item, ASSEMBLY_MOD)[index] : item)
+      ))
+    ));
 
     return [
       ...unshifted,
       {
         ...afterAssemblyItem,
         crossSectionedColumns: before,
-        occupiedMods: [occupiedMods[0], assemblyMod],
+        occupiedMods: [occupiedMods[0], ASSEMBLY_MOD],
       },
       assemblyItem,
       {
         ...afterAssemblyItem,
         crossSectionedColumns: after,
-        occupiedMods: [assemblyMod + 1, occupiedMods[1] + 1],
+        occupiedMods: [ASSEMBLY_MOD/* + 1*/, occupiedMods[1]/* + 1*/],
         sourceId: sourceId + 1,
       },
       ...shifted,
     ];
   }
   // Handles case where assembly cuts through a singular class (such as a double mod)
-  if (afterAssemblyItem.startMod !== assemblyMod) {
-    const [beforeAssembly, afterAssembly] = splitItem(afterAssemblyItem, assemblyMod);
+  if (afterAssemblyItem.startMod !== ASSEMBLY_MOD) {
+    const [beforeAssembly, afterAssembly] = splitItem(afterAssemblyItem, ASSEMBLY_MOD);
     return [
       ...unshifted,
       beforeAssembly,

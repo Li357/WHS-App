@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { Alert,AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
@@ -9,7 +9,7 @@ import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import momentDurationFormat from 'moment-duration-format';
 
 import WHSApp from './src/reducers/reducer';
@@ -18,8 +18,16 @@ import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
-import { fetchUserInfo, setProfilePhoto, setDayInfo, logOut } from './src/actions/actionCreators';
+import {
+  fetchUserInfo,
+  setRefreshed,
+  setProfilePhoto,
+  setDayInfo,
+  setSchedule,
+  logOut
+} from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
+import { interpolateAssembly, mapToFinals } from './src/util/processSchedule';
 import reportError from './src/util/reportError';
 
 // Update locale before using it in transform
@@ -35,9 +43,8 @@ const transformMoments = createTransform(
     const copy = { ...outboundState };
     Object.keys(copy).forEach((key) => {
       const value = copy[key];
-
-      // If either string or array, then convert to moment object
-      if (['string', 'object'].includes(typeof value)) {
+      // If either string or array, then convert to moment object, do not convert if schedule!
+      if (['string', 'object'].includes(typeof value) && key !== 'schedule') {
         copy[key] = Array.isArray(value)
           ? value.map(date => moment(date))
           : moment(value);
@@ -58,7 +65,7 @@ const store = createStore(
   persistedReducer,
   applyMiddleware(
     thunk,
-    createLogger(),
+    //createLogger(),
   ),
 );
 const persistor = persistStore(store);
@@ -107,25 +114,38 @@ export default class App extends Component {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
+        const { dayInfo: { lastUpdate } } = store.getState();
+        const now = moment();
+        const today = now.day();
+        if (
+          lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
+          && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat)
+        ) {
+          this.updateDayInfo(now);
+        }
+
         const {
+          dayInfo: { hasAssembly, isFinals },
           specialDates: { semesterOneStart, semesterTwoStart, lastDay },
           refreshedSemesterOne,
           refreshedSemesterTwo,
           username,
           password,
+          schedule,
         } = store.getState();
-        const now = moment();
 
-        if (now.isAfter(semesterTwoStart) && now.isBefore(lastDay) && !refreshedSemesterTwo) {
+        if (now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') && !refreshedSemesterTwo) {
           // If in semester two and has not refreshed, refresh info
           store.dispatch(fetchUserInfo(username, password));
+          store.dispatch(setRefreshed(true, true));
         } else if (
-          now.isAfter(semesterOneStart) && now.isBefore(semesterTwoStart)
+          now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
           && !refreshedSemesterOne
         ) {
           // If in semester one and has not refreshed, refresh info
           store.dispatch(fetchUserInfo(username, password));
-        } else if (now.isAfter(lastDay.clone().add(2, 'months'))) {
+          store.dispatch(setRefreshed(true, false));
+        } else if (now.isSameOrAfter(lastDay.clone().add(2, 'months'), 'day')) {
           /**
            * If two months after last day, refresh
            * The third argument bypasses the semesterOneStart < now < semesterTwoStart check
@@ -133,11 +153,33 @@ export default class App extends Component {
            * (i.e. August 1st) and it refreshes, it should not refresh on the first day
            */
           store.dispatch(fetchUserInfo(username, password, true));
+          store.dispatch(setRefreshed(false, false));
         }
 
-        this.updateDayInfo(now);
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
+
+        /**
+         * This extra check of restrictedTitles makes sure interpolation and finals mapping only
+         * takes place once (though it's less important for mapToFinals since that returns a new
+         * array on invocation)
+         */
+        const restrictedTitles = ['Assembly', 'Finals'];
+        const onlyIfCurrentDay = fn => (content) => {
+          if (
+            content[0].day === now.day()
+            && content.every(({ title }) => !restrictedTitles.includes(title))
+          ) {
+            return fn(content);
+          }
+          return content;
+        }
+
+        if (hasAssembly) {
+          store.dispatch(setSchedule(schedule.map(onlyIfCurrentDay(interpolateAssembly))));
+        } else if (isFinals) {
+          store.dispatch(setSchedule(schedule.map(onlyIfCurrentDay(mapToFinals))));
+        }
       } catch (error) {
         const { settings: { errorReporting } } = store.getState();
         reportError(

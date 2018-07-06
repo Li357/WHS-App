@@ -1,12 +1,15 @@
 import moment from 'moment';
 
 import { getMods } from './processSchedule';
-import { PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, SCHEDULES } from '../constants/constants';
+import {
+  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, ASSEMBLY_MOD,
+  SCHEDULES,
+} from '../constants/constants';
 
 /**
  * Get current mod based on passed date, defaults to now
  */
-const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
+const getCurrentMod = ({ start, end, schedule, hasAssembly }, date = moment()) => {
   if (date.isAfter(end)) {
     return AFTER_SCHOOL;
   } else if (date.isBefore(start)) {
@@ -15,7 +18,12 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
 
   return schedule.reduce((currentMod, timePair, index, array) => {
     const [modStart, modEnd] = timePair.map(time => moment(`${time}:00`, 'k:mm:ss'));
-    const modNumber = index + Number(date.day() === 3);
+    /**
+     * Add 1 to modNumber if Wednesday (because no homeroom so day starts at mod 1 not 0 (HR))
+     * and subtract 1 to modNumber if it's an assembly day and the current mod is greater than the
+     * assembly mod, because the mod numbers do not shift after an assembly, though the index does
+     */
+    const modNumber = index + Number(date.day() === 3) - Number(hasAssembly && index > ASSEMBLY_MOD);
     const isBetween = date.isAfter(modStart) && date.isBefore(modEnd);
 
     if (isBetween) {
@@ -25,11 +33,11 @@ const getCurrentMod = ({ start, end, schedule }, date = moment()) => {
     const prevMod = array[index - 1];
     if (prevMod) {
       const prevModEnd = moment(`${prevMod[1]}:00`, 'k:mm:ss');
-      const isPassingPeriod = date.isBefore(modStart) && date.isAfter(prevModEnd);
+      const isPassingPeriod = date.isSameOrBefore(modStart) && date.isSameOrAfter(prevModEnd);
 
-      return isPassingPeriod
-        ? PASSING_PERIOD_FACTOR + modNumber
-        : currentMod;
+      if (isPassingPeriod) {
+        return PASSING_PERIOD_FACTOR + modNumber;
+      }
     }
     return currentMod;
   }, 0);
@@ -70,6 +78,7 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   }
 
   const userDaySchedule = schedule[normalizedDay];
+  // TODO: HANDLE ASSEMBLY HERE
   const nextMod = currentMod > PASSING_PERIOD_FACTOR
     ? currentMod - PASSING_PERIOD_FACTOR
     : currentMod + 1;

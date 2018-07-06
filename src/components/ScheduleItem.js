@@ -21,16 +21,17 @@ const ScheduleItem = ({
     <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
       <View style={styles.modIndicator}>
         {
-          classMods.map((modNumber, index) => (
-            <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
-              <Text style={styles.bodyText}>
-                {
-                  // This displays mods 5 - 8 (finals mods) on the last day
-                  modNumber !== 0 ? modNumber + (isLastDay ? 4 : 0) : 'HR'
-                }
-              </Text>
-            </View>
-          ))
+          classMods.map((modNumber, index) => {
+            // This displays mods 5 - 8 (finals mods) on the last day
+            const number = modNumber !== 0 ? modNumber + (isLastDay ? 4 : 0) : 'HR';
+            const displayMod = title === 'Assembly' ? 'AS' : number;
+
+            return (
+              <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
+                <Text style={styles.bodyText}>{displayMod}</Text>
+              </View>
+            );
+          })
         }
       </View>
       <View style={styles.separator} />

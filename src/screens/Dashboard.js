@@ -24,7 +24,7 @@ import {
 } from '../util/dashboardInfo';
 import {
   HEIGHT,
-  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK,
+  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK, ASSEMBLY_MOD,
 } from '../constants/constants';
 
 const mapStateToProps = ({
@@ -45,7 +45,7 @@ export default class Dashboard extends Component {
   constructor(props) {
     super(props);
 
-    const { navigation } = this.props;
+    const { navigation } = props;
     // This needs to be in the constructor for it to be registered by React Navigation
     this.blurSubscriber = navigation.addListener('willBlur', this.clearCountdowns);
     // Start countdowns back when user navigates back to dashboard
@@ -111,7 +111,7 @@ export default class Dashboard extends Component {
   updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
     const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
     const {
-      start, end, schedule, isBreak, isSummer,
+      start, end, schedule, isBreak, isSummer, hasAssembly,
     } = props.dayInfo;
 
     /**
@@ -142,8 +142,10 @@ export default class Dashboard extends Component {
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
      * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays
+     * Also, add one to current mod if there is an assembly and it is after the assembly due
+     * to the index shift of having another timepair for the assembly
      */
-    const modNumber = currentMod - Number(now.day() === 3);
+    const modNumber = currentMod - Number(now.day() === 3) + Number(hasAssembly && currentMod > ASSEMBLY_MOD);
     const isDuringMod = modNumber < PASSING_PERIOD_FACTOR;
     const isPassingPeriod = modNumber > PASSING_PERIOD_FACTOR && modNumber < BEFORE_SCHOOL;
 
@@ -167,6 +169,7 @@ export default class Dashboard extends Component {
       untilPassingPeriodEnd,
       isBreak,
       isSummer,
+      hasAssembly,
     };
 
     // This handles the initial state set in constructor
@@ -212,7 +215,10 @@ export default class Dashboard extends Component {
       untilPassingPeriodEnd,
       isBreak,
       isSummer,
+      hasAssembly,
     } = this.state;
+    // TODO: isGoingToBeAssembly if currentMod === ASSEMBLY_MOD + PPF
+    const isCurrentlyAssembly = hasAssembly && currentMod === ASSEMBLY_MOD;
 
     /**
      * This condition should be first so that even on weekends during the summer, the summer
@@ -230,7 +236,10 @@ export default class Dashboard extends Component {
     /* eslint-disable function-paren-newline */
     if (currentMod <= PASSING_PERIOD_FACTOR) {
       return getDuringModInfo(
-        currentMod, nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
+        isCurrentlyAssembly
+          ? 'ASSEMBLY'
+          : currentMod,
+        nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
       );
     }
 
@@ -242,9 +251,9 @@ export default class Dashboard extends Component {
     /* eslint-disable indent */
     return currentMod === AFTER_SCHOOL
       ? getAfterSchoolInfo()
+      // TODO: Account for isGoingToBeAssembly
       : getDuringPassingPeriodInfo(
-          nextMod,
-          nextClass, untilPassingPeriodEnd, untilDayEnd,
+          nextMod, nextClass, untilPassingPeriodEnd, untilDayEnd,
           isHalfMod(nextMod),
         );
     /* eslint-enable function-paren-newline, indent */

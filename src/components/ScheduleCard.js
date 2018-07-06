@@ -68,9 +68,10 @@ export default class ScheduleCard extends Component {
     const format = time => moment(time, 'k:mm').format('h:mm');
 
     let userSchedule;
-    if (hasAssembly) {
+    // Only want logic to apply when not current day (current day is handled via App.js)
+    if (hasAssembly && !isCurrentDay) {
       userSchedule = interpolateAssembly(content);
-    } else if (isFinals) {
+    } else if (isFinals && !isCurrentDay) {
       userSchedule = mapToFinals(content);
     } else {
       // Don't show No Homeroom on ScheduleCard
@@ -90,6 +91,10 @@ export default class ScheduleCard extends Component {
       : userSchedule;
     /* eslint-enable indent */
 
+    // 20 is the margin, adds extra height for assemblies, remove height for Wednesdays
+    const progressBarHeight = MOD_ITEMS_HEIGHT +
+      (hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0);
+
     return (
       <Card style={styles.container}>
         <CardItem header bordered style={styles.header}>
@@ -108,7 +113,7 @@ export default class ScheduleCard extends Component {
                 <View style={styles.barContainer}>
                   <VerticalBar
                     progress={progress}
-                    height={MOD_ITEMS_HEIGHT - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0)}
+                    height={progressBarHeight}
                     style={styles.bar}
                   />
                 </View>

@@ -12,10 +12,11 @@ const PASSING_PERIOD_FACTOR = 1000; // Passing period IDs are 1000 + next mod #
 const BEFORE_SCHOOL = 5000;
 const AFTER_SCHOOL = 5001;
 const BREAK = -1; // ID for break is -1 (essentially N/A)
+const ASSEMBLY_MOD = 3;
 
 export {
   REQUEST_TIMEOUT,
   WIDTH, HEIGHT, MOD_ITEM_HEIGHT, MOD_ITEMS_HEIGHT,
-  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK,
+  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK, ASSEMBLY_MOD,
 };
 export { default as SCHEDULES } from './schedules';

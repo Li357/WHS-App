@@ -11,7 +11,9 @@ Making the app less crappy and bug prone, with linting and  testing (I hope). Le
 ### Rewrite Roadmap:
 
 Next up:
-- [ ] [IN PROGRESS] Handle different types of dates (need to manually add in meantime)
+- [ ] [TESTING] Handle different types of dates (need to manually add in meantime)
+- [ ] Adjust mod item height because some mods (assemblies, homeroom, and different dates) have different
+lengths leaving the progress bar off
 
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting

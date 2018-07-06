@@ -14,6 +14,7 @@ import {
   SET_PROFILE_PHOTO,
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
+  SET_SCHEDULE,
   SET_SETTINGS,
   SET_REFRESHED,
   LOG_OUT,
@@ -44,6 +45,7 @@ const setDayInfo = createActionCreator(
   'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate',
   'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsLast',
 );
+const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
 const logOut = createActionCreator(LOG_OUT);
@@ -124,10 +126,10 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     ));
     /* eslint-enable function-paren-newline */
 
-    if (date.isAfter(semesterTwoStart) && date.isBefore(lastDay)) {
+    if (date.isSameOrAfter(semesterTwoStart, 'day') && date.isSameOrBefore(lastDay, 'day')) {
       dispatch(setRefreshed(true, true));
     } else if (
-      (date.isAfter(semesterOneStart) && date.isBefore(semesterTwoStart))
+      (date.isSameOrAfter(semesterOneStart, 'day') && date.isSameOrBefore(semesterTwoStart, 'day'))
       || beforeStartRefresh
     ) {
       dispatch(setRefreshed(true, false));
@@ -160,6 +162,7 @@ export {
   setUserInfo,
   setProfilePhoto,
   setDayInfo,
+  setSchedule,
   setSettings,
   setRefreshed,
   logOut,
