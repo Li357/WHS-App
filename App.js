@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert,AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
@@ -9,7 +9,7 @@ import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import moment, { isMoment } from 'moment';
+import moment from 'moment';
 import momentDurationFormat from 'moment-duration-format';
 
 import WHSApp from './src/reducers/reducer';
@@ -23,11 +23,9 @@ import {
   setRefreshed,
   setProfilePhoto,
   setDayInfo,
-  setSchedule,
-  logOut
+  logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
-import { interpolateAssembly, mapToFinals } from './src/util/processSchedule';
 import reportError from './src/util/reportError';
 
 // Update locale before using it in transform
@@ -65,7 +63,7 @@ const store = createStore(
   persistedReducer,
   applyMiddleware(
     thunk,
-    //createLogger(),
+    createLogger(),
   ),
 );
 const persistor = persistStore(store);
@@ -125,13 +123,11 @@ export default class App extends Component {
         }
 
         const {
-          dayInfo: { hasAssembly, isFinals },
           specialDates: { semesterOneStart, semesterTwoStart, lastDay },
           refreshedSemesterOne,
           refreshedSemesterTwo,
           username,
           password,
-          schedule,
         } = store.getState();
 
         if (now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') && !refreshedSemesterTwo) {
@@ -158,28 +154,6 @@ export default class App extends Component {
 
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
-
-        /**
-         * This extra check of restrictedTitles makes sure interpolation and finals mapping only
-         * takes place once (though it's less important for mapToFinals since that returns a new
-         * array on invocation)
-         */
-        const restrictedTitles = ['Assembly', 'Finals'];
-        const onlyIfCurrentDay = fn => (content) => {
-          if (
-            content[0].day === now.day()
-            && content.every(({ title }) => !restrictedTitles.includes(title))
-          ) {
-            return fn(content);
-          }
-          return content;
-        }
-
-        if (hasAssembly) {
-          store.dispatch(setSchedule(schedule.map(onlyIfCurrentDay(interpolateAssembly))));
-        } else if (isFinals) {
-          store.dispatch(setSchedule(schedule.map(onlyIfCurrentDay(mapToFinals))));
-        }
       } catch (error) {
         const { settings: { errorReporting } } = store.getState();
         reportError(

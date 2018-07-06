@@ -1,4 +1,5 @@
 import _, { minBy, maxBy, sortBy } from 'lodash';
+import moment from 'moment';
 
 import { findClassWithMod } from './querySchedule';
 import { ASSEMBLY_MOD } from '../constants/constants';
@@ -76,22 +77,25 @@ const interpolateCrossSectionedMods = scheduleItems => (
   }, [])
 );
 
-// TODO: Clean up this mess
-const shiftItem = ({ crossSectionedBlock, occupiedMods, startMod, endMod, ...scheduleItem }, by) => ({
+const shiftItem = ({
+  crossSectionedBlock, crossSectionedColumns, occupiedMods, startMod, endMod, ...scheduleItem
+}, by) => ({
   ...scheduleItem,
   ...(
     crossSectionedBlock
+      /* eslint-disable indent */
       ? {
           // Shifts occupied mods by one
-          //occupiedMods: occupiedMods.map(mod => mod + 1),
+          occupiedMods: occupiedMods.map(mod => mod + 1),
           crossSectionedColumns: crossSectionedColumns.map(column => (
             column.map(item => shiftItem(item, by))
           )),
         }
       : {
-          startMod: startMod,// + by,
-          endMod: endMod// + by,
+          startMod: startMod + by,
+          endMod: endMod + by,
         }
+      /* eslint-enable indent */
   ),
 });
 
@@ -101,14 +105,14 @@ const splitItem = (item, splitMod) => [
     ...item,
     sourceId: item.sourceId + 1,
     length: (item.endMod + 1) - splitMod,
-    startMod: splitMod
+    startMod: splitMod,
   }, 1),
 ];
 
 const interpolateAssembly = (content) => {
   // This calculates the actual index of the assembly in relation the user's schedule
   const assemblyIndex = content.findIndex(({
-    crossSectionedBlock, occupiedMods, ...scheduleItem,
+    crossSectionedBlock, occupiedMods, ...scheduleItem
   }) => (
     (crossSectionedBlock && occupiedMods.includes(ASSEMBLY_MOD))
     || (!crossSectionedBlock && findClassWithMod(scheduleItem, ASSEMBLY_MOD))
@@ -139,7 +143,9 @@ const interpolateAssembly = (content) => {
         column
           .filter(item => findClassWithMod(item, ASSEMBLY_MOD - 1))
           // This will split cross-sectioned mods that do overlap the assembly
-          .map(item => item.endMod !== ASSEMBLY_MOD ? splitItem(item, ASSEMBLY_MOD)[index] : item)
+          .map(item => (
+            item.endMod !== ASSEMBLY_MOD ? splitItem(item, ASSEMBLY_MOD)[index] : item
+          ))
       ))
     ));
 
@@ -154,7 +160,7 @@ const interpolateAssembly = (content) => {
       {
         ...afterAssemblyItem,
         crossSectionedColumns: after,
-        occupiedMods: [ASSEMBLY_MOD/* + 1*/, occupiedMods[1]/* + 1*/],
+        occupiedMods: [ASSEMBLY_MOD + 1, occupiedMods[1] + 1],
         sourceId: sourceId + 1,
       },
       ...shifted,
@@ -190,6 +196,27 @@ const mapToFinals = content => [
   })), // 4 final mods
 ];
 
+const onlyIfCurrentDay = fn => (content) => {
+  const day = moment().day();
+  if (content[0].day === day) {
+    return fn(content);
+  }
+  return content;
+};
+const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
+  if (!hasAssembly && !isFinals) {
+    return schedule;
+  }
+
+  /* eslint-disable function-paren-newline */
+  return schedule.map(onlyIfCurrentDay(
+    hasAssembly
+      ? interpolateAssembly
+      : mapToFinals,
+  ));
+  /* eslint-enable function-paren-newline */
+};
+
 /**
  * Schedule processing algorithm
  * If current startMod + length < next startMod, fill with open mod(s)
@@ -214,4 +241,4 @@ const processSchedule = schedule => (
 );
 
 export default processSchedule;
-export { getMods, mapToFinals, interpolateAssembly };
+export { getMods, mapToFinals, interpolateAssembly, processFinalsOrAssembly };

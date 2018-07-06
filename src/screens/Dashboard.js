@@ -6,6 +6,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
 import moment from 'moment';
+import { floor } from 'lodash';
 
 import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
@@ -13,6 +14,7 @@ import DashboardBlock from '../components/DashboardBlock';
 import CrossSectionBlock from '../components/CrossSectionBlock';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
+import { processFinalsOrAssembly } from '../util/processSchedule';
 import { getCurrentMod, getNextClass, isHalfMod } from '../util/querySchedule';
 import {
   getBeforeSchoolInfo,
@@ -28,8 +30,10 @@ import {
 } from '../constants/constants';
 
 const mapStateToProps = ({
-  loginError, dates, ...rest
+  loginError, dates, schedule, dayInfo, ...rest
 }, ownProps) => ({
+  schedule: processFinalsOrAssembly(schedule, dayInfo.hasAssembly, dayInfo.isFinals),
+  dayInfo,
   ...rest,
   ...ownProps,
 });
@@ -89,7 +93,7 @@ export default class Dashboard extends Component {
 
   createCountdown = (key) => {
     const id = setInterval(() => {
-      if (this.state[key] > 0) {
+      if (floor(this.state[key], -3) === 0) {
         /**
          * This is inevitably a little inaccurate because
          * 1. React Native's layer of abstraction causes a slight delay of interval callback
@@ -139,15 +143,18 @@ export default class Dashboard extends Component {
       return;
     }
 
+    const isDuringMod = currentMod < PASSING_PERIOD_FACTOR;
+    const isPassingPeriod = currentMod > PASSING_PERIOD_FACTOR && currentMod < BEFORE_SCHOOL;
+    const ignorePassingPeriod = currentMod - (isPassingPeriod ? PASSING_PERIOD_FACTOR : 0);
+
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
      * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays
      * Also, add one to current mod if there is an assembly and it is after the assembly due
      * to the index shift of having another timepair for the assembly
      */
-    const modNumber = currentMod - Number(now.day() === 3) + Number(hasAssembly && currentMod > ASSEMBLY_MOD);
-    const isDuringMod = modNumber < PASSING_PERIOD_FACTOR;
-    const isPassingPeriod = modNumber > PASSING_PERIOD_FACTOR && modNumber < BEFORE_SCHOOL;
+    const modNumber = (currentMod - Number(now.day() === 3)) +
+      Number(hasAssembly && ignorePassingPeriod > ASSEMBLY_MOD);
 
     const untilModEnd = isDuringMod
       ? moment(`${schedule[modNumber][1]}:00`, 'k:mm:ss').diff(now)
@@ -237,7 +244,7 @@ export default class Dashboard extends Component {
     if (currentMod <= PASSING_PERIOD_FACTOR) {
       return getDuringModInfo(
         isCurrentlyAssembly
-          ? 'ASSEMBLY'
+          ? 'Assembly'
           : currentMod,
         nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
       );

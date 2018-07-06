@@ -9,11 +9,11 @@ import { isHalfMod } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const ScheduleItem = ({
-  isLastDay, title, body, length, ...scheduleItem
+  isLastDay, isAfterAssembly, title, body, length, ...scheduleItem
 }) => {
   const classMods = getMods(scheduleItem);
   const modHeights = classMods.map(modNumber => (
-    MOD_ITEM_HEIGHT / (isHalfMod(modNumber) ? 2 : 1)
+    MOD_ITEM_HEIGHT / (isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
 
@@ -22,8 +22,10 @@ const ScheduleItem = ({
       <View style={styles.modIndicator}>
         {
           classMods.map((modNumber, index) => {
-            // This displays mods 5 - 8 (finals mods) on the last day
-            const number = modNumber !== 0 ? modNumber + (isLastDay ? 4 : 0) : 'HR';
+            const number = modNumber !== 0
+              // This displays mods 5 - 8 (finals mods) on the last day, shifts one for assembly
+              ? (modNumber + (isLastDay ? 4 : 0)) - Number(isAfterAssembly)
+              : 'HR';
             const displayMod = title === 'Assembly' ? 'AS' : number;
 
             return (

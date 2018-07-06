@@ -9,7 +9,9 @@ import {
 /**
  * Get current mod based on passed date, defaults to now
  */
-const getCurrentMod = ({ start, end, schedule, hasAssembly }, date = moment()) => {
+const getCurrentMod = ({
+  start, end, schedule, hasAssembly,
+}, date = moment()) => {
   if (date.isAfter(end)) {
     return AFTER_SCHOOL;
   } else if (date.isBefore(start)) {
@@ -23,7 +25,8 @@ const getCurrentMod = ({ start, end, schedule, hasAssembly }, date = moment()) =
      * and subtract 1 to modNumber if it's an assembly day and the current mod is greater than the
      * assembly mod, because the mod numbers do not shift after an assembly, though the index does
      */
-    const modNumber = index + Number(date.day() === 3) - Number(hasAssembly && index > ASSEMBLY_MOD);
+    const modNumber = index +
+      (Number(date.day() === 3) - Number(hasAssembly && index > ASSEMBLY_MOD));
     const isBetween = date.isAfter(modStart) && date.isBefore(modEnd);
 
     if (isBetween) {
@@ -69,7 +72,7 @@ const getCurrentCrossSectioned = ({ crossSectionedColumns }, currentMod) => (
  * Get next class based on next mod
  * Returns N/A when there is no next class
  */
-const getNextClass = (schedule, currentMod, date = moment()) => {
+const getNextClass = (schedule, currentMod, date) => {
   // Since arrays are 0-based and the days start at 1 (for Monday), need to -1
   const normalizedDay = date.day() - 1;
 
@@ -78,7 +81,6 @@ const getNextClass = (schedule, currentMod, date = moment()) => {
   }
 
   const userDaySchedule = schedule[normalizedDay];
-  // TODO: HANDLE ASSEMBLY HERE
   const nextMod = currentMod > PASSING_PERIOD_FACTOR
     ? currentMod - PASSING_PERIOD_FACTOR
     : currentMod + 1;

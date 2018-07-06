@@ -8,12 +8,15 @@ import moment from 'moment';
 import ScheduleCard from '../components/ScheduleCard';
 import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
+import { processFinalsOrAssembly } from '../util/processSchedule';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
 const mapStateToProps = ({
   schedule, dayInfo, specialDates,
 }) => ({
-  schedule, dayInfo, specialDates,
+  schedule: processFinalsOrAssembly(schedule, dayInfo.hasAssembly, dayInfo.isFinals),
+  dayInfo,
+  specialDates,
 });
 
 @waitForAnimation

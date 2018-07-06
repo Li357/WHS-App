@@ -8,10 +8,10 @@ import { isHalfMod } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const CrossSectionItem = ({
-  occupiedMods, crossSectionedColumns,
+  isAfterAssembly, occupiedMods, crossSectionedColumns,
 }) => {
   const modHeights = occupiedMods.map(modNumber => (
-    MOD_ITEM_HEIGHT / (isHalfMod(modNumber) ? 2 : 1)
+    MOD_ITEM_HEIGHT / (isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
 
@@ -21,7 +21,9 @@ const CrossSectionItem = ({
         {
           occupiedMods.map((modNumber, index) => (
             <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
-              <Text style={styles.bodyText}>{modNumber !== 0 ? modNumber : 'HR'}</Text>
+              <Text style={styles.bodyText}>
+                {modNumber !== 0 ? modNumber - Number(isAfterAssembly) : 'HR'}
+              </Text>
             </View>
           ))
         }

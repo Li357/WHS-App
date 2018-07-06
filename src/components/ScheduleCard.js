@@ -10,7 +10,7 @@ import ScheduleItem from './ScheduleItem';
 import CrossSectionItem from './CrossSectionItem';
 import { selectSchedule } from '../util/querySchedule';
 import { mapToFinals, interpolateAssembly } from '../util/processSchedule';
-import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT } from '../constants/constants';
+import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT, ASSEMBLY_MOD } from '../constants/constants';
 
 @withNavigation
 export default class ScheduleCard extends Component {
@@ -68,7 +68,10 @@ export default class ScheduleCard extends Component {
     const format = time => moment(time, 'k:mm').format('h:mm');
 
     let userSchedule;
-    // Only want logic to apply when not current day (current day is handled via App.js)
+    /**
+     * Only want logic to apply when not current day (current day is handled via
+     * processFinalsOrAssembly and connect)
+     */
     if (hasAssembly && !isCurrentDay) {
       userSchedule = interpolateAssembly(content);
     } else if (isFinals && !isCurrentDay) {
@@ -93,7 +96,7 @@ export default class ScheduleCard extends Component {
 
     // 20 is the margin, adds extra height for assemblies, remove height for Wednesdays
     const progressBarHeight = MOD_ITEMS_HEIGHT +
-      (hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0);
+      ((hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0));
 
     return (
       <Card style={styles.container}>
@@ -120,12 +123,28 @@ export default class ScheduleCard extends Component {
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
-                scheduleToShow.map(({ sourceId, crossSectionedBlock, ...item }) => (
-                  crossSectionedBlock
-                    // Cross-sectioning will never be a problem on the last day
-                    ? <CrossSectionItem key={sourceId} {...item} />
-                    : <ScheduleItem key={sourceId} {...item} isLastDay={isLastDay} />
-                ))
+                scheduleToShow.map(({ sourceId, crossSectionedBlock, ...item }) => {
+                  const isAfterAssembly = crossSectionedBlock
+                    ? item.occupiedMods[0] > ASSEMBLY_MOD
+                    : item.startMod > ASSEMBLY_MOD;
+
+                  /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location */
+                  return (
+                    crossSectionedBlock
+                      ? <CrossSectionItem
+                          key={sourceId}
+                          isAfterAssembly={isAfterAssembly}
+                          {...item}
+                        />
+                      : <ScheduleItem
+                          key={sourceId}
+                          isLastDay={isLastDay}
+                          isAfterAssembly={isAfterAssembly}
+                          {...item}
+                        />
+                  );
+                  /* eslint-enable react/jsx-indent-props, react/jsx-closing-bracket-location */
+                })
               }
             </View>
           </View>
