@@ -142,6 +142,7 @@ export default class ScheduleCard extends Component {
                           key={sourceId}
                           isFinals={isFinals}
                           isLastDay={isLastDay}
+                          hasAssembly={hasAssembly}
                           isAfterAssembly={isAfterAssembly}
                           {...item}
                         />

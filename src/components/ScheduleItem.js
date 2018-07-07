@@ -6,10 +6,10 @@ import { sum } from 'lodash';
 
 import { getMods } from '../util/processSchedule';
 import { isHalfMod } from '../util/querySchedule';
-import { MOD_ITEM_HEIGHT } from '../constants/constants';
+import { MOD_ITEM_HEIGHT, ASSEMBLY_MOD } from '../constants/constants';
 
 const ScheduleItem = ({
-  isLastDay, isFinals, isAfterAssembly, title, body, length, ...scheduleItem
+  isLastDay, isFinals, hasAssembly, isAfterAssembly, title, body, length, ...scheduleItem
 }) => {
   const classMods = getMods(scheduleItem);
   const modHeights = classMods.map(modNumber => (
@@ -27,7 +27,10 @@ const ScheduleItem = ({
               // This displays mods 5 - 8 (finals mods) on the last day, shifts one for assembly
               ? (modNumber + (isLastDay ? 4 : 0)) - Number(isAfterAssembly)
               : 'HR';
-            const displayMod = title === 'Assembly' ? 'AS' : number;
+            const displayMod = title === 'Assembly' ||
+              (hasAssembly && scheduleItem.startMod === ASSEMBLY_MOD) // Handles timestable 'AS'
+                ? 'AS'
+                : number;
 
             return (
               <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>

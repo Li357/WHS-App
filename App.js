@@ -23,10 +23,14 @@ import {
   setRefreshed,
   setProfilePhoto,
   setDayInfo,
+  setSchedule,
   logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
 import reportError from './src/util/reportError';
+
+import TEST_SCHEDULE from './test.json';
+import processSchedule from './src/util/processSchedule';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -63,7 +67,7 @@ const store = createStore(
   persistedReducer,
   applyMiddleware(
     thunk,
-    //createLogger(),
+    createLogger(),
   ),
 );
 const persistor = persistStore(store);
@@ -154,6 +158,7 @@ export default class App extends Component {
 
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
+        store.dispatch(setSchedule(processSchedule(TEST_SCHEDULE.schedule)));
       } catch (error) {
         const { settings: { errorReporting } } = store.getState();
         reportError(

@@ -104,7 +104,7 @@ const splitItem = (item, splitMod) => [
   shiftItem({
     ...item,
     sourceId: item.sourceId + 1,
-    length: (item.endMod + 1) - splitMod,
+    length: item.endMod - splitMod,
     startMod: splitMod,
   }, 1),
 ];
@@ -204,8 +204,6 @@ const onlyIfCurrentDay = fn => (content) => {
   return content;
 };
 const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
-  console.log(isFinals);
-
   if (!hasAssembly && !isFinals) {
     return schedule;
   }

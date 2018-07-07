@@ -1,0 +1,646 @@
+{
+  "schedule": [
+    {
+      "sourceId": 19315,
+      "sourceType": "course",
+      "title": "Band - Warrior ",
+      "body": "Rm. 183 (Krueger)",
+      "roomNumber": "183",
+      "sectionNumber": 5,
+      "phaseNumber": 1,
+      "day": 4,
+      "startMod": 1,
+      "length": 1,
+      "endMod": 2,
+      "data": {
+        "courseId": "321"
+      }
+    },
+    {
+      "sourceId": 19316,
+      "sourceType": "course",
+      "title": "Band - Warrior ",
+      "body": "Rm. 183 (Krueger)",
+      "roomNumber": "183",
+      "sectionNumber": 5,
+      "phaseNumber": 1,
+      "day": 3,
+      "startMod": 1,
+      "length": 1,
+      "endMod": 2,
+      "data": {
+        "courseId": "321"
+      }
+    },
+    {
+      "sourceId": 19317,
+      "sourceType": "course",
+      "title": "Band - Warrior ",
+      "body": "Rm. 183 (Krueger)",
+      "roomNumber": "183",
+      "sectionNumber": 5,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 1,
+      "length": 1,
+      "endMod": 2,
+      "data": {
+        "courseId": "321"
+      }
+    },
+    {
+      "sourceId": 39420384,
+      "sourceType": "course",
+      "title": "TEST CLASS",
+      "body": "Rm. MISC",
+      "roomNumber": "493",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 2,
+      "length": 2,
+      "endMod": 4
+    },
+    {
+      "sourceId": 39420385,
+      "sourceType": "course",
+      "title": "TEST CLASS 2",
+      "body": "Rm. MISC",
+      "roomNumber": "333",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 3,
+      "length": 1,
+      "endMod": 4
+    },
+    {
+      "sourceId": 19325,
+      "sourceType": "course",
+      "title": "Band - Warrior ",
+      "body": "Rm. 183 (Krueger)",
+      "roomNumber": "183",
+      "sectionNumber": 5,
+      "phaseNumber": 1,
+      "day": 5,
+      "startMod": 1,
+      "length": 1,
+      "endMod": 2,
+      "data": {
+        "courseId": "321"
+      }
+    },
+    {
+      "sourceId": 19341,
+      "sourceType": "course",
+      "title": "Band - Concert Jazz ",
+      "body": "Rm. 184 (Krueger)",
+      "roomNumber": "184",
+      "sectionNumber": 4,
+      "phaseNumber": 2,
+      "day": 3,
+      "startMod": 10,
+      "length": 2,
+      "endMod": 12,
+      "data": {
+        "courseId": "319"
+      }
+    },
+    {
+      "sourceId": 19342,
+      "sourceType": "course",
+      "title": "Band - Concert Jazz ",
+      "body": "Rm. 184 (Krueger)",
+      "roomNumber": "184",
+      "sectionNumber": 4,
+      "phaseNumber": 2,
+      "day": 5,
+      "startMod": 12,
+      "length": 1,
+      "endMod": 13,
+      "data": {
+        "courseId": "319"
+      }
+    },
+    {
+      "sourceId": 19346,
+      "sourceType": "course",
+      "title": "Band - Concert Jazz ",
+      "body": "Rm. 184 (Krueger)",
+      "roomNumber": "184",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 2,
+      "startMod": 10,
+      "length": 2,
+      "endMod": 12,
+      "data": {
+        "courseId": "319"
+      }
+    },
+    {
+      "sourceId": 19581,
+      "sourceType": "course",
+      "title": "English 1(H) S2",
+      "body": "Rm. 220 (Pueppka)",
+      "roomNumber": "220",
+      "sectionNumber": 1,
+      "phaseNumber": 2,
+      "day": 4,
+      "startMod": 6,
+      "length": 2,
+      "endMod": 8,
+      "data": {
+        "courseId": "474"
+      }
+    },
+    {
+      "sourceId": 19585,
+      "sourceType": "course",
+      "title": "English 1(H) S2",
+      "body": "Rm. 132 (Heitmann)",
+      "roomNumber": "132",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 5,
+      "startMod": 2,
+      "length": 1,
+      "endMod": 3,
+      "data": {
+        "courseId": "474"
+      }
+    },
+    {
+      "sourceId": 19586,
+      "sourceType": "course",
+      "title": "English 1(H) S2",
+      "body": "Rm. 132 (Heitmann)",
+      "roomNumber": "132",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 3,
+      "startMod": 4,
+      "length": 2,
+      "endMod": 6,
+      "data": {
+        "courseId": "474"
+      }
+    },
+    {
+      "sourceId": 19587,
+      "sourceType": "course",
+      "title": "English 1(H) S2",
+      "body": "Rm. 132 (Heitmann)",
+      "roomNumber": "132",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 2,
+      "startMod": 12,
+      "length": 1,
+      "endMod": 13,
+      "data": {
+        "courseId": "474"
+      }
+    },
+    {
+      "sourceId": 20374,
+      "sourceType": "course",
+      "title": "Latin 1",
+      "body": "Rm. 146 (Black)",
+      "roomNumber": "146",
+      "sectionNumber": 1,
+      "phaseNumber": 2,
+      "day": 2,
+      "startMod": 6,
+      "length": 2,
+      "endMod": 8,
+      "data": {
+        "courseId": "414"
+      }
+    },
+    {
+      "sourceId": 20376,
+      "sourceType": "course",
+      "title": "Latin 1",
+      "body": "Rm. 146 (Black)",
+      "roomNumber": "146",
+      "sectionNumber": 1,
+      "phaseNumber": 4,
+      "day": 4,
+      "startMod": 2,
+      "length": 1,
+      "endMod": 3,
+      "data": {
+        "courseId": "414"
+      }
+    },
+    {
+      "sourceId": 20377,
+      "sourceType": "course",
+      "title": "Latin 1",
+      "body": "Rm. 146 (Black)",
+      "roomNumber": "146",
+      "sectionNumber": 1,
+      "phaseNumber": 5,
+      "day": 5,
+      "startMod": 3,
+      "length": 1,
+      "endMod": 4,
+      "data": {
+        "courseId": "414"
+      }
+    },
+    {
+      "sourceId": 20378,
+      "sourceType": "course",
+      "title": "Latin 1",
+      "body": "Rm. 146 (Black)",
+      "roomNumber": "146",
+      "sectionNumber": 2,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 13,
+      "length": 1,
+      "endMod": 14,
+      "data": {
+        "courseId": "414"
+      }
+    },
+    {
+      "sourceId": 20380,
+      "sourceType": "course",
+      "title": "Latin 1",
+      "body": "Rm. 146 (Black)",
+      "roomNumber": "146",
+      "sectionNumber": 2,
+      "phaseNumber": 3,
+      "day": 3,
+      "startMod": 12,
+      "length": 1,
+      "endMod": 13,
+      "data": {
+        "courseId": "414"
+      }
+    },
+    {
+      "sourceId": 21149,
+      "sourceType": "course",
+      "title": "Calculus BC AP",
+      "body": "Rm. 231 (Rau)",
+      "roomNumber": "231",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 10,
+      "length": 2,
+      "endMod": 12,
+      "data": {
+        "courseId": "351"
+      }
+    },
+    {
+      "sourceId": 21150,
+      "sourceType": "course",
+      "title": "Calculus BC AP",
+      "body": "Rm. 231 (Rau)",
+      "roomNumber": "231",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 2,
+      "startMod": 1,
+      "length": 1,
+      "endMod": 2,
+      "data": {
+        "courseId": "351"
+      }
+    },
+    {
+      "sourceId": 21151,
+      "sourceType": "course",
+      "title": "Calculus BC AP",
+      "body": "Rm. 231 (Rau)",
+      "roomNumber": "231",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 3,
+      "startMod": 2,
+      "length": 1,
+      "endMod": 3,
+      "data": {
+        "courseId": "351"
+      }
+    },
+    {
+      "sourceId": 21152,
+      "sourceType": "course",
+      "title": "Calculus BC AP",
+      "body": "Rm. 222 (Rau)",
+      "roomNumber": "222",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 4,
+      "startMod": 11,
+      "length": 2,
+      "endMod": 13,
+      "data": {
+        "courseId": "351"
+      }
+    },
+    {
+      "sourceId": 21153,
+      "sourceType": "course",
+      "title": "Calculus BC AP",
+      "body": "Rm. 231 (Rau)",
+      "roomNumber": "231",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 5,
+      "startMod": 4,
+      "length": 2,
+      "endMod": 6,
+      "data": {
+        "courseId": "351"
+      }
+    },
+    {
+      "sourceId": 21279,
+      "sourceType": "course",
+      "title": "S\\u0026C1 - Strength \\u0026 Conditioning 1",
+      "body": "Rm. 150 (Dunn)",
+      "roomNumber": "150",
+      "sectionNumber": 1,
+      "phaseNumber": 2,
+      "day": 4,
+      "startMod": 3,
+      "length": 3,
+      "endMod": 6,
+      "data": {
+        "courseId": "572"
+      }
+    },
+    {
+      "sourceId": 21281,
+      "sourceType": "course",
+      "title": "S\\u0026C1 - Strength \\u0026 Conditioning 1",
+      "body": "Rm. 150 (Dunn)",
+      "roomNumber": "150",
+      "sectionNumber": 3,
+      "phaseNumber": 1,
+      "day": 3,
+      "startMod": 13,
+      "length": 2,
+      "endMod": 15,
+      "data": {
+        "courseId": "572"
+      }
+    },
+    {
+      "sourceId": 21445,
+      "sourceType": "course",
+      "title": "Biology (H) Sem 2",
+      "body": "Rm. 313 (Caffey)",
+      "roomNumber": "313",
+      "sectionNumber": 6,
+      "phaseNumber": 2,
+      "day": 5,
+      "startMod": 13,
+      "length": 1,
+      "endMod": 14,
+      "data": {
+        "courseId": "324"
+      }
+    },
+    {
+      "sourceId": 21453,
+      "sourceType": "course",
+      "title": "Biology (H) Sem 2",
+      "body": "AUDI (Caffey)",
+      "roomNumber": "AUDI",
+      "sectionNumber": 1,
+      "phaseNumber": 3,
+      "day": 1,
+      "startMod": 6,
+      "length": 2,
+      "endMod": 8,
+      "data": {
+        "courseId": "324"
+      }
+    },
+    {
+      "sourceId": 21461,
+      "sourceType": "course",
+      "title": "Biology (H) Sem 2",
+      "body": "Rm. 313 (Caffey)",
+      "roomNumber": "313",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 4,
+      "startMod": 14,
+      "length": 1,
+      "endMod": 15,
+      "data": {
+        "courseId": "324"
+      }
+    },
+    {
+      "sourceId": 21462,
+      "sourceType": "course",
+      "title": "Biology (H) Sem 2",
+      "body": "Rm. 313 (Caffey)",
+      "roomNumber": "313",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 3,
+      "startMod": 3,
+      "length": 1,
+      "endMod": 4,
+      "data": {
+        "courseId": "324"
+      }
+    },
+    {
+      "sourceId": 21463,
+      "sourceType": "course",
+      "title": "Biology (H) Sem 2",
+      "body": "Rm. 313 (Caffey)",
+      "roomNumber": "313",
+      "sectionNumber": 7,
+      "phaseNumber": 1,
+      "day": 2,
+      "startMod": 4,
+      "length": 2,
+      "endMod": 6,
+      "data": {
+        "courseId": "324"
+      }
+    },
+    {
+      "sourceId": 22155,
+      "sourceType": "course",
+      "title": "Human Geography AP",
+      "body": "Rm. 220 (Fey)",
+      "roomNumber": "220",
+      "sectionNumber": 1,
+      "phaseNumber": 2,
+      "day": 5,
+      "startMod": 6,
+      "length": 3,
+      "endMod": 9,
+      "data": {
+        "courseId": "461"
+      }
+    },
+    {
+      "sourceId": 22159,
+      "sourceType": "course",
+      "title": "Human Geography AP",
+      "body": "Rm. 210 (Fey)",
+      "roomNumber": "210",
+      "sectionNumber": 2,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 4,
+      "length": 2,
+      "endMod": 6,
+      "data": {
+        "courseId": "461"
+      }
+    },
+    {
+      "sourceId": 22160,
+      "sourceType": "course",
+      "title": "Human Geography AP",
+      "body": "Rm. 210 (Fey)",
+      "roomNumber": "210",
+      "sectionNumber": 2,
+      "phaseNumber": 1,
+      "day": 2,
+      "startMod": 14,
+      "length": 1,
+      "endMod": 15,
+      "data": {
+        "courseId": "461"
+      }
+    },
+    {
+      "sourceId": 22161,
+      "sourceType": "course",
+      "title": "Human Geography AP",
+      "body": "Rm. 210 (Fey)",
+      "roomNumber": "210",
+      "sectionNumber": 2,
+      "phaseNumber": 1,
+      "day": 4,
+      "startMod": 8,
+      "length": 2,
+      "endMod": 10,
+      "data": {
+        "courseId": "461"
+      }
+    },
+    {
+      "sourceId": 22298,
+      "sourceType": "course",
+      "title": "Earth \\u0026 Space Science.com",
+      "body": "Rm. 305 (Bergman)",
+      "roomNumber": "305",
+      "sectionNumber": 2,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 12,
+      "length": 1,
+      "endMod": 13,
+      "data": {
+        "courseId": "385"
+      }
+    },
+    {
+      "sourceId": 18848,
+      "sourceType": "annotation",
+      "title": "Band Sectional",
+      "body": "Band Room",
+      "roomNumber": "Band Room",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 1,
+      "startMod": 14,
+      "length": 1,
+      "endMod": 15,
+      "data": null
+    },
+    {
+      "sourceId": 549,
+      "sourceType": "homeroom",
+      "title": "Homeroom",
+      "body": "Rm. 113 (Grossman)",
+      "roomNumber": "113",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 1,
+      "startMod": 0,
+      "length": 1,
+      "endMod": 1,
+      "data": null
+    },
+    {
+      "sourceId": 549,
+      "sourceType": "homeroom",
+      "title": "Homeroom",
+      "body": "Rm. 113 (Grossman)",
+      "roomNumber": "113",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 2,
+      "startMod": 0,
+      "length": 1,
+      "endMod": 1,
+      "data": null
+    },
+    {
+      "sourceId": 549,
+      "sourceType": "annotation",
+      "title": "No Homeroom",
+      "body": "Classes shift 20 minutes earlier",
+      "roomNumber": "",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 3,
+      "startMod": 0,
+      "length": 1,
+      "endMod": 1,
+      "data": null
+    },
+    {
+      "sourceId": 549,
+      "sourceType": "homeroom",
+      "title": "Homeroom",
+      "body": "Rm. 113 (Grossman)",
+      "roomNumber": "113",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 4,
+      "startMod": 0,
+      "length": 1,
+      "endMod": 1,
+      "data": null
+    },
+    {
+      "sourceId": 549,
+      "sourceType": "homeroom",
+      "title": "Homeroom",
+      "body": "Rm. 113 (Grossman)",
+      "roomNumber": "113",
+      "sectionNumber": 0,
+      "phaseNumber": 0,
+      "day": 5,
+      "startMod": 0,
+      "length": 1,
+      "endMod": 1,
+      "data": null
+    }
+  ],
+  "studentId": "2034",
+  "action": "Student",
+  "controller": "Students",
+  "userId": "3175"
+}

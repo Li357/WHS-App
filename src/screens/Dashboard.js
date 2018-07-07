@@ -30,7 +30,7 @@ import {
 } from '../constants/constants';
 
 const mapStateToProps = ({
-  loginError, dates, schedule, dayInfo, ...rest
+  loginError, schedule, dayInfo, ...rest
 }, ownProps) => ({
   schedule: processFinalsOrAssembly(schedule, dayInfo.hasAssembly, dayInfo.isFinals),
   dayInfo,
@@ -143,18 +143,13 @@ export default class Dashboard extends Component {
       return;
     }
 
-    const isDuringMod = currentMod < PASSING_PERIOD_FACTOR;
-    const isPassingPeriod = currentMod > PASSING_PERIOD_FACTOR && currentMod < BEFORE_SCHOOL;
-    const ignorePassingPeriod = currentMod - (isPassingPeriod ? PASSING_PERIOD_FACTOR : 0);
-
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
      * since arrays are 0-based, it must be decremented by 1 for array access on Wednesdays
-     * Also, add one to current mod if there is an assembly and it is after the assembly due
-     * to the index shift of having another timepair for the assembly
      */
-    const modNumber = (currentMod - Number(now.day() === 3)) +
-      Number(hasAssembly && ignorePassingPeriod > ASSEMBLY_MOD);
+    const modNumber = currentMod - Number(now.day() === 3);
+    const isDuringMod = currentMod < PASSING_PERIOD_FACTOR;
+    const isPassingPeriod = currentMod > PASSING_PERIOD_FACTOR && currentMod < BEFORE_SCHOOL;
 
     const untilModEnd = isDuringMod
       ? moment(`${schedule[modNumber][1]}:00`, 'k:mm:ss').diff(now)
@@ -238,8 +233,27 @@ export default class Dashboard extends Component {
       return getDuringWeekendInfo();
     }
 
-    const displayMod = currentMod === 0 ? 'Homeroom' : currentMod;
-    /* eslint-disable function-paren-newline */
+    const { specialDates: { lastDay }, dayInfo: { isFinals } } = this.props;
+    const isLastDay = moment().isSame(lastDay, 'day');
+
+    // This represents purely the "mod" part of currentMod, i.e. 3 given 1003
+    const normalizedMod = currentMod - (
+      currentMod > PASSING_PERIOD_FACTOR
+        ? PASSING_PERIOD_FACTOR
+        : 0
+    );
+    /**
+     * This is needed to shift mod numbers presentationally, i.e. although the mod immediately
+     * following an assembly at mod 3 seemingly starts at mod "4" internally, it is presentationally
+     * starting at mod 3, a continuation as if the assembly didn't exist
+     */
+    const isAfterAssembly = hasAssembly && normalizedMod > ASSEMBLY_MOD;
+    const displayMod = normalizedMod === 0
+      ? 'Homeroom'
+      // Shifts for assembly and last day where finals mods start at 5 (1 + 4)
+      : (normalizedMod + (isLastDay ? 4 : 0)) - Number(isAfterAssembly);
+
+    /* eslint-disable function-paren-newline, indent */
     if (currentMod <= PASSING_PERIOD_FACTOR) {
       const isCurrentlyAssembly = hasAssembly && currentMod === ASSEMBLY_MOD;
 
@@ -247,7 +261,8 @@ export default class Dashboard extends Component {
         isCurrentlyAssembly
           ? 'Assembly'
           : displayMod,
-        nextClass, untilModEnd, untilDayEnd, isHalfMod(currentMod),
+        nextClass, untilModEnd, untilDayEnd,
+        !isFinals && isHalfMod(normalizedMod),
       );
     }
 
@@ -255,11 +270,8 @@ export default class Dashboard extends Component {
       return getBeforeSchoolInfo(untilDayStart);
     }
 
-    const nextMod = currentMod - PASSING_PERIOD_FACTOR;
-    const isGoingToBeAssembly = hasAssembly &&
-      currentMod - PASSING_PERIOD_FACTOR === ASSEMBLY_MOD;
+    const isGoingToBeAssembly = hasAssembly && normalizedMod === ASSEMBLY_MOD;
 
-    /* eslint-disable indent */
     return currentMod === AFTER_SCHOOL
       ? getAfterSchoolInfo()
       : getDuringPassingPeriodInfo(
@@ -267,7 +279,7 @@ export default class Dashboard extends Component {
             ? 'Assembly'
             : displayMod,
           nextClass, untilPassingPeriodEnd, untilDayEnd,
-          isHalfMod(nextMod),
+          !isFinals && isHalfMod(normalizedMod),
         );
     /* eslint-enable function-paren-newline, indent */
   }

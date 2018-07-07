@@ -13,10 +13,10 @@ Making the app less crappy and bug prone, with linting and  testing (I hope). Le
 Next up:
 - [ ] [TESTING] Handle different types of dates (need to manually add in meantime)
   - [x] Test no-overlap on assembly dates
-  - [ ] Test overlap on assembly dates
+  - [x] Test overlap on assembly dates (NEEDS BACKWARDS-COMPAT TESTS)
   - [ ] Test cross sectioned overlap on assembly dates
-  - [ ] Test finals display on ScheduleCard and Dashboard
-    - [ ] For last day of finals, start at mod 5 on Dashboard
+  - [x] Test finals display on ScheduleCard and Dashboard
+    - [x] For last day of finals, start at mod 5 on Dashboard
 - [ ] Adjust mod item height because some mods (assemblies, homeroom, finals, and different dates) have different
 lengths leaving the progress bar off
 
