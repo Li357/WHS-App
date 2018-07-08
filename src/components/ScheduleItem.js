@@ -13,8 +13,11 @@ const ScheduleItem = ({
 }) => {
   const classMods = getMods(scheduleItem);
   const modHeights = classMods.map(modNumber => (
-    // On finals days, none are half mods
-    MOD_ITEM_HEIGHT / (!isFinals && isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
+    // On finals days, none are half mods (homeroom is a 'half mod')
+    MOD_ITEM_HEIGHT / (
+      (!isFinals && isHalfMod(modNumber - Number(isAfterAssembly))) || modNumber === 0
+        ? 2 : 1
+    )
   ));
   const scheduleItemHeight = sum(modHeights);
 

@@ -26,11 +26,13 @@ const interpolateOpenMods = scheduleItems => (
   scheduleItems.reduce((withOpenMods, { endMod, sourceId }, index, array) => {
     const newArray = [...withOpenMods, array[index]];
     const next = array[index + 1];
+    const nextStartMod = next && (next.startMod || next.occupiedMods[0]);
+    const lessThanNext = endMod < nextStartMod;
     if (
-      (next && endMod < next.startMod) // Either next exists and endMod < next startMod
+      lessThanNext // Either next exists and endMod < next startMod or cross-sectioned block
       || (!next && endMod !== 15) // Or next does not exist and endMod not 15 (last mod(s) are open)
     ) {
-      const openModLength = (next ? next.startMod : 15) - endMod;
+      const openModLength = (next ? nextStartMod : 15) - endMod;
       return [
         ...newArray,
         {
@@ -125,8 +127,7 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
       const nextBlock = arr[i + 1];
       const nextOccupiedMods = nextBlock && getOccupiedMods(nextBlock);
       const between = nextBlock
-        // Need +1 because getMods in getModsInBetween is exclusive
-        ? getModsInBetween(occupiedMods.slice(-1)[0], nextOccupiedMods[0] + 1, scheduleItems)
+        ? getModsInBetween(occupiedMods.slice(-1)[0], nextOccupiedMods[0], scheduleItems)
         : [];
 
       return [

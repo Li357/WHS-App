@@ -26,7 +26,7 @@ const CrossSectionItem = ({
         {
           exclusiveMods.map((modNumber, index) => (
             <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
-              <Text style={styles.bodyText}>
+              <Text style={styles.modText}>
                 {modNumber !== 0 ? modNumber - Number(isAfterAssembly) : 'HR'}
               </Text>
             </View>
@@ -65,7 +65,7 @@ const CrossSectionItem = ({
 
                   // Array of 2s and 1s of current cross sectioned mod in column signifying ratios
                   const flexRatios = getMods({ startMod, endMod }).map(mod => (
-                    isHalfMod(mod) ? 1 : 2
+                    isHalfMod(mod - Number(isAfterAssembly)) ? 1 : 2
                   ));
                   const wholeFlex = sum(flexRatios.slice(0, ratio + length + 1));
                   const modItemFlex = sum(flexRatios.slice(0, length + 1));
@@ -122,6 +122,7 @@ const styles = EStyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
+  modText: { fontFamily: '$fontLight' },
   separator: {
     height: '100%',
     borderLeftColor: 'lightgrey',
@@ -144,6 +145,9 @@ const styles = EStyleSheet.create({
     fontFamily: '$fontRegular',
     fontSize: 16,
   },
-  bodyText: { fontFamily: '$fontLight' },
+  bodyText: {
+    textAlign: 'center',
+    fontFamily: '$fontLight',
+  },
   empty: { backgroundColor: 'rgba(0, 0, 0, 0.05)' },
 });
