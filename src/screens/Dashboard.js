@@ -323,5 +323,8 @@ Dashboard.navigationOptions = {
 const styles = EStyleSheet.create({
   container: { alignItems: 'center' },
   icon: { fontSize: 20 },
-  infoContainer: { width: '80%' },
+  infoContainer: {
+    width: '80%',
+    paddingVertical: 30,
+  },
 });

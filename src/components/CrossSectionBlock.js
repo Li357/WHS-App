@@ -16,13 +16,16 @@ const CrossSectionBlock = ({ currentCrossSectioned }) => (
         ))
       }
     </List>
-    <Text style={styles.title}>Next mod</Text>
+    <Text style={styles.title}>Next class</Text>
   </ListItem>
 );
 export default CrossSectionBlock;
 
 const styles = EStyleSheet.create({
-  itemContainer: { flexDirection: 'column' },
+  itemContainer: {
+    flexDirection: 'column',
+    borderBottomWidth: 0,
+  },
   modList: {
     width: '100%',
     marginVertical: 10,

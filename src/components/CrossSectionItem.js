@@ -10,7 +10,8 @@ import { MOD_ITEM_HEIGHT } from '../constants/constants';
 const CrossSectionItem = ({
   isAfterAssembly, occupiedMods, crossSectionedColumns,
 }) => {
-  const modHeights = occupiedMods.map(modNumber => (
+  const exclusiveMods = occupiedMods.slice(0, -1);
+  const modHeights = exclusiveMods.map(modNumber => (
     MOD_ITEM_HEIGHT / (isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
@@ -19,7 +20,7 @@ const CrossSectionItem = ({
     <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
       <View style={styles.modIndicator}>
         {
-          occupiedMods.map((modNumber, index) => (
+          exclusiveMods.map((modNumber, index) => (
             <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
               <Text style={styles.bodyText}>
                 {modNumber !== 0 ? modNumber - Number(isAfterAssembly) : 'HR'}
@@ -39,11 +40,15 @@ const CrossSectionItem = ({
           crossSectionedColumns.map((column, colIndex, { length: colLength }) => (
             <View
               key={colIndex}
-              style={[styles.column, {
-                width: `${87.5 / colLength}%`,
-                borderRightColor: colIndex !== colLength - 1 ? 'lightgrey' : 'white',
-                borderRightWidth: Number(colIndex !== colLength - 1),
-              }]}
+              style={[
+                styles.column,
+                {
+                  width: `${87.5 / colLength}%`,
+                  borderRightColor: colIndex !== colLength - 1 ? 'lightgrey' : 'white',
+                  borderRightWidth: Number(colIndex !== colLength - 1),
+                },
+                column.length === 0 && styles.empty,
+              ]}
             >
               {
                 /* eslint-enable react/no-array-index-key */

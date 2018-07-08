@@ -45,14 +45,19 @@ const getCurrentMod = ({
  * Internal function that is intended to be used as a callback
  * in finding the class in the user's schedule that has mods
  * containing the current mod, i.e. startMod <= currentMod < endMod
+ * To handle cross-sectioned situations, it checks for occupiedMods array,
+ * and since getMods is [startMod, endMod), the last element of occupiedMods is ignored
+ * as it is inclusive
  */
-const findClassWithMod = (item, currentMod) => getMods(item).includes(currentMod);
+const findClassWithMod = ({ occupiedMods, ...item }, currentMod) => (
+  ((occupiedMods && occupiedMods.slice(0, -1))  || getMods(item)).includes(currentMod)
+);
 
 /**
  * Internal function that gets current cross sectioned mods based on the passed currentMod
  * by iterating through the columns and checking class mods
  */
-const getCurrentCrossSectioned = ({ crossSectionedColumns }, currentMod) => (
+const getCurrentCrossSectioned = (crossSectionedColumns, currentMod) => (
   crossSectionedColumns.reduce((current, column) => {
     // Since this is by column, it can be assumed there is either 0 or 1 in each column
     const currentInColumn = column.find(item => findClassWithMod(item, currentMod));

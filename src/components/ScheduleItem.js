@@ -44,7 +44,7 @@ const ScheduleItem = ({
       <View style={styles.info}>
         <View style={styles.textContainer}>
           <Text style={styles.titleText}>{title}</Text>
-          {body && <Text style={styles.bodyText}>{body}</Text>}
+          {body && <Text style={styles.bodyText}>{decodeURIComponent(body)}</Text>}
         </View>
       </View>
     </CardItem>

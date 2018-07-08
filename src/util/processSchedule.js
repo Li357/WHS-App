@@ -10,9 +10,9 @@ const range = (start, end) => Array(end - start).fill().map((x, i) => i + start)
 const getMods = ({ startMod, endMod }) => range(startMod, endMod);
 
 const getOccupiedMods = (scheduleItems) => {
-  const min = minBy(scheduleItems, 'startMod');
-  const max = maxBy(scheduleItems, 'endMod');
-  return range(min, max + 1);
+  const { startMod } = minBy(scheduleItems, 'startMod');
+  const { endMod } = maxBy(scheduleItems, 'endMod');
+  return range(startMod, endMod + 1);
 };
 
 const interpolateOpenMods = scheduleItems => (
@@ -40,31 +40,35 @@ const interpolateOpenMods = scheduleItems => (
 );
 
 const interpolateCrossSectionedMods = scheduleItems => (
-  scheduleItems.slice().reduce((withCrossSections, { endMod, sourceId }, index, array) => {
-    const newArray = [...withCrossSections, array[index]];
+  scheduleItems.reduce((withCrossSections, { endMod, sourceId }, index, array) => {
     const next = array[index + 1];
+    const current = array[index];
+
     if (next && endMod > next.startMod) {
-      const crossSectioned = array.slice(index).filter((item, i, arr) => {
+      const crossSectioned = [current, ...array.slice(index).filter((item, i, arr) => {
         const nextItem = arr[i + 1];
         return nextItem && item.endMod > nextItem.startMod;
-      });
-      array.splice(index, crossSectioned.length); // Skip over cross-sectioned mods
+      })];
+
+      array.splice(index, crossSectioned.length - 1); // Skip over cross-sectioned mods
       const occupiedMods = getOccupiedMods(crossSectioned);
 
       const groupedByColumn = crossSectioned.reduce((grouped, item) => {
         const availableColumn = grouped.findIndex(sub => (
-          sub.find(subItem => subItem.endMod < item.startMod)
+          sub.find(subItem => subItem.endMod <= item.startMod)
         ));
-        if (availableColumn) {
+        if (availableColumn > -1) {
+          grouped[availableColumn] = grouped[availableColumn] || [];
           grouped[availableColumn].push(item);
           return grouped;
         }
         grouped.push([item]);
         return grouped;
       }, []);
+      // TODO: NEED TO HANDLE MULTIPLE CROSS SECTIONS
 
       return [
-        ...newArray,
+        ...withCrossSections,
         {
           sourceId: sourceId + 20000,
           crossSectionedBlock: true,
@@ -73,7 +77,7 @@ const interpolateCrossSectionedMods = scheduleItems => (
         },
       ];
     }
-    return newArray;
+    return [...withCrossSections, current];
   }, [])
 );
 
@@ -86,6 +90,7 @@ const shiftItem = ({
       /* eslint-disable indent */
       ? {
           // Shifts occupied mods by one
+          crossSectionedBlock,
           occupiedMods: occupiedMods.map(mod => mod + 1),
           crossSectionedColumns: crossSectionedColumns.map(column => (
             column.map(item => shiftItem(item, by))
@@ -139,12 +144,17 @@ const interpolateAssembly = (content) => {
     const { crossSectionedColumns, occupiedMods, sourceId } = afterAssemblyItem;
     const [before, after] = Array(2).fill(crossSectionedColumns).map((array, index) => (
       array.map(column => (
-        // Subtract 1 because we want all cross sectioned mods before assembly
+        /**
+         * Subtract 1 because we want all cross sectioned mods before assembly
+         * and 0 because we want all cross-sectioned mods after assembly, not shifted by one
+         */
         column
-          .filter(item => findClassWithMod(item, ASSEMBLY_MOD - 1))
+          .filter(item => findClassWithMod(item, ASSEMBLY_MOD - [1, 0][index]))
           // This will split cross-sectioned mods that do overlap the assembly
           .map(item => (
-            item.endMod !== ASSEMBLY_MOD ? splitItem(item, ASSEMBLY_MOD)[index] : item
+            !(item.endMod === ASSEMBLY_MOD || item.startMod === ASSEMBLY_MOD)
+              ? splitItem(item, ASSEMBLY_MOD)[index]
+              : shiftItem(item, 1)
           ))
       ))
     ));
@@ -160,7 +170,7 @@ const interpolateAssembly = (content) => {
       {
         ...afterAssemblyItem,
         crossSectionedColumns: after,
-        occupiedMods: [ASSEMBLY_MOD + 1, occupiedMods[1] + 1],
+        occupiedMods: [ASSEMBLY_MOD + 1, occupiedMods.slice(-1)[0] + 1],
         sourceId: sourceId + 1,
       },
       ...shifted,

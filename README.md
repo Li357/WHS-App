@@ -11,14 +11,16 @@ Making the app less crappy and bug prone, with linting and  testing (I hope). Le
 ### Rewrite Roadmap:
 
 Next up:
-- [ ] [TESTING] Handle different types of dates (need to manually add in meantime)
-  - [x] Test no-overlap on assembly dates
-  - [x] Test overlap on assembly dates (NEEDS BACKWARDS-COMPAT TESTS)
-  - [ ] Test cross sectioned overlap on assembly dates
+- [x] Handle different types of dates (need to manually add in meantime)
+  - [x] Test no-overlap on assembly dates (NEEDS BACKWARDS-COMPAT TESTS)
+  - [x] Test overlap on assembly dates  (NEEDS BACKWARDS-COMPAT TESTS)
+  - [x] Test cross sectioned overlap on assembly dates
   - [x] Test finals display on ScheduleCard and Dashboard
     - [x] For last day of finals, start at mod 5 on Dashboard
 - [ ] Adjust mod item height because some mods (assemblies, homeroom, finals, and different dates) have different
 lengths leaving the progress bar off
+- [ ] Fix bug to handle multiple cross sections per day
+- [ ] Add decodeURIComponent to handle encoded JSON (i.e. \\u0026)
 
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting

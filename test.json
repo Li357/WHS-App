@@ -75,6 +75,19 @@
       "endMod": 4
     },
     {
+      "sourceId": 39420386,
+      "sourceType": "course",
+      "title": "TEST CLASS 3",
+      "body": "Rm. MISC",
+      "roomNumber": "332",
+      "sectionNumber": 1,
+      "phaseNumber": 1,
+      "day": 1,
+      "startMod": 10,
+      "length": 3,
+      "endMod": 13
+    },
+    {
       "sourceId": 19325,
       "sourceType": "course",
       "title": "Band - Warrior ",
