@@ -3,9 +3,11 @@ import { Text } from 'react-native';
 import { ListItem } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
+import { decodeUnicode } from '../util/querySchedule';
+
 const DashboardBlock = ({ title, subtitle, value }) => (
   <ListItem noIndent style={styles.item}>
-    <Text style={styles.value}>{value}</Text>
+    <Text style={styles.value}>{decodeUnicode(value)}</Text>
     {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
     {title && <Text style={styles.title}>{title}</Text>}
   </ListItem>

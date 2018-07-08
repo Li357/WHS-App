@@ -19,8 +19,8 @@ Next up:
     - [x] For last day of finals, start at mod 5 on Dashboard
 - [ ] Adjust mod item height because some mods (assemblies, homeroom, finals, and different dates) have different
 lengths leaving the progress bar off
-- [ ] Fix bug to handle multiple cross sections per day
-- [ ] Add decodeURIComponent to handle encoded JSON (i.e. \\u0026)
+- [x] Fix bug to handle multiple cross sections per day
+- [x] Decode encoded JSON (i.e. \\u0026)
 
 - [x] Update dependencies and React/React Native
 - [ ] Consistent code and linting

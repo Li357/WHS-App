@@ -3,6 +3,8 @@ import { Text } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { List, ListItem, Left, Right } from 'native-base';
 
+import { decodeUnicode } from '../util/querySchedule';
+
 const CrossSectionBlock = ({ currentCrossSectioned }) => (
   <ListItem noIndent style={styles.itemContainer}>
     <Text style={styles.headerText}>You&apos;re cross sectioned with these classes next mod:</Text>
@@ -10,7 +12,7 @@ const CrossSectionBlock = ({ currentCrossSectioned }) => (
       {
         currentCrossSectioned.map(({ title, body }) => (
           <ListItem noIndent style={styles.modItem}>
-            <Left><Text style={styles.modText}>{title}</Text></Left>
+            <Left><Text style={styles.modText}>{decodeUnicode(title)}</Text></Left>
             <Right><Text style={styles.modText}>{body}</Text></Right>
           </ListItem>
         ))

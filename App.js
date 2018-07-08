@@ -67,7 +67,7 @@ const store = createStore(
   persistedReducer,
   applyMiddleware(
     thunk,
-    //createLogger(),
+    createLogger(),
   ),
 );
 const persistor = persistStore(store);

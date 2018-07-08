@@ -39,24 +39,49 @@ const interpolateOpenMods = scheduleItems => (
   }, [])
 );
 
-const interpolateCrossSectionedMods = scheduleItems => (
-  scheduleItems.reduce((withCrossSections, { endMod, sourceId }, index, array) => {
+const getModsInBetween = (start, end, scheduleItems) => (
+  scheduleItems.filter(item => {
+    const mods = getMods(item);
+    return start <= mods[0] && end >= mods.slice(-1)[0];
+  })
+);
+const interpolateCrossSectionedMods = (scheduleItems) => {
+  const firstCrossSectionIndex = scheduleItems.findIndex(({ endMod }, index, array) => {
     const next = array[index + 1];
-    const current = array[index];
+    return next && endMod > next.startMod;
+  });
 
-    if (next && endMod > next.startMod) {
-      const crossSectioned = [current, ...array.slice(index).filter((item, i, arr) => {
-        const nextItem = arr[i + 1];
-        return nextItem && item.endMod > nextItem.startMod;
-      })];
+  if (firstCrossSectionIndex > -1) {
+    const { sourceId } = scheduleItems[firstCrossSectionIndex];
+    const crossSectioned = scheduleItems.slice(firstCrossSectionIndex).filter((item, i, arr) => {
+      const prevItem = arr[i - 1];
+      const nextItem = arr[i + 1];
+      return (prevItem && prevItem.endMod > item.startMod)
+        || (nextItem && item.endMod > nextItem.startMod);
+    });
 
-      array.splice(index, crossSectioned.length - 1); // Skip over cross-sectioned mods
-      const occupiedMods = getOccupiedMods(crossSectioned);
+    let currentBlock = 0;
+    const crossSectionedBlocks = crossSectioned.reduce((blocks, item, i, arr) => {
+      const prevItem = arr[i - 1];
 
-      const groupedByColumn = crossSectioned.reduce((grouped, item) => {
+      if (prevItem && prevItem.endMod < item.startMod) {
+        blocks.push([item]);
+        currentBlock++;
+        return blocks;
+      }
+      blocks[currentBlock] = blocks[currentBlock] || [];
+      blocks[currentBlock].push(item);
+      return blocks;
+    }, []);
+
+    const withBetweens = crossSectionedBlocks.reduce((withBetween, block, i, arr) => {
+      const occupiedMods = getOccupiedMods(block);
+
+      const groupedByColumn = block.reduce((grouped, item) => {
         const availableColumn = grouped.findIndex(sub => (
           sub.find(subItem => subItem.endMod <= item.startMod)
         ));
+
         if (availableColumn > -1) {
           grouped[availableColumn] = grouped[availableColumn] || [];
           grouped[availableColumn].push(item);
@@ -65,21 +90,39 @@ const interpolateCrossSectionedMods = scheduleItems => (
         grouped.push([item]);
         return grouped;
       }, []);
-      // TODO: NEED TO HANDLE MULTIPLE CROSS SECTIONS
+
+      const nextBlock = arr[i + 1];
+      const nextOccupiedMods = nextBlock && getOccupiedMods(nextBlock);
+      const between = nextBlock
+        ? getModsInBetween(occupiedMods.slice(-1)[0], nextOccupiedMods[0], scheduleItems)
+        : [];
 
       return [
-        ...withCrossSections,
+        ...withBetween,
         {
-          sourceId: sourceId + 20000,
+          sourceId: sourceId + 20000 + i,
           crossSectionedBlock: true,
           crossSectionedColumns: groupedByColumn,
           occupiedMods,
         },
+        ...between,
       ];
-    }
-    return [...withCrossSections, current];
-  }, [])
-);
+    }, []);
+
+    const { occupiedMods } = withBetweens.slice(-1)[0];
+    const afterIndex = scheduleItems.findIndex(item => (
+      occupiedMods && item.startMod >= occupiedMods.slice(-1)[0]
+    ));
+
+    return [
+      ...scheduleItems.slice(0, firstCrossSectionIndex),
+      ...withBetweens,
+      ...scheduleItems.slice(afterIndex),
+    ];
+  }
+
+  return scheduleItems;
+};
 
 const shiftItem = ({
   crossSectionedBlock, crossSectionedColumns, occupiedMods, startMod, endMod, ...scheduleItem

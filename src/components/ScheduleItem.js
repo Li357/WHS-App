@@ -5,7 +5,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { sum } from 'lodash';
 
 import { getMods } from '../util/processSchedule';
-import { isHalfMod } from '../util/querySchedule';
+import { isHalfMod, decodeUnicode } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT, ASSEMBLY_MOD } from '../constants/constants';
 
 const ScheduleItem = ({
@@ -43,8 +43,8 @@ const ScheduleItem = ({
       <View style={styles.separator} />
       <View style={styles.info}>
         <View style={styles.textContainer}>
-          <Text style={styles.titleText}>{title}</Text>
-          {body && <Text style={styles.bodyText}>{decodeURIComponent(body)}</Text>}
+          <Text style={styles.titleText}>{decodeUnicode(title)}</Text>
+          {body && <Text style={styles.bodyText}>{body}</Text>}
         </View>
       </View>
     </CardItem>

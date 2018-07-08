@@ -4,7 +4,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { CardItem } from 'native-base';
 import { sum } from 'lodash';
 
-import { isHalfMod } from '../util/querySchedule';
+import { isHalfMod, decodeUnicode } from '../util/querySchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const CrossSectionItem = ({
@@ -62,7 +62,7 @@ const CrossSectionItem = ({
                   const nextItem = array[index + 1];
                   const prevItem = array[index - 1];
                   const ratio = nextItem ? nextItem.startMod - endMod : 0;
-
+                  // TODO: Calculate flex (2 for full, 1 for half)
                   return (
                     <View key={sourceId} style={{ flex: ratio + length }}>
                       {
@@ -74,7 +74,7 @@ const CrossSectionItem = ({
                           <View style={[styles.empty, { flex: startMod - occupiedMods[0] }]} />
                       }
                       <View style={[styles.modItem, { flex: length }]}>
-                        <Text style={styles.titleText}>{title}</Text>
+                        <Text style={styles.titleText}>{decodeUnicode(title)}</Text>
                         <Text style={styles.bodyText}>{body}</Text>
                       </View>
                       {
@@ -124,6 +124,8 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey',
   },
   titleText: {
     textAlign: 'center',

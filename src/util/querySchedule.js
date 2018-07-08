@@ -171,8 +171,11 @@ const getDayInfo = (specialDates, date) => {
   return [...range, schedule, date, isSummer, isBreak, hasAssembly, isFinals];
 };
 
+const decodeUnicode = string => JSON.parse(`"${string}"`);
+
 export {
   getCurrentMod, getNextClass,
   selectSchedule, getDayInfo,
   isHalfMod, findClassWithMod,
+  decodeUnicode,
 };
