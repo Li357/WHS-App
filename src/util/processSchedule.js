@@ -4,17 +4,24 @@ import moment from 'moment';
 import { findClassWithMod } from './querySchedule';
 import { ASSEMBLY_MOD } from '../constants/constants';
 
-// This function is exclusive
+// Internal function (for getMods) to get range of numbers, [start, end)
 const range = (start, end) => Array(end - start).fill().map((x, i) => i + start);
 
+// Returns an array of numbers signifying a class' mods, startMod <= x < endMod
 const getMods = ({ startMod, endMod }) => range(startMod, endMod);
 
+// Returns an array of occupied mods for cross-sectioned blocks, [start, end] inclusive
 const getOccupiedMods = (scheduleItems) => {
   const { startMod } = minBy(scheduleItems, 'startMod');
   const { endMod } = maxBy(scheduleItems, 'endMod');
   return range(startMod, endMod + 1);
 };
 
+/**
+ * Interpolates open mods into an array of schedule items, accomplishing by reducing scheduleItems
+ * and searching the next item. If the next item's startMod is greater than the current item's
+ * endMod, then there must be an open mod
+ */
 const interpolateOpenMods = scheduleItems => (
   scheduleItems.reduce((withOpenMods, { endMod, sourceId }, index, array) => {
     const newArray = [...withOpenMods, array[index]];
@@ -39,27 +46,44 @@ const interpolateOpenMods = scheduleItems => (
   }, [])
 );
 
+// Internal function to return an array of scheduleItems between the specified bounds
 const getModsInBetween = (start, end, scheduleItems) => (
   scheduleItems.filter(item => {
     const mods = getMods(item);
     return start <= mods[0] && end >= mods.slice(-1)[0];
   })
 );
+/**
+ * Interpolates cross sectioned blocks into an array of scheduleItems. The algorithm itself finds
+ * the first cross-sectioned mod within the array, by checking if the next item's startMod is less
+ * than that of the current endMod signifying cross-sectioning. Then, if a cross-section block
+ * exists, it finds the remaining cross sectioned blocks, splits them into consecutive blocks to
+ * handle multiple cross sectioned blocks. After, it finds the items between each block, then
+ * interpolates the cross sectioned blocks before and after the items in between
+ */
 const interpolateCrossSectionedMods = (scheduleItems) => {
   const firstCrossSectionIndex = scheduleItems.findIndex(({ endMod }, index, array) => {
     const next = array[index + 1];
     return next && endMod > next.startMod;
   });
 
-  if (firstCrossSectionIndex > -1) {
+  if (firstCrossSectionIndex > -1) { // If cross-sectioned block exists in current user day schedule
     const { sourceId } = scheduleItems[firstCrossSectionIndex];
     const crossSectioned = scheduleItems.slice(firstCrossSectionIndex).filter((item, i, arr) => {
+      /**
+       * Bidirectional inspection is needed because we want both the first and last items in each
+       * consecutive cross-sectioned block
+       */
       const prevItem = arr[i - 1];
       const nextItem = arr[i + 1];
       return (prevItem && prevItem.endMod > item.startMod)
         || (nextItem && item.endMod > nextItem.startMod);
     });
 
+    /**
+     * A naive approach to split cross sectioned mods into consecutive blocks by keeping a record
+     * of the current block, and checking each next element until the block is over
+     */
     let currentBlock = 0;
     const crossSectionedBlocks = crossSectioned.reduce((blocks, item, i, arr) => {
       const prevItem = arr[i - 1];
@@ -74,27 +98,35 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
       return blocks;
     }, []);
 
+    /**
+     * Interpolates the mods in between each cross sectioned block, and organizes each block
+     * optimally into columns for display (see CrossSectionItem)
+     */
     const withBetweens = crossSectionedBlocks.reduce((withBetween, block, i, arr) => {
       const occupiedMods = getOccupiedMods(block);
 
       const groupedByColumn = block.reduce((grouped, item) => {
+        // Finds available column to insert next item in block
         const availableColumn = grouped.findIndex(sub => (
           sub.find(subItem => subItem.endMod <= item.startMod)
         ));
 
-        if (availableColumn > -1) {
+        if (availableColumn > -1) { // If there is an available column
           grouped[availableColumn] = grouped[availableColumn] || [];
           grouped[availableColumn].push(item);
           return grouped;
         }
+        // If not, start a new column
         grouped.push([item]);
         return grouped;
       }, []);
 
+      // Gets the mods in between the current block and the next block
       const nextBlock = arr[i + 1];
       const nextOccupiedMods = nextBlock && getOccupiedMods(nextBlock);
       const between = nextBlock
-        ? getModsInBetween(occupiedMods.slice(-1)[0], nextOccupiedMods[0], scheduleItems)
+        // Need +1 because getMods in getModsInBetween is exclusive
+        ? getModsInBetween(occupiedMods.slice(-1)[0], nextOccupiedMods[0] + 1, scheduleItems)
         : [];
 
       return [
@@ -109,11 +141,17 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
       ];
     }, []);
 
+    /**
+     * Since each block contains >1 mod, we cannot just slice at firstCrossSectionIndex
+     * to get all the mods after withBetweens
+     */
     const { occupiedMods } = withBetweens.slice(-1)[0];
+    // Finds the index where withBetweens ends
     const afterIndex = scheduleItems.findIndex(item => (
       occupiedMods && item.startMod >= occupiedMods.slice(-1)[0]
     ));
 
+    // Reconstruct scheduleItems by inserting withBetweens which includes the cross-sectioned blocks
     return [
       ...scheduleItems.slice(0, firstCrossSectionIndex),
       ...withBetweens,
@@ -124,6 +162,7 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
   return scheduleItems;
 };
 
+// Internal function to shift each scheduleItem's start and end mods by one during assemblies
 const shiftItem = ({
   crossSectionedBlock, crossSectionedColumns, occupiedMods, startMod, endMod, ...scheduleItem
 }, by) => ({
@@ -147,6 +186,7 @@ const shiftItem = ({
   ),
 });
 
+// Interal function to split a scheduleItem in two in case of overlapping mods in an assembly
 const splitItem = (item, splitMod) => [
   { ...item, length: splitMod - item.startMod, endMod: splitMod },
   shiftItem({
@@ -157,6 +197,14 @@ const splitItem = (item, splitMod) => [
   }, 1),
 ];
 
+/**
+ * Interpolates an assembly scheduleItem in an assembly situation. It handles three cases:
+ * 1. Assembly doesn't cut through any current classes (i.e. double mods or cross sectioned blocks)
+ *    in which case a simple insertion is sufficient
+ * 2. Assembly cuts through singular class (i.e. double mod) in which splitItems is called to split
+ *    the class in two chunks, before and after the assembly
+ * 3. Assembly cuts through cross-sectioned block, in which case it splits items in each column
+ */
 const interpolateAssembly = (content) => {
   // This calculates the actual index of the assembly in relation the user's schedule
   const assemblyIndex = content.findIndex(({
@@ -239,6 +287,7 @@ const interpolateAssembly = (content) => {
   ];
 };
 
+// Returns an array of finals schedule items
 const mapToFinals = content => [
   content[0], // Homeroom info
   ...Array(4).fill().map((item, index) => ({
@@ -249,6 +298,7 @@ const mapToFinals = content => [
   })), // 4 final mods
 ];
 
+// Curried function to only apply passed function if day of the scheduleItem array is current day
 const onlyIfCurrentDay = fn => (content) => {
   const day = moment().day();
   if (content[0].day === day) {
@@ -256,6 +306,7 @@ const onlyIfCurrentDay = fn => (content) => {
   }
   return content;
 };
+// On finals or assembly days, map the schedules into assembly or finals schedules
 const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
   if (!hasAssembly && !isFinals) {
     return schedule;

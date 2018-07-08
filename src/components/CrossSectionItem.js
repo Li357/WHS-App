@@ -5,6 +5,7 @@ import { CardItem } from 'native-base';
 import { sum } from 'lodash';
 
 import { isHalfMod, decodeUnicode } from '../util/querySchedule';
+import { getMods } from '../util/processSchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const CrossSectionItem = ({
@@ -15,6 +16,9 @@ const CrossSectionItem = ({
     MOD_ITEM_HEIGHT / (isHalfMod(modNumber - Number(isAfterAssembly)) ? 2 : 1)
   ));
   const scheduleItemHeight = sum(modHeights);
+
+  // Array of 2s and 1s signifying the flex ratios of each mod number
+  const scheduleItemFlexRatios = exclusiveMods.map(mod => isHalfMod(mod) ? 1 : 2);
 
   return (
     <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
@@ -52,28 +56,36 @@ const CrossSectionItem = ({
             >
               {
                 /* eslint-enable react/no-array-index-key */
-                /**
-                 * This array has true / false values based on if the row (occupied mod)
-                 * and column (current cross sectioned class being mapped) is occupied
-                 */
                 column.map(({
                   sourceId, length, startMod, endMod, title, body,
                 }, index, array) => {
                   const nextItem = array[index + 1];
                   const prevItem = array[index - 1];
                   const ratio = nextItem ? nextItem.startMod - endMod : 0;
-                  // TODO: Calculate flex (2 for full, 1 for half)
+
+                  // Array of 2s and 1s of current cross sectioned mod in column signifying ratios
+                  const flexRatios = getMods({ startMod, endMod }).map(mod => (
+                    isHalfMod(mod) ? 1 : 2
+                  ));
+                  const wholeFlex = sum(flexRatios.slice(0, ratio + length + 1));
+                  const modItemFlex = sum(flexRatios.slice(0, length + 1));
+                  const prefixFlex = sum(scheduleItemFlexRatios.slice(0, startMod - occupiedMods[0]));
+
                   return (
-                    <View key={sourceId} style={{ flex: ratio + length }}>
+                    <View key={sourceId} style={{ flex: wholeFlex }}>
                       {
                         /**
                          * This pads the column if the first item in the column does not start at
                          * beginning of cross sectioned block
                          */
                         !prevItem && startMod !== occupiedMods[0] &&
-                          <View style={[styles.empty, { flex: startMod - occupiedMods[0] }]} />
+                          <View style={[styles.empty, {
+                            flex: prefixFlex,
+                            borderBottomWidth: 1,
+                            borderBottomColor: 'lightgrey',
+                          }]} />
                       }
-                      <View style={[styles.modItem, { flex: length }]}>
+                      <View style={[styles.modItem, { flex: modItemFlex }]}>
                         <Text style={styles.titleText}>{decodeUnicode(title)}</Text>
                         <Text style={styles.bodyText}>{body}</Text>
                       </View>
@@ -83,7 +95,7 @@ const CrossSectionItem = ({
                          * the end of the cross sectioned block
                          */
                       }
-                      <View style={[styles.empty, { flex: ratio }]} />
+                      <View style={[styles.empty, { flex: wholeFlex - modItemFlex }]} />
                     </View>
                   );
                 })
