@@ -53,6 +53,4 @@ fastlane/Preview.html
 fastlane/screenshots
 
 .expo/
-android/
-ios/
 .tern-project
