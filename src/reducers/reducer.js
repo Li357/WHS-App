@@ -1,124 +1,156 @@
 import {
+  SET_LOGIN_ERROR,
+  SET_USER_INFO,
   SET_CREDENTIALS,
-  RECEIVE_USER_INFO,
   SET_PROFILE_PHOTO,
-  SET_SCHOOL_PICTURE,
-  RECEIVE_DATES,
+  SET_SPECIAL_DATES,
+  SET_SCHEDULE,
+  SET_DAY_INFO,
+  SET_SETTINGS,
   SET_REFRESHED,
-  SET_LAST_SUMMER,
-  LOG_OUT
-} from '../actions/actions.js';
+  SET_ERROR_QUEUE,
+  ADD_ERROR_TO_QUEUE,
+  LOG_OUT,
+} from '../actions/actions';
 
-const whsApp = (state = {
-  username: ' ',
-  password: ' ',
-  error: '',
-  name: ' ',
-  classOf: ' ',
-  homeroom: ' ',
-  counselor: ' ',
-  dean: ' ',
-  id: ' ',
+const initialState = {
+  loginError: false,
+  username: '',
+  password: '',
+  name: '',
+  classOf: '',
+  homeroom: null,
+  counselor: null,
+  dean: null,
+  id: '',
+  isTeacher: false,
   schedule: [],
-  profilePhoto: ' ',
-  dates: [],
-  refreshedOne: false,
-  refreshedTwo: false,
-  lastSummerStart: null,
-  schoolPicture: ' '
-}, {
+  profilePhoto: null,
+  schoolPicture: null,
+  dayInfo: {
+    start: null,
+    end: null,
+    schedule: [],
+    lastUpdate: null,
+    isSummer: false,
+    isBreak: false,
+    isFinals: false,
+    hasAssembly: false,
+  },
+  specialDates: {
+    semesterOneStart: null,
+    semesterTwoStart: null,
+    lastDay: null,
+    noSchoolDates: [],
+    otherNoSchoolDates: [],
+  },
+  settings: { errorReporting: true },
+  refreshedSemesterOne: false,
+  refreshedSemesterTwo: false,
+  errorQueue: [],
+};
+
+const WHSApp = (state = initialState, {
   type,
+  loginError,
   username,
   password,
-  error,
-  name,
-  classOf,
-  homeroom,
-  counselor,
-  dean,
-  id,
   schedule,
   profilePhoto,
   schoolPicture,
-  dates,
-  semester,
-  refreshed,
-  lastSummerStart
+  dayStart,
+  dayEnd,
+  daySchedule,
+  dayIsSummer,
+  dayIsBreak,
+  dayHasAssembly,
+  dayIsFinals,
+  lastDayInfoUpdate,
+  specialDates,
+  settings,
+  refreshedSemesterOne,
+  refreshedSemesterTwo,
+  errorQueue,
+  newError,
+  ...userInfo
 }) => {
-  switch(type) {
+  switch (type) {
+    case SET_LOGIN_ERROR:
+      return {
+        ...state,
+        loginError,
+      };
+    case SET_USER_INFO:
+      return {
+        ...state,
+        ...userInfo,
+        schedule,
+        schoolPicture,
+      };
     case SET_CREDENTIALS:
       return {
         ...state,
         username,
-        password
+        password,
+      };
+    case SET_SPECIAL_DATES:
+      return {
+        ...state,
+        specialDates,
       };
     case SET_PROFILE_PHOTO:
       return {
         ...state,
-        profilePhoto
+        profilePhoto,
       };
-    case RECEIVE_USER_INFO:
+    case SET_DAY_INFO:
       return {
         ...state,
-        error,
-        ...(!error ? {
-          name,
-          classOf,
-          homeroom,
-          counselor,
-          dean,
-          id,
-          schedule,
-          schoolPicture
-        } : {})
+        dayInfo: {
+          start: dayStart,
+          end: dayEnd,
+          schedule: daySchedule,
+          lastUpdate: lastDayInfoUpdate,
+          isSummer: dayIsSummer,
+          isBreak: dayIsBreak,
+          hasAssembly: dayHasAssembly,
+          isFinals: dayIsFinals,
+        },
       };
-    case SET_SCHOOL_PICTURE:
+    case SET_SCHEDULE:
       return {
         ...state,
-        schoolPicture
+        schedule,
       };
-    case RECEIVE_DATES:
+    case SET_SETTINGS:
       return {
         ...state,
-        dates
+        settings,
       };
     case SET_REFRESHED:
       return {
         ...state,
-        [`refreshed${semester[0].toUpperCase()}${semester.slice(1)}`]: refreshed
+        refreshedSemesterOne,
+        refreshedSemesterTwo,
       };
-    case SET_LAST_SUMMER:
+    case SET_ERROR_QUEUE:
       return {
         ...state,
-        lastSummerStart
-      }
+        errorQueue,
+      };
+    case ADD_ERROR_TO_QUEUE:
+      return {
+        ...state,
+        errorQueue: [
+          ...state.errorQueue,
+          newError,
+        ],
+      };
     case LOG_OUT:
-      return {
-        ...state,
-        username: ' ',
-        password: ' ',
-        error: '',
-        name: ' ',
-        classOf: ' ',
-        homeroom: ' ',
-        counselor: ' ',
-        dean: ' ',
-        id: ' ',
-        schedule: [],
-        profilePhoto: ' ',
-        refreshedOne: false,
-        refreshedTwo: false,
-        lastSummerStart: null,
-        schoolPicture: ' '
-      };
-    case 'SET_SCHEDULE':
-      return {
-        ...state,
-        schedule
-      }
+      return initialState;
     default:
       return state;
   }
-}
+};
 
-export default whsApp;
+export default WHSApp;

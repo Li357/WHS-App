@@ -1,355 +1,205 @@
-import {
-  Alert,
-  AsyncStorage
-} from 'react-native';
-
-import cheerio from 'react-native-cheerio';
+import { AsyncStorage } from 'react-native';
+import { load } from 'react-native-cheerio';
 import fetch from 'react-native-fetch-polyfill';
+import { mapValues } from 'lodash';
+import moment from 'moment';
 
+import processSchedule from '../util/processSchedule';
+import { getDayInfo } from '../util/querySchedule';
+import { REQUEST_TIMEOUT } from '../constants/constants';
 import {
+  SET_LOGIN_ERROR,
+  SET_USER_INFO,
   SET_CREDENTIALS,
-  RECEIVE_USER_INFO,
   SET_PROFILE_PHOTO,
-  SET_SCHOOL_PICTURE,
-  RECEIVE_DATES,
+  SET_SPECIAL_DATES,
+  SET_DAY_INFO,
+  SET_SCHEDULE,
+  SET_SETTINGS,
   SET_REFRESHED,
-  SET_LAST_SUMMER,
-  LOG_OUT
-} from './actions.js';
+  SET_ERROR_QUEUE,
+  ADD_ERROR_TO_QUEUE,
+  LOG_OUT,
+} from './actions';
 
-const setCredentials = (username, password) => ({
-  type: SET_CREDENTIALS,
-  username,
-  password
+const createActionCreator = (type, ...argNames) => (...args) => ({
+  type,
+  ...argNames.reduce((argObj, argName, index) => ({
+    ...argObj,
+    [argName]: args[index],
+  }), {}),
 });
 
-const receiveUserInfo = (error, name, classOf, homeroom, counselor, dean, id, schedule, schoolPicture) => ({
-  type: RECEIVE_USER_INFO,
-  error,
-  name,
-  classOf,
-  homeroom,
-  counselor,
-  dean,
-  id,
-  schedule,
-  schoolPicture
-});
+// Login error represents a credential mismatch, not an internal error
+const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
+const setUserInfo = createActionCreator(
+  SET_USER_INFO,
+  'name', 'classOf', 'homeroom', 'counselor', 'dean', 'id', 'schedule', 'schoolPicture', 'isTeacher',
+);
+const setCredentials = createActionCreator(
+  SET_CREDENTIALS,
+  'username', 'password',
+);
+const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
+const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
+const setDayInfo = createActionCreator(
+  SET_DAY_INFO,
+  'dayStart', 'dayEnd', 'daySchedule', 'lastDayInfoUpdate',
+  'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsFinals',
+);
+const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
+const setSettings = createActionCreator(SET_SETTINGS, 'settings');
+const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
+const addErrorToQueue = createActionCreator(ADD_ERROR_TO_QUEUE, 'newError');
+const setErrorQueue = createActionCreator(SET_ERROR_QUEUE, 'errorQueue');
+const logOut = createActionCreator(LOG_OUT);
 
-const setProfilePhoto = profilePhoto => ({
-  type: SET_PROFILE_PHOTO,
-  profilePhoto
-});
+/**
+ * Function returns false on failed login
+ * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
+ * different from the client-side XMLHttpRequest
+ */
+const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
+  async (dispatch, getState) => {
+    const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
-const receiveDates = dates => ({
-  type: RECEIVE_DATES,
-  dates
-});
+    // First request clears the user from previous signin
+    await fetch(loginURL, {
+      method: 'POST',
+      timeout: REQUEST_TIMEOUT,
+    });
 
-const logOut = () => ({
-  type: LOG_OUT
-});
+    const userpageResponse = await fetch(loginURL, {
+      method: 'POST',
+      timeout: REQUEST_TIMEOUT,
+    });
+    const userpageHTML = await userpageResponse.text();
 
-const setSchoolPicture = schoolPicture => ({
-  type: SET_SCHOOL_PICTURE,
-  schoolPicture
-});
-
-const setRefreshed = (semester, refreshed) => ({
-  type: SET_REFRESHED,
-  semester,
-  refreshed
-});
-
-const setLastSummer = lastSummerStart => ({
-  type: SET_LAST_SUMMER,
-  lastSummerStart
-});
-
-const saveProfilePhoto = (username, profilePhoto) => async dispatch => {
-  dispatch(setProfilePhoto(profilePhoto));
-  try {
-    await AsyncStorage.setItem(`${username}:profilePhoto`, profilePhoto);
-  } catch(error) {
-    Alert.alert(
-      'Error',
-      `An error occurred: ${error}`,
-      [
-        { text: 'OK' }
-      ]
-    );
-  }
-};
-
-const fetchUserInfo = (username, password, refresh, hasProfilePhoto) => async dispatch => {
-  try {
-    await fetch( //This is needed to clear the current user
-      `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
-      {
-        method: 'POST',
-        timeout: 6000
-      }
-    );
-    const user = await fetch(
-      `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`,
-      {
-        method: 'POST',
-        timeout: 6000
-      }
-    );
-    const userHTML = await user.text();
-
-    const $ = cheerio.load(userHTML);
+    const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
     const name = $('title').text().split('|')[0].trim();
-    if(error) {
-      dispatch(receiveUserInfo(error));
-    } else if(name === 'Login') { //Not sure this will happen but always good to prepare
-      const logout = () => {
-        dispatch(logOut());
-        navigate('Login');
-      }
 
-      Alert.alert(
-        'Error',
-        `An error occurred while logging in. ${refresh ? 'Your username and/or password may have changed.' : ''} Please try again.`,
-        [
-          {
-            text: 'OK',
-            onPress: logout
-          }
-        ]
-      );
-      dispatch(receiveUserInfo(' '));
-    } else {
-      dispatch(setCredentials(username, password));
-
-      const studentOverview = $('.card-header + .card-block');
-      const children = studentOverview.children('p.card-subtitle:not(.text-muted)');
-      const rawJSON = $('.page-content + script')[0].children[0].data.trim();
-      const id = studentOverview.children().eq(13).text().slice(15);
-      const schedule = JSON.parse(rawJSON.slice(24, -2)).schedule;
-      const studentPicture = $('.profile-picture')[0].attribs.style.slice(22, -2);
-
-      const classOf = $('.header-title > h6').text();
-
-      let mentors = [
-        children.eq(0).text().trim(), //Fixes weird bug on Android
-        children.eq(1).text().trim(),
-        children.eq(2).text().trim()
-      ];
-      if(classOf === 'Teacher') {
-        mentors = [null, null, null];
-      }
-
-      const values = [
-        name,
-        $('.header-title > h6').text(),
-        ...mentors,
-        id,
-        schedule,
-        studentPicture
-      ];
-
-      dispatch(receiveUserInfo('', ...values));
-
-      const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
-      dispatch(setProfilePhoto(profilePhoto ? profilePhoto : studentPicture));
-    }
-  } catch(error) {
-    Alert.alert(
-      'Error',
-      'An error occurred, please check your internet connection.',
-      [
-        { text: 'OK' }
-      ]
-    );
-    dispatch(receiveUserInfo(' '));
-  }
-};
-
-const fetchDates = refresh => async dispatch => {
-  try {
-    const now = new Date();
-    const fullYear = now.getFullYear();
-    const year = fullYear - (now.getMonth() + 1 < 8) + Boolean(refresh);
-    const reasons = [
-        'NO SCHOOL',
-        'LATE START',
-        'NO SCHOOL (PROFESSIONAL DEVELOPMENT)',
-        'FIRST DAY OF SCHOOL',
-        'LAST DAY OF SCHOOL'
-    ];
-    const dates = [];
-
-    for(const month of Array.from(new Array(12), (_, i) => i + 1)) {
-      const paddedMonth = `${month > 9 ? '' : '0'}${month}`;
-      const modifiedYear = year + (month < 8);
-
-      const calendar = await fetch(
-        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_pq4vhhqt81f6no85undm0pr22k%40group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`,
-        { timeout: 7000 }
-      );
-      const calendarHTML = await calendar.text();
-
-      const whsCalendar = await fetch(
-        `https://calendar.google.com/calendar/htmlembed?src=westside66.net_qsgj2c0p7acid5c9t7dhe1q100@group.calendar.google.com&ctz=America/Chicago&dates=${modifiedYear}${paddedMonth}01/${modifiedYear}${paddedMonth}28`,
-        { timeout: 7000 }
-      );
-      const whsCalendarHTML = await whsCalendar.text();
-
-      [calendarHTML, whsCalendarHTML].forEach(html => {
-        const $ = cheerio.load(html);
-        $('.tbg').each(function() {
-          const eventText = $(this).find('span').text();
-          if(reasons.includes(eventText.toUpperCase()) || reasons.some(reason => eventText.toUpperCase().includes(reason)) && html === whsCalendarHTML) {
-            const td = $(this).parent().parent();
-            let extraSpans = 0; //# of extra colSpans in previous tds in each calendar row
-            td.prevAll().each(function() {
-                const colSpan = $(this)[0].attribs.colspan || 1;
-                extraSpans += colSpan - 1
-            });
-            const index = td.index() + extraSpans;
-            const datelines = td.parent().prevAll().not('.grid-row').not('col');
-            const closestTr = datelines.first(); //the closest tr to the current element has the day
-
-            const day = +closestTr.children().eq(index).text();
-            if(!(day < 7 && datelines.length > 5)) {
-              const obj = {
-                month,
-                day,
-                year: modifiedYear,
-                first: false,
-                second: false,
-                last: false,
-                late: false,
-                assembly: false,
-                finals: false,
-                early: false
-              };
-              if(eventText.toUpperCase() === reasons[3]) {
-                obj.first = true;
-                dates.push(obj);
-              } else if(eventText.toUpperCase() === reasons[4]) {
-                [1, 0].forEach(extraDay => {
-                  dates.push({
-                    ...obj,
-                    finals: true,
-                    day: day - extraDay,
-                    last: extraDay === 0
-                  });
-                });
-              } else if(eventText.toUpperCase().includes(reasons[1])) {
-                obj.late = true;
-                dates.push(obj);
-              } else {
-                if(month === 12 && day > 14) {
-                  [1, 0].forEach(extraDay => {
-                    dates.push({
-                      ...obj,
-                      finals: true,
-                      day: day - (3 + extraDay)
-                    });
-                  });
-                }
-
-                Array.from(new Array(+td.toArray()[0].attribs.colspan || 1), (_, i) => i + 1).forEach(extraDay => {
-                  dates.push({
-                    ...obj,
-                    day: day + extraDay - 1
-                  });
-                });
-              }
-            }
-          }
-        });
-      });
+    if (error !== '') { // If error exists
+      dispatch(setLoginError(true));
+      return false;
     }
 
-    let pass = false; //only want check to run once
-    const withSecondSemester = dates.reduce((newArray, { //find date of second semester start
-      year,
-      month,
-      day
-    }, index) => {
-      if(month === 1) { //Second semester is in January
-        if(dates[index + 1] && dates[index + 1].day !== day + 1 && new Date(year, month - 1, day + 1).getDay() === 6 && !pass) { //if not consecutive and next day isn't weekend
-          pass = true;
-          return [
-            ...newArray,
-            dates[index],
-            {
-              month,
-              day: day + 3, //Skip weekend
-              year,
-              first: false,
-              second: true,
-              last: false
-            }
-          ];
-        }
-      }
-      return [
-        ...newArray,
-        dates[index]
-      ];
-    }, []);
+    const jsonPrefix = 'window._pageDataJson = \'';
+    const profilePhotoPrefix = 'background-image: url(';
 
-    dispatch(receiveDates(withSecondSemester));
-  } catch(error) {
-    Alert.alert(
-      'Error',
-      `An error occurred, please check your internet connection.`,
-      [
-        { text: 'OK' }
-      ]
-    );
+    // This is either 'Class of 20XX' or 'Teacher'
+    const nameSubtitle = $('.header-title > h6').text();
+    const infoCard = $('.card-header + .card-block');
+    const scheduleString = $('.page-content + script').contents()[0].data.trim();
+    const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
+    const studentPicture = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
+
+    // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
+    const isTeacher = nameSubtitle === 'Teacher';
+    const studentInfo = !isTeacher
+      ? infoCard
+        .find('.card-subtitle a, .card-text:last-child')
+        .contents()
+        .map((index, { data }) => data.split(':').slice(-1)[0].trim())
+      : [null, null, null];
+
+    /**
+     *  Do all heavy lifting before setting credentials in case user interrupts user info fetching
+     *  so they're technically not logged in and refetch can happen as necessary
+     */
+
+    const processedSchedule = processSchedule(schedule);
+
+    // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
+    const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
+    dispatch(setProfilePhoto(profilePhoto || studentPicture));
+    // Directly call fetchSpecialDates here for setDaySchedule
+    await dispatch(fetchSpecialDates());
+
+    const {
+      specialDates,
+      specialDates: { semesterOneStart, semesterTwoStart, lastDay },
+    } = getState();
+    const date = moment();
+
+    // Set day info in user info fetch
+    dispatch(setDayInfo(...getDayInfo(specialDates, date)));
+    /* eslint-disable function-paren-newline */
+    dispatch(setUserInfo(
+      name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,
+    ));
+    /* eslint-enable function-paren-newline */
+
+    if (date.isSameOrAfter(semesterTwoStart, 'day') && date.isSameOrBefore(lastDay, 'day')) {
+      dispatch(setRefreshed(true, true));
+    } else if (
+      (date.isSameOrAfter(semesterOneStart, 'day') && date.isSameOrBefore(semesterTwoStart, 'day'))
+      || beforeStartRefresh
+    ) {
+      dispatch(setRefreshed(true, false));
+    }
+    dispatch(setCredentials(username, password));
+
+    return true;
   }
+);
+
+const toMoment = date => moment(date, 'MMMM D YYYY');
+const mapValuesToMoment = json => (
+  mapValues(json, value => (
+    Array.isArray(value) ? value.map(toMoment) : toMoment(value)
+  ))
+);
+// Function returns false on failed fetch of dates
+const fetchSpecialDates = () => async (dispatch) => {
+  // Connect to express server which gets school calendar PDF
+  const specialDatesResponse = await fetch(
+    'https://whs-server.herokuapp.com/specialDates',
+    { timeout: REQUEST_TIMEOUT },
+  );
+  if (specialDatesResponse.ok) {
+    const json = await specialDatesResponse.json();
+    dispatch(setSpecialDates(mapValuesToMoment(json)));
+    return true;
+  }
+  return false;
 };
 
-const fetchSpecialDates = () => async (dispatch, getState) => {
-  try {
-    const { dates } = getState();
-
-    const specDates = await fetch(`https://whs-server.herokuapp.com/dates`, { timeout: 3000 });
-    const specJSON = await specDates.json();
-
-    const fetched = specJSON.filter(({
-      month,
-      day,
-      year
-    }) => !dates.find(({
-      month: dMonth,
-      day: dDay,
-      year: dYear
-    }) => month == dMonth && day == dDay && year == dYear));
-
-    await dispatch(receiveDates([
-      ...dates,
-      ...fetched
-    ]));
-  } catch(error) {
-    Alert.alert(
-      'Error',
-      'An error occurred, please check your internet connection.',
-      [
-        { text: 'OK' }
-      ]
-    );
+const fetchOtherDates = () => async (dispatch, getState) => {
+  const otherDatesResponse = await fetch(
+    'https://whs-server.herokuapp.com/otherDates',
+    { timeout: REQUEST_TIMEOUT / 6 },
+  );
+  if (otherDatesResponse.ok) {
+    const json = await otherDatesResponse.json();
+    const { specialDates } = getState();
+    dispatch(setSpecialDates({
+      ...specialDates,
+      ...mapValuesToMoment(json),
+    }));
+    return true;
   }
-}
+  return false;
+};
+
+const postErrors = errors => async (dispatch) => {
+  const response = await fetch(
+    'https://whs-server.herokuapp.com/errors',
+    {
+      timeout: REQUEST_TIMEOUT,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ errors }),
+    },
+  );
+  dispatch(setErrorQueue([]));
+  return response.ok;
+};
 
 export {
-  setCredentials,
-  receiveUserInfo,
-  setProfilePhoto,
-  setSchoolPicture,
-  setRefreshed,
-  setLastSummer,
+  setUserInfo, setProfilePhoto, setSchedule,
+  setDayInfo, setRefreshed,
+  setSettings, setErrorQueue, addErrorToQueue,
+  fetchUserInfo, fetchSpecialDates, fetchOtherDates, postErrors,
   logOut,
-  saveProfilePhoto,
-  fetchUserInfo,
-  receiveDates,
-  fetchDates,
-  fetchSpecialDates
 };

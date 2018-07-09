@@ -1,56 +1,60 @@
 # WHS
 
-
-
 A schedule & mod information app for [WHS](http://whs.westside66.org/). Created
-with [Expo](https://expo.io/)/[CRNA](https://github.com/react-community/create-react-native-app)
-& [React Native](https://facebook.github.io/react-native/) by Andrew Li. This has
-been ejected. © 2018 Andrew Li, MIT License.
+with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2018 Andrew Li, MIT License.
 
-# Known Bugs
+## v2.0.0
 
-- react-native-blur does not work correctly on Android. Not using on Android currently
+Complete rewrite and redesign with NativeBase. Getting rid of CodePush for app version uniformity.
+Making the app less crappy and bug prone, with linting and  testing (I hope). Less sloppy code.
 
-# To Do List
+### Rewrite Roadmap:
 
-This is the list of everything I want to get done in the app:
+Next up:
+- [x] Handle different types of dates (need to manually add in meantime)
+  - [x] Test no-overlap on assembly dates
+  - [x] Test overlap on assembly dates
+  - [x] Test cross sectioned overlap on assembly dates
+  - [x] Test finals display on ScheduleCard and Dashboard
+    - [x] For last day of finals, start at mod 5 on Dashboard
+  - [x] Test early dismissal dates
+  - [x] Test late start dates
+- [x] Fix bug to handle multiple cross sections per day
+- [x] Decode encoded JSON (i.e. \\u0026)
 
-- [x] Login screen
-- [x] Logout
-- [x] Current mod
-- [x] Next class
-- [x] Mod & day timers
-- [x] Schedule viewer
-- [x] Handle cross-sectioned mods
-- [x] Handle late-start/early dismissals
-- [x] Handle holidays/breaks
-- [x] Handle end of the school year & summer
-- [x] Upload profile photo
-- [x] Auto-refresh on student details/schedule
-- [x] Redux rewrite for better performance
-- [x] Finish Android startup screens & icons
-- [ ] Notification system for mod ends
-
-Currently pending (definitely implemented soon):
-
-- [x] Querying of school calendar to get days off, auto-refresh
-- [ ] Adding notification system of next class at mod end
-- [x] Add cross-section warning on dashboard
-
-Auto-refresh depends on the fact *the school calendar updates for the next year by the end of the year!*
-
-If your username or password changes, you will still be able to see your information.
-This is because all your information is stored when you first sign in. It's recommended
-that you sign out if your credentials have changed. Auto-refresh will not work if your
-credentials change.
-
-Bug wise:
-
-- [x] Fix the hamburger menu problem with state and double clicking
-- [x] Update from react-native-swiper to an Android-compatible library
-- [ ] Wait for update on react-native-blur so that the BlurView is rendered with Image, not after
-
-Here are some app-OS goals:
-
-- [x] iOS Version
-- [x] Android Version
+- [x] Update dependencies and React/React Native
+- [ ] Consistent code and linting
+  - [x] Refactor components and screens for less file congestion and more reuse
+  - [x] Better error handling for server request exceptions
+  - [x] Better error reporting for AsyncStorage accesses
+  - [ ] Consistent typing and explicit code
+  - [x] Consistent actions and action creators
+  - [x] Use ESLint
+- [ ] Unit testing with Jest
+  - [ ] Login system
+  - [ ] Dashboard date handling/operations
+  - [ ] Schedule display of cross-sectioned mods and other irregularities
+- [x] Redo refreshing system
+- [x] UI Redesign with Native Base
+  - [ ] Login
+    - [x] Native Base inputs and buttons
+    - [x] Vector icon for loading animation
+    - [x] Better UI for login failure
+    - [x] Keyboard avoiding view for all phone sizes
+  - [x] Dashboard
+    - [x] Parallax scroll view
+    - [x] Upload own photo
+    - [x] Option to reset to school photo
+    - [x] Display cross-sectioned warning
+  - [x] Schedule
+    - [x] Preprocess data in action creators before rendering in Schedule to reduce lag
+    - [x] Wait for drawer animation to finish to reduce choppiness
+    - [x] Vertical progress bar to signify relative position in day
+    - [x] Better approach to showing time tables for mods
+    - [x] Display cross-sectioned mods
+  - [x] Settings
+    - [x] Make manual refresh more prominent and user friendly
+  - [x] Drawer
+    - [x] Banner to show current date for better look
+    - [x] Icons for different screens (and tint colors)
+    - [x] Logout span full width with same style as screens
