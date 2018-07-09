@@ -23,11 +23,10 @@ Next up:
 - [x] Decode encoded JSON (i.e. \\u0026)
 
 - [x] Update dependencies and React/React Native
-- [ ] Consistent code and linting
+- [x] Consistent code and linting
   - [x] Refactor components and screens for less file congestion and more reuse
   - [x] Better error handling for server request exceptions
   - [x] Better error reporting for AsyncStorage accesses
-  - [ ] Consistent typing and explicit code
   - [x] Consistent actions and action creators
   - [x] Use ESLint
 - [ ] Unit testing with Jest
@@ -36,7 +35,7 @@ Next up:
   - [ ] Schedule display of cross-sectioned mods and other irregularities
 - [x] Redo refreshing system
 - [x] UI Redesign with Native Base
-  - [ ] Login
+  - [x] Login
     - [x] Native Base inputs and buttons
     - [x] Vector icon for loading animation
     - [x] Better UI for login failure
