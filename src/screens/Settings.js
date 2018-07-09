@@ -11,10 +11,8 @@ import withHamburger from '../util/withHamburger';
 import reportError from '../util/reportError';
 import { fetchUserInfo, setSettings } from '../actions/actionCreators';
 
-const mapStateToProps = ({
-  username, password, settings,
-}, ownProps) => ({
-  username, password, settings, ...ownProps,
+const mapStateToProps = (state, ownProps) => ({
+  ...state, ...ownProps,
 });
 
 @waitForAnimation
@@ -60,11 +58,10 @@ export default class Settings extends Component {
         );
       }
     } catch (error) {
-      const { settings: { errorReporting } } = this.props;
+      const { dispatch, settings: { errorReporting } } = this.props;
       reportError(
         'Something went wrong while refreshing. Please check your internet connection.',
-        error,
-        errorReporting,
+        error, errorReporting, dispatch, this.props,
       );
     }
 

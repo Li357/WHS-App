@@ -6,8 +6,9 @@ import moment from 'moment';
  */
 const format = ms => moment.duration(Math.abs(ms)).format('h:*mm:ss');
 
+/* eslint-disable function-paren-newline */
 const getDuringModInfo = (
-  currentMod, { title, body, ...item }, untilModEnd, untilDayEnd, isHalfMod
+  currentMod, { title, body, ...item }, untilModEnd, untilDayEnd, isHalfMod,
 ) => [
   {
     title: `Current${isHalfMod ? ' half' : ''} mod`,
@@ -29,7 +30,7 @@ const getDuringModInfo = (
   },
 ];
 
-/* eslint-disable function-paren-newline */
+
 const getDuringPassingPeriodInfo = (
   nextMod, { title, body, ...item }, untilPassingPeriodEnd, untilDayEnd, isNextHalfMod,
 ) => [

@@ -50,7 +50,7 @@ const getCurrentMod = ({
  * as it is inclusive
  */
 const findClassWithMod = ({ occupiedMods, ...item }, currentMod) => (
-  ((occupiedMods && occupiedMods.slice(0, -1))  || getMods(item)).includes(currentMod)
+  ((occupiedMods && occupiedMods.slice(0, -1)) || getMods(item)).includes(currentMod)
 );
 
 /**
@@ -152,14 +152,16 @@ const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
  * the day info, if it's Summer or a break
  */
 const getDayInfo = (specialDates, date) => {
-  const { semesterOneStart, lastDay, noSchoolDates } = specialDates;
+  const {
+    semesterOneStart, lastDay, noSchoolDates, otherNoSchoolDates,
+  } = specialDates;
   const { schedule, isFinals, hasAssembly } = selectSchedule(specialDates, date);
   const range = [
     schedule[0][0],
     schedule.slice(-1)[0][1],
   ].map(time => moment(`${time}:00`, 'k:mm:ss'));
 
-  const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
+  const isBreak = [...noSchoolDates, ...otherNoSchoolDates].some(day => day.isSame(date, 'day'));
   /**
    * This check either checks if it is after the last day, because around two months after
    * last day, dates are refreshed and lastDay is next year, so then can check if date is before

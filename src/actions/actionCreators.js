@@ -17,6 +17,8 @@ import {
   SET_SCHEDULE,
   SET_SETTINGS,
   SET_REFRESHED,
+  SET_ERROR_QUEUE,
+  ADD_ERROR_TO_QUEUE,
   LOG_OUT,
 } from './actions';
 
@@ -48,6 +50,8 @@ const setDayInfo = createActionCreator(
 const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
 const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
+const addErrorToQueue = createActionCreator(ADD_ERROR_TO_QUEUE, 'newError');
+const setErrorQueue = createActionCreator(SET_ERROR_QUEUE, 'errorQueue');
 const logOut = createActionCreator(LOG_OUT);
 
 /**
@@ -110,7 +114,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || studentPicture));
     // Directly call fetchSpecialDates here for setDaySchedule
-    await fetchSpecialDates()(dispatch);
+    await dispatch(fetchSpecialDates());
 
     const {
       specialDates,
@@ -140,6 +144,12 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
   }
 );
 
+const toMoment = date => moment(date, 'MMMM D YYYY');
+const mapValuesToMoment = json => (
+  mapValues(json, value => (
+    Array.isArray(value) ? value.map(toMoment) : toMoment(value)
+  ))
+);
 // Function returns false on failed fetch of dates
 const fetchSpecialDates = () => async (dispatch) => {
   // Connect to express server which gets school calendar PDF
@@ -149,23 +159,47 @@ const fetchSpecialDates = () => async (dispatch) => {
   );
   if (specialDatesResponse.ok) {
     const json = await specialDatesResponse.json();
-    const toMoment = date => moment(date, 'MMMM D YYYY');
-    dispatch(setSpecialDates(mapValues(json, value => (
-      Array.isArray(value) ? value.map(toMoment) : toMoment(value)
-    ))));
+    dispatch(setSpecialDates(mapValuesToMoment(json)));
     return true;
   }
   return false;
 };
 
+const fetchOtherDates = () => async (dispatch, getState) => {
+  const otherDatesResponse = await fetch(
+    'https://whs-server.herokuapp.com/otherDates',
+    { timeout: REQUEST_TIMEOUT / 6 },
+  );
+  if (otherDatesResponse.ok) {
+    const json = await otherDatesResponse.json();
+    const { specialDates } = getState();
+    dispatch(setSpecialDates({
+      ...specialDates,
+      ...mapValuesToMoment(json),
+    }));
+    return true;
+  }
+  return false;
+};
+
+const postErrors = errors => async (dispatch) => {
+  const response = await fetch(
+    'https://whs-server.herokuapp.com/errors',
+    {
+      timeout: REQUEST_TIMEOUT,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ errors }),
+    },
+  );
+  dispatch(setErrorQueue([]));
+  return response.ok;
+};
+
 export {
-  setUserInfo,
-  setProfilePhoto,
-  setDayInfo,
-  setSchedule,
-  setSettings,
-  setRefreshed,
+  setUserInfo, setProfilePhoto, setSchedule,
+  setDayInfo, setRefreshed,
+  setSettings, setErrorQueue, addErrorToQueue,
+  fetchUserInfo, fetchSpecialDates, fetchOtherDates, postErrors,
   logOut,
-  fetchUserInfo,
-  fetchSpecialDates,
 };

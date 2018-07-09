@@ -17,8 +17,8 @@ Next up:
   - [x] Test cross sectioned overlap on assembly dates
   - [x] Test finals display on ScheduleCard and Dashboard
     - [x] For last day of finals, start at mod 5 on Dashboard
-  - [ ] Test early dismissal dates
-  - [ ] Test late start dates
+  - [x] Test early dismissal dates
+  - [x] Test late start dates
 - [x] Fix bug to handle multiple cross sections per day
 - [x] Decode encoded JSON (i.e. \\u0026)
 

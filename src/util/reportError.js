@@ -1,12 +1,22 @@
 import { Alert } from 'react-native';
 
-const reportError = (message, error, shouldReportError) => {
-  console.log(error);
+import { addErrorToQueue } from '../actions/actionCreators';
+
+const reportError = (msg, { name, message }, shouldReportError, dispatch, state) => {
   if (shouldReportError) {
-    // TODO: Post error to database
+    // Filter out unnecessary parts of state for reporting
+    const {
+      username, password, navigation, dispatch: d, ...currentState
+    } = state;
+
+    dispatch(addErrorToQueue({
+      timestamp: new Date(),
+      currentState,
+      error: `${name} ${message}`,
+    }));
   }
   Alert.alert(
-    'Error', `${message}`,
+    'Error', `${msg}`,
     [{ text: 'OK' }],
   );
 };

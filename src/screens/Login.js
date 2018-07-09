@@ -13,9 +13,7 @@ import { fetchUserInfo } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
-const mapStateToProps = ({ loginError, settings }) => ({ loginError, settings });
-
-@connect(mapStateToProps)
+@connect()
 export default class Login extends PureComponent {
   state = {
     username: '',
@@ -55,11 +53,10 @@ export default class Login extends PureComponent {
         return;
       }
     } catch (error) {
-      const { settings: { errorReporting } } = this.props;
+      const { dispatch, settings: { errorReporting } } = this.props;
       reportError(
         'Something went wrong while logging in. Please check your internet connection.',
-        error,
-        errorReporting,
+        error, errorReporting, dispatch, this.props,
       );
     }
 

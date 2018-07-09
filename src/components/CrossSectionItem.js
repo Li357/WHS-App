@@ -18,7 +18,7 @@ const CrossSectionItem = ({
   const scheduleItemHeight = sum(modHeights);
 
   // Array of 2s and 1s signifying the flex ratios of each mod number
-  const scheduleItemFlexRatios = exclusiveMods.map(mod => isHalfMod(mod) ? 1 : 2);
+  const scheduleItemFlexRatios = exclusiveMods.map(mod => (isHalfMod(mod) ? 1 : 2));
 
   return (
     <CardItem bordered style={[styles.item, { height: scheduleItemHeight }]}>
@@ -69,7 +69,11 @@ const CrossSectionItem = ({
                   ));
                   const wholeFlex = sum(flexRatios.slice(0, ratio + length + 1));
                   const modItemFlex = sum(flexRatios.slice(0, length + 1));
-                  const prefixFlex = sum(scheduleItemFlexRatios.slice(0, startMod - occupiedMods[0]));
+                  /* eslint-disable function-paren-newline */
+                  const prefixFlex = sum(
+                    scheduleItemFlexRatios.slice(0, startMod - occupiedMods[0]),
+                  );
+                  /* eslint-enable function-paren-newline */
 
                   return (
                     <View key={sourceId} style={{ flex: wholeFlex }}>
@@ -79,11 +83,13 @@ const CrossSectionItem = ({
                          * beginning of cross sectioned block
                          */
                         !prevItem && startMod !== occupiedMods[0] &&
-                          <View style={[styles.empty, {
-                            flex: prefixFlex,
-                            borderBottomWidth: 1,
-                            borderBottomColor: 'lightgrey',
-                          }]} />
+                          <View
+                            style={[styles.empty, {
+                              flex: prefixFlex,
+                              borderBottomWidth: 1,
+                              borderBottomColor: 'lightgrey',
+                            }]}
+                          />
                       }
                       <View style={[styles.modItem, { flex: modItemFlex }]}>
                         <Text style={styles.titleText}>{decodeUnicode(title)}</Text>

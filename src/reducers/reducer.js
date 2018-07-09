@@ -8,6 +8,8 @@ import {
   SET_DAY_INFO,
   SET_SETTINGS,
   SET_REFRESHED,
+  SET_ERROR_QUEUE,
+  ADD_ERROR_TO_QUEUE,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -40,10 +42,12 @@ const initialState = {
     semesterTwoStart: null,
     lastDay: null,
     noSchoolDates: [],
+    otherNoSchoolDates: [],
   },
   settings: { errorReporting: true },
   refreshedSemesterOne: false,
   refreshedSemesterTwo: false,
+  errorQueue: [],
 };
 
 const WHSApp = (state = initialState, {
@@ -66,6 +70,8 @@ const WHSApp = (state = initialState, {
   settings,
   refreshedSemesterOne,
   refreshedSemesterTwo,
+  errorQueue,
+  newError,
   ...userInfo
 }) => {
   switch (type) {
@@ -126,6 +132,19 @@ const WHSApp = (state = initialState, {
         ...state,
         refreshedSemesterOne,
         refreshedSemesterTwo,
+      };
+    case SET_ERROR_QUEUE:
+      return {
+        ...state,
+        errorQueue,
+      };
+    case ADD_ERROR_TO_QUEUE:
+      return {
+        ...state,
+        errorQueue: [
+          ...state.errorQueue,
+          newError,
+        ],
       };
     case LOG_OUT:
       return initialState;

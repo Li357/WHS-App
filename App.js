@@ -20,6 +20,8 @@ import Settings from './src/screens/Settings';
 import DrawerContent from './src/components/DrawerContent';
 import {
   fetchUserInfo,
+  fetchOtherDates,
+  postErrors,
   setRefreshed,
   setProfilePhoto,
   setDayInfo,
@@ -67,7 +69,7 @@ const store = createStore(
   persistedReducer,
   applyMiddleware(
     thunk,
-    //createLogger(),
+    createLogger(),
   ),
 );
 const persistor = persistStore(store);
@@ -88,7 +90,7 @@ export default class App extends Component {
     AppState.removeEventListener('change', this.handleAppStateChange);
   }
 
-  handleAppStateChange = (newStatus) => {
+  handleAppStateChange = async (newStatus) => {
     /**
      * This handler handles the case where the user does not quit the app but has it in the
      * background, in which case the app does some updates when they refocus the app
@@ -102,11 +104,12 @@ export default class App extends Component {
       && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
     ) {
       this.updateDayInfo(now); // Pass already created instance
+      await this.silentlyFetchOtherDates();
     }
   }
 
   handleRehydrate = async () => {
-    const { dayInfo } = store.getState();
+    const { dayInfo, errorQueue } = store.getState();
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
     if (typeof dayInfo === 'undefined') {
       // Log out and reset store on update to v2 if the user is previous v1.x user
@@ -125,6 +128,7 @@ export default class App extends Component {
         ) {
           this.updateDayInfo(now);
         }
+        await this.silentlyFetchOtherDates();
 
         const {
           specialDates: { semesterOneStart, semesterTwoStart, lastDay },
@@ -163,13 +167,15 @@ export default class App extends Component {
         const { settings: { errorReporting } } = store.getState();
         reportError(
           'Something went wrong reloading your information. Please try restarting the app.',
-          error,
-          errorReporting,
+          error, errorReporting, store.dispatch, store.getState(),
         );
         return;
       }
     }
     this.setState({ loaded: true });
+
+    // No await here - do not need to wait for error reporting to finish before rendering
+    store.dispatch(postErrors(errorQueue));
   }
 
   updateDayInfo = (date = moment()) => {
@@ -186,6 +192,15 @@ export default class App extends Component {
     const { username, schoolPicture } = store.getState();
     const profilePhoto = await storage.getItem(`${username}:profilePhoto`);
     store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
+  }
+
+  silentlyFetchOtherDates = async () => {
+    // We want to update dates every single app open, no need to report error if no internet
+    try {
+      await store.dispatch(fetchOtherDates());
+    /* eslint-disable no-empty */
+    } catch (error) {}
+    /* eslint-enable no-empty */
   }
 
   render() {

@@ -11,8 +11,7 @@ import { HEIGHT } from '../constants/constants';
 import background from '../../assets/images/background.png';
 
 const mapStateToProps = (state, ownProps) => ({
-  ...state,
-  ...ownProps,
+  ...state, ...ownProps,
 });
 
 @connect(mapStateToProps)

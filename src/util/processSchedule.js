@@ -50,7 +50,7 @@ const interpolateOpenMods = scheduleItems => (
 
 // Internal function to return an array of scheduleItems between the specified bounds
 const getModsInBetween = (start, end, scheduleItems) => (
-  scheduleItems.filter(item => {
+  scheduleItems.filter((item) => {
     const mods = getMods(item);
     return start <= mods[0] && end >= mods.slice(-1)[0];
   })
@@ -92,11 +92,13 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
 
       if (prevItem && prevItem.endMod < item.startMod) {
         blocks.push([item]);
-        currentBlock++;
+        currentBlock += 1;
         return blocks;
       }
+      /* eslint-disable no-param-reassign */
       blocks[currentBlock] = blocks[currentBlock] || [];
       blocks[currentBlock].push(item);
+      /* eslint-enable no-param-reassign */
       return blocks;
     }, []);
 
@@ -114,8 +116,10 @@ const interpolateCrossSectionedMods = (scheduleItems) => {
         ));
 
         if (availableColumn > -1) { // If there is an available column
+          /* eslint-disable no-param-reassign */
           grouped[availableColumn] = grouped[availableColumn] || [];
           grouped[availableColumn].push(item);
+          /* eslint-enable no-param-reassign */
           return grouped;
         }
         // If not, start a new column
