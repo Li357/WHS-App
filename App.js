@@ -21,15 +21,13 @@ import DrawerContent from './src/components/DrawerContent';
 import {
   fetchUserInfo,
   fetchOtherDates,
-  postErrors,
   setRefreshed,
   setProfilePhoto,
   setDayInfo,
-  setSchedule,
   logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
-import reportError from './src/util/reportError';
+import { reportError } from './src/util/misc';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -62,12 +60,14 @@ const persistConfig = {
   transforms: [transformMoments],
 };
 const persistedReducer = persistReducer(persistConfig, WHSApp);
+
+let middleware = [thunk];
+if (process.env.NODE_ENV === 'development') {
+  middleware = [...middleware, createLogger()]; // Only apply logger middleware in development
+}
 const store = createStore(
   persistedReducer,
-  applyMiddleware(
-    thunk,
-    createLogger(),
-  ),
+  applyMiddleware(...middleware),
 );
 const persistor = persistStore(store);
 
@@ -106,7 +106,7 @@ export default class App extends Component {
   }
 
   handleRehydrate = async () => {
-    const { dayInfo, errorQueue } = store.getState();
+    const { dayInfo } = store.getState();
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
     if (typeof dayInfo === 'undefined') {
       // Log out and reset store on update to v2 if the user is previous v1.x user
@@ -160,18 +160,14 @@ export default class App extends Component {
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {
-        const { settings: { errorReporting } } = store.getState();
         reportError(
           'Something went wrong reloading your information. Please try restarting the app.',
-          error, errorReporting, store.dispatch, store.getState(),
+          error,
         );
         return;
       }
     }
     this.setState({ loaded: true });
-
-    // No await here - do not need to wait for error reporting to finish before rendering
-    store.dispatch(postErrors(errorQueue));
   }
 
   updateDayInfo = (date = moment()) => {

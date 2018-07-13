@@ -5,12 +5,13 @@ with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2
 
 ## v2.0.0
 
-Complete rewrite and redesign with NativeBase. Getting rid of CodePush for app version uniformity.
-Making the app less crappy and bug prone, with linting and  testing (I hope). Less sloppy code.
+Complete rewrite and redesign with NativeBase. Now with linting and better code.
 
 ### Rewrite Roadmap:
 
 Next up:
+- [ ] Integration with [bugsnag](https://docs.bugsnag.com/platforms/react-native/) for better
+      error reporting, more conservative use of CodePush to prevent uneven versioning between users
 - [x] Handle different types of dates (need to manually add in meantime)
   - [x] Test no-overlap on assembly dates
   - [x] Test overlap on assembly dates

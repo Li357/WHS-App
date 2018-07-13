@@ -15,10 +15,7 @@ import {
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
   SET_SCHEDULE,
-  SET_SETTINGS,
   SET_REFRESHED,
-  SET_ERROR_QUEUE,
-  ADD_ERROR_TO_QUEUE,
   LOG_OUT,
 } from './actions';
 
@@ -48,10 +45,7 @@ const setDayInfo = createActionCreator(
   'dayIsSummer', 'dayIsBreak', 'dayHasAssembly', 'dayIsFinals',
 );
 const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
-const setSettings = createActionCreator(SET_SETTINGS, 'settings');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
-const addErrorToQueue = createActionCreator(ADD_ERROR_TO_QUEUE, 'newError');
-const setErrorQueue = createActionCreator(SET_ERROR_QUEUE, 'errorQueue');
 const logOut = createActionCreator(LOG_OUT);
 
 /**
@@ -182,24 +176,9 @@ const fetchOtherDates = () => async (dispatch, getState) => {
   return false;
 };
 
-const postErrors = errors => async (dispatch) => {
-  const response = await fetch(
-    'https://whs-server.herokuapp.com/errors',
-    {
-      timeout: REQUEST_TIMEOUT,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ errors }),
-    },
-  );
-  dispatch(setErrorQueue([]));
-  return response.ok;
-};
-
 export {
   setUserInfo, setProfilePhoto, setSchedule,
   setDayInfo, setRefreshed,
-  setSettings, setErrorQueue, addErrorToQueue,
-  fetchUserInfo, fetchSpecialDates, fetchOtherDates, postErrors,
+  fetchUserInfo, fetchSpecialDates, fetchOtherDates,
   logOut,
 };

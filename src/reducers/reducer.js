@@ -6,10 +6,7 @@ import {
   SET_SPECIAL_DATES,
   SET_SCHEDULE,
   SET_DAY_INFO,
-  SET_SETTINGS,
   SET_REFRESHED,
-  SET_ERROR_QUEUE,
-  ADD_ERROR_TO_QUEUE,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -44,10 +41,8 @@ const initialState = {
     noSchoolDates: [],
     otherNoSchoolDates: [],
   },
-  settings: { errorReporting: true },
   refreshedSemesterOne: false,
   refreshedSemesterTwo: false,
-  errorQueue: [],
 };
 
 const WHSApp = (state = initialState, {
@@ -67,11 +62,8 @@ const WHSApp = (state = initialState, {
   dayIsFinals,
   lastDayInfoUpdate,
   specialDates,
-  settings,
   refreshedSemesterOne,
   refreshedSemesterTwo,
-  errorQueue,
-  newError,
   ...userInfo
 }) => {
   switch (type) {
@@ -122,29 +114,11 @@ const WHSApp = (state = initialState, {
         ...state,
         schedule,
       };
-    case SET_SETTINGS:
-      return {
-        ...state,
-        settings,
-      };
     case SET_REFRESHED:
       return {
         ...state,
         refreshedSemesterOne,
         refreshedSemesterTwo,
-      };
-    case SET_ERROR_QUEUE:
-      return {
-        ...state,
-        errorQueue,
-      };
-    case ADD_ERROR_TO_QUEUE:
-      return {
-        ...state,
-        errorQueue: [
-          ...state.errorQueue,
-          newError,
-        ],
       };
     case LOG_OUT:
       return initialState;

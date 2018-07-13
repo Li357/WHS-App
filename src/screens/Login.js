@@ -8,12 +8,14 @@ import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
-import reportError from '../util/reportError';
+import { reportError, selectProps } from '../util/misc';
 import { fetchUserInfo } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
 
-@connect()
+const mapStateToProps = selectProps('loginError');
+
+@connect(mapStateToProps)
 export default class Login extends PureComponent {
   state = {
     username: '',
@@ -53,10 +55,9 @@ export default class Login extends PureComponent {
         return;
       }
     } catch (error) {
-      const { dispatch, settings: { errorReporting } } = this.props;
       reportError(
         'Something went wrong while logging in. Please check your internet connection.',
-        error, errorReporting, dispatch, this.props,
+        error,
       );
     }
 
@@ -69,10 +70,6 @@ export default class Login extends PureComponent {
         loginAnimDone: false,
       });
     });
-  }
-
-  performLogin = async () => {
-
   }
 
   render() {

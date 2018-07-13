@@ -30,7 +30,7 @@ import {
 } from '../constants/constants';
 
 const mapStateToProps = ({
-  loginError, schedule, dayInfo, ...rest
+  schedule, dayInfo, ...rest
 }, ownProps) => ({
   schedule: processFinalsOrAssembly(schedule, dayInfo.hasAssembly, dayInfo.isFinals),
   dayInfo,
