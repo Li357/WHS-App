@@ -136,6 +136,16 @@ class App extends Component {
   }
 
   componentWillMount() {
+    Alert.alert(
+      'Update',
+      `WHS Scheduler v2 is out, with a new look and many critical bug fixes. WHS v1 is no longer supported,
+      so please update via the App Store or Google Play Store. Use this version at your own risk.`,
+      [
+        // TODO: Add button to take user to app store / google play store
+        { text: 'OK' }
+      ]
+    );
+
     this.persistor = persistStore(store, {
       storage: AsyncStorage,
       blacklist: ['profilePhoto']
