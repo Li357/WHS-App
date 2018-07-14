@@ -294,55 +294,6 @@
 			remoteGlobalIDString = F886647B1F4ADB500036D01B;
 			remoteInfo = "CodePush-tvOS";
 		};
-		B2A6904220F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3DBE0D001F3B181A0099AA32;
-			remoteInfo = fishhook;
-		};
-		B2A6904420F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3DBE0D0D1F3B181C0099AA32;
-			remoteInfo = "fishhook-tvOS";
-		};
-		B2A6905620F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EBF21BDC1FC498900052F4D5;
-			remoteInfo = jsinspector;
-		};
-		B2A6905820F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EBF21BFA1FC4989A0052F4D5;
-			remoteInfo = "jsinspector-tvOS";
-		};
-		B2A6905A20F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9936F3131F5F2E4B0010BF04;
-			remoteInfo = privatedata;
-		};
-		B2A6905C20F31F73001186AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9936F32F1F5F2E5B0010BF04;
-			remoteInfo = "privatedata-tvOS";
-		};
-		B2A7A9811F895B190083CE32 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DB14EEA8F542443FA0CF71BF /* ReactNativePermissions.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
-			remoteInfo = ReactNativePermissions;
-		};
 		B2B0F2CE1F7604E300EBFB1D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 068F220EFD0B418F9FA3D7A0 /* RCTImageResizer.xcodeproj */;
@@ -370,6 +321,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 014A3B5C1C6CF33500B6D375;
 			remoteInfo = RNImagePicker;
+		};
+		B2D5A9B020F974AA00E18EA8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B2D5A9AC20F974AA00E18EA8 /* ReactNativePermissions.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
+			remoteInfo = ReactNativePermissions;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -410,10 +368,10 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8CC4D9141A254A4DBEA8A16F /* RNBlur.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBlur.xcodeproj; path = "../node_modules/react-native-blur/ios/RNBlur.xcodeproj"; sourceTree = "<group>"; };
 		B0EF013461B44CFCB89670CF /* BebasNeueBook.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BebasNeueBook.ttf; path = ../assets/fonts/BebasNeueBook.ttf; sourceTree = "<group>"; };
+		B2D5A9AC20F974AA00E18EA8 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		BF01F711A1BA43FB8C499569 /* libReactNativePermissions.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativePermissions.a; sourceTree = "<group>"; };
 		C08DC46B22B24E3C88BECD6B /* libRNImagePicker.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNImagePicker.a; sourceTree = "<group>"; };
 		CB55DAF860BB4B18B9FB3324 /* Roboto Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto Regular.ttf"; path = "../assets/fonts/Roboto Regular.ttf"; sourceTree = "<group>"; };
-		DB14EEA8F542443FA0CF71BF /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -548,8 +506,6 @@
 			children = (
 				139FDEF41B06529B00C62182 /* libRCTWebSocket.a */,
 				3DAD3E991DF850E9000B6D8A /* libRCTWebSocket-tvOS.a */,
-				B2A6904320F31F73001186AB /* libfishhook.a */,
-				B2A6904520F31F73001186AB /* libfishhook-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -578,14 +534,10 @@
 				3DAD3EAB1DF850E9000B6D8A /* libcxxreact.a */,
 				3DAD3EAD1DF850E9000B6D8A /* libjschelpers.a */,
 				3DAD3EAF1DF850E9000B6D8A /* libjschelpers.a */,
-				B2A6905720F31F73001186AB /* libjsinspector.a */,
-				B2A6905920F31F73001186AB /* libjsinspector-tvOS.a */,
 				B249067E1F6A237500885512 /* libthird-party.a */,
 				B24906801F6A237500885512 /* libthird-party.a */,
 				B24906821F6A237500885512 /* libdouble-conversion.a */,
 				B24906841F6A237500885512 /* libdouble-conversion.a */,
-				B2A6905B20F31F73001186AB /* libprivatedata.a */,
-				B2A6905D20F31F73001186AB /* libprivatedata-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -630,6 +582,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				B2D5A9AC20F974AA00E18EA8 /* ReactNativePermissions.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -645,7 +598,6 @@
 				068F220EFD0B418F9FA3D7A0 /* RCTImageResizer.xcodeproj */,
 				1EAB629F6ACB46F887CA6268 /* RNFS.xcodeproj */,
 				8CC4D9141A254A4DBEA8A16F /* RNBlur.xcodeproj */,
-				DB14EEA8F542443FA0CF71BF /* ReactNativePermissions.xcodeproj */,
 				537DF0518BA14BEE93CF1372 /* CodePush.xcodeproj */,
 			);
 			name = Libraries;
@@ -704,14 +656,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B2A7A9601F895B190083CE32 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B2A7A9821F895B190083CE32 /* libReactNativePermissions.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		B2B0F2C11F7604DF00EBFB1D /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -748,6 +692,14 @@
 				18980AE0D9BF402ABB8F3A92 /* libCodePush.a */,
 			);
 			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		B2D5A9AD20F974AA00E18EA8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B2D5A9B120F974AA00E18EA8 /* libReactNativePermissions.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -917,8 +869,8 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
-					ProductGroup = B2A7A9601F895B190083CE32 /* Products */;
-					ProjectRef = DB14EEA8F542443FA0CF71BF /* ReactNativePermissions.xcodeproj */;
+					ProductGroup = B2D5A9AD20F974AA00E18EA8 /* Products */;
+					ProjectRef = B2D5A9AC20F974AA00E18EA8 /* ReactNativePermissions.xcodeproj */;
 				},
 				{
 					ProductGroup = B2061CAC1F78538F00E4C5D2 /* Products */;
@@ -1175,55 +1127,6 @@
 			remoteRef = B282A5CA1F950E510003FB83 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		B2A6904320F31F73001186AB /* libfishhook.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libfishhook.a;
-			remoteRef = B2A6904220F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A6904520F31F73001186AB /* libfishhook-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libfishhook-tvOS.a";
-			remoteRef = B2A6904420F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A6905720F31F73001186AB /* libjsinspector.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libjsinspector.a;
-			remoteRef = B2A6905620F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A6905920F31F73001186AB /* libjsinspector-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libjsinspector-tvOS.a";
-			remoteRef = B2A6905820F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A6905B20F31F73001186AB /* libprivatedata.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libprivatedata.a;
-			remoteRef = B2A6905A20F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A6905D20F31F73001186AB /* libprivatedata-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libprivatedata-tvOS.a";
-			remoteRef = B2A6905C20F31F73001186AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B2A7A9821F895B190083CE32 /* libReactNativePermissions.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libReactNativePermissions.a;
-			remoteRef = B2A7A9811F895B190083CE32 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		B2B0F2CF1F7604E300EBFB1D /* libRCTImageResizer.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1250,6 +1153,13 @@
 			fileType = archive.ar;
 			path = libRNImagePicker.a;
 			remoteRef = B2B0F2EE1F7604E300EBFB1D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B2D5A9B120F974AA00E18EA8 /* libReactNativePermissions.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactNativePermissions.a;
+			remoteRef = B2D5A9B020F974AA00E18EA8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

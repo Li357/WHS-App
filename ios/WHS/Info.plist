@@ -38,7 +38,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires access to your camera to take pictures.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library.</string>
 	<key>UIAppFonts</key>

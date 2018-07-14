@@ -4,6 +4,7 @@ import {
   AsyncStorage,
   Dimensions,
   Image,
+  Linking,
   Platform,
   ScrollView,
   StatusBar,
@@ -135,13 +136,23 @@ class App extends Component {
     navigate('Login');
   }
 
+  openStore = () => {
+    const url = Platform.select({
+      ios: 'itms://itunes.apple.com/us/app/WHS/id1298249748',
+      android: 'https://play.google.com/store/apps/details?id=com.li357.whs'
+    });
+    console.log(url);
+
+    Linking.openURL(url);
+  }
+
   componentWillMount() {
     Alert.alert(
       'Update',
       `WHS Scheduler v2 is out, with a new look and many critical bug fixes. WHS v1 is no longer supported,
       so please update via the App Store or Google Play Store. Use this version at your own risk.`,
       [
-        // TODO: Add button to take user to app store / google play store
+        { text: 'Update', onPress: this.openStore },
         { text: 'OK' }
       ]
     );
