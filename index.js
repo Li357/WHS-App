@@ -1,6 +1,5 @@
 import { AppRegistry } from 'react-native';
-import App from './App';
-import { YellowBox } from 'react-native';
 
-YellowBox.ignoreWarnings(['Warning', 'Module', 'Required', 'RCTBridge']);
+import App from './App';
+
 AppRegistry.registerComponent('WHS', () => App);

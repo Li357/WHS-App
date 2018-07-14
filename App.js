@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
 import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
-import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { persistStore, persistReducer, createTransform } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 import { PersistGate } from 'redux-persist/integration/react';
-import thunk from 'redux-thunk';
-import { createLogger } from 'redux-logger';
-import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
+import { createSwitchNavigator } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer'; // Using my fork
+import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 import momentDurationFormat from 'moment-duration-format';
 
-import WHSApp from './src/reducers/reducer';
+import { store, persistor, storage } from './src/util/initializeStore';
 import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
@@ -35,47 +32,17 @@ moment.updateLocale('en', {
 });
 momentDurationFormat(moment);
 
-// This transform is needed to rehydrate dates as moment objects
-const transformMoments = createTransform(
-  inboundState => inboundState,
-  (outboundState) => {
-    const copy = { ...outboundState };
-    Object.keys(copy).forEach((key) => {
-      const value = copy[key];
-      // If either string or array, then convert to moment object, do not convert if schedule!
-      if (['string', 'object'].includes(typeof value) && key !== 'schedule') {
-        copy[key] = Array.isArray(value)
-          ? value.map(date => moment(date))
-          : moment(value);
-      }
-    });
-    return copy;
-  },
-  { whitelist: ['specialDates', 'dayInfo'] },
-);
-const persistConfig = {
-  key: 'root',
-  storage,
-  blacklist: ['profilePhoto', 'loginError'],
-  transforms: [transformMoments],
-};
-const persistedReducer = persistReducer(persistConfig, WHSApp);
-
-let middleware = [thunk];
-if (process.env.NODE_ENV === 'development') {
-  middleware = [...middleware, createLogger()]; // Only apply logger middleware in development
-}
-const store = createStore(
-  persistedReducer,
-  applyMiddleware(...middleware),
-);
-const persistor = persistStore(store);
-
 const hasLoggedIn = () => {
   const { username, password } = store.getState();
   return username && password;
 };
 
+const codePushOptions = {
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+  installMode: codePush.InstallMode.ON_NEXT_RESUME,
+};
+
+@codePush(codePushOptions)
 export default class App extends Component {
   state = { loaded: false }
 
