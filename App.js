@@ -44,7 +44,7 @@ const codePushOptions = {
 
 @codePush(codePushOptions)
 export default class App extends Component {
-  state = { loaded: false }
+  state = { rehydrated: false }
 
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
@@ -55,20 +55,22 @@ export default class App extends Component {
   }
 
   handleAppStateChange = async (newStatus) => {
-    /**
-     * This handler handles the case where the user does not quit the app but has it in the
-     * background, in which case the app does some updates when they refocus the app
-     */
-    const { dayInfo: { lastUpdate } } = store.getState();
-    const now = moment();
-    const today = now.day();
-    if (
-      newStatus === 'active'
-      && lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
-      && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
-    ) {
-      this.updateDayInfo(now); // Pass already created instance
-      await this.silentlyFetchOtherDates();
+    if (this.state.rehydrated && hasLoggedIn()) { // Checks if logged in and rehydrated just in case
+      /**
+       * This handler handles the case where the user does not quit the app but has it in the
+       * background, in which case the app does some updates when they refocus the app
+       */
+      const { dayInfo: { lastUpdate } } = store.getState();
+      const now = moment();
+      const today = now.day();
+      if (
+        newStatus === 'active'
+        && lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
+        && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
+      ) {
+        this.updateDayInfo(now); // Pass already created instance
+        await this.silentlyFetchOtherDates();
+      }
     }
   }
 
@@ -134,7 +136,7 @@ export default class App extends Component {
         return;
       }
     }
-    this.setState({ loaded: true });
+    this.setState({ rehydrated: true });
   }
 
   updateDayInfo = (date = moment()) => {
@@ -163,9 +165,9 @@ export default class App extends Component {
   }
 
   render() {
-    const { loaded } = this.state;
+    const { rehydrated } = this.state;
     let Navigator;
-    if (loaded) {
+    if (rehydrated) {
       const Drawer = createDrawerNavigator(
         {
           Dashboard: { screen: Dashboard },
@@ -201,7 +203,7 @@ export default class App extends Component {
           <View style={styles.container}>
             <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
             {
-              loaded &&
+              rehydrated &&
                 <Navigator onNavigationStateChange={null} />
             }
           </View>

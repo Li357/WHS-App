@@ -19,8 +19,13 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "jest",
-    "lint": "node_modules/.bin/eslint src App.js App.test.js"
-  },
+    "lint": "node_modules/.bin/eslint src App.js App.test.js",
+    "deploy:precheck": "yarn lint",
+    "deploy:ios": "code-push release-react WHS-iOS ios",
+    "deploy:android": "code-push release-react WHS-Android android",
+    "deploy:staging": "yarn run deploy:precheck && yarn run deploy:ios && yarn run deploy:android",
+    "deploy:production": "yarn run deploy:precheck && code-push promote WHS-iOS Staging Production"
+  }, 
   "jest": {
     "preset": "react-native"
   },
