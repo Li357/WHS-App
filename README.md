@@ -3,15 +3,19 @@
 A schedule & mod information app for [WHS](http://whs.westside66.org/). Created
 with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2018 Andrew Li, MIT License.
 
-## v2.0.0
+## v2
 
-Complete rewrite and redesign with NativeBase. Now with linting and better code.
+Complete rewrite and redesign with NativeBase. Now with linting and better code. Using multiple
+deployment targets for CodePush testing and Bugsnag for crashlytics.
+
+## v1 (latest 1.0.2)
+
+The source for version 1.0.2 and history for v1 is in [the v1 branch](https://github.com/Li357/WHS/tree/v1).
 
 ### Rewrite Roadmap:
 
 Next up:
-- [ ] Integration with [bugsnag](https://docs.bugsnag.com/platforms/react-native/) for better
-      error reporting, more conservative use of CodePush to prevent uneven versioning between users
+- [x] Integration with [bugsnag](https://docs.bugsnag.com/platforms/react-native/) for better error reporting, more conservative use of CodePush to prevent uneven versioning between users
 - [x] Handle different types of dates (need to manually add in meantime)
   - [x] Test no-overlap on assembly dates
   - [x] Test overlap on assembly dates
