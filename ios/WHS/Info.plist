@@ -50,6 +50,7 @@
 		<string>Roboto-Regular.ttf</string>
 		<string>Roboto-Thin.ttf</string>
 		<string>Roboto-Light.ttf</string>
+		<string>Feather.ttf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
@@ -63,7 +64,7 @@
 	<false/>
 	<key>CodePushDeploymentKey</key>
 	<string>$(CODEPUSH_KEY)</string>
-  <key>BugsnagAPIKey</key>
-  <string>3fb4434641f5a8e78c8a1ca4ad968cc5</string>
+	<key>BugsnagAPIKey</key>
+	<string>3fb4434641f5a8e78c8a1ca4ad968cc5</string>
 </dict>
 </plist>

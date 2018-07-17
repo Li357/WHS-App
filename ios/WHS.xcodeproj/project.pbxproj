@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -62,6 +61,7 @@
 		D326AE76AEBC4868B6446F1F /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3E51114B86E94A98B192ED92 /* FontAwesome.ttf */; };
 		DC8C2817E7D4490D90E75B7A /* libBugsnagReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 177C4B721A2E4A6F8F562706 /* libBugsnagReactNative.a */; };
 		FA901A1E8CCD4A569B952B10 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 50048263558441A3BB91817C /* libRNImagePicker.a */; };
+		B8441C633084481EB8540311 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 85174DA8BF1C47678DCD59E9 /* Feather.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -474,6 +474,7 @@
 		EA47CD2B76C443279F1C427D /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		F174A450AF6F417E88EA67EC /* BugsnagReactNative.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BugsnagReactNative.xcodeproj; path = "../node_modules/bugsnag-react-native/cocoa/BugsnagReactNative.xcodeproj"; sourceTree = "<group>"; };
 		F5BDAB1F2B154BFF8D5B899B /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
+		85174DA8BF1C47678DCD59E9 /* Feather.ttf */ = {isa = PBXFileReference; name = "Feather.ttf"; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -692,6 +693,7 @@
 				1655D19FAC1C40EEB527DA47 /* Roboto-Thin.ttf */,
 				25073AA1294F481687266A5E /* Roboto-Light.ttf */,
 				DFB1DC27498B4FAD985535F2 /* MaterialCommunityIcons.ttf */,
+				85174DA8BF1C47678DCD59E9 /* Feather.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1419,6 +1421,7 @@
 				C246579DF7E84CBA87ADA613 /* Roboto-Thin.ttf in Resources */,
 				663F7B5905C9447ABDFDDF90 /* Roboto-Light.ttf in Resources */,
 				63334BB75008486189CC7C36 /* MaterialCommunityIcons.ttf in Resources */,
+				B8441C633084481EB8540311 /* Feather.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
