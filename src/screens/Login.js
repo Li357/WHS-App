@@ -108,12 +108,10 @@ export default class Login extends PureComponent {
             </Item>
           </Form>
           <Animated.View
-            style={[
-              styles.loginContainer, {
-                width: loginWidth,
-                paddingHorizontal: loginAnimDone ? WIDTH / 150 : 0,
-              },
-            ]}
+            style={{
+              width: loginWidth,
+              paddingHorizontal: loginAnimDone ? WIDTH / 150 : 0,
+            }}
           >
             <Button
               block

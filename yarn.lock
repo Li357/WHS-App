@@ -5222,12 +5222,6 @@ react-lifecycles-compat@^3, react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
 
-react-native-blur@^3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-blur/-/react-native-blur-3.2.2.tgz#5bfb50638d148982c9560436554ed01d77d6d07d"
-  dependencies:
-    prop-types "^15.5.10"
-
 react-native-cheerio@^1.0.0-rc.4:
   version "1.0.0-rc.4"
   resolved "https://registry.yarnpkg.com/react-native-cheerio/-/react-native-cheerio-1.0.0-rc.4.tgz#bab0c1fe5888bbd69481d9b928d58b525f18f3b1"

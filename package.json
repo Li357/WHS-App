@@ -25,7 +25,7 @@
     "deploy:android": "code-push release-react WHS-Android android",
     "deploy:staging": "yarn run deploy:precheck && yarn run deploy:ios && yarn run deploy:android",
     "deploy:production": "yarn run deploy:precheck && code-push promote WHS-iOS Staging Production"
-  }, 
+  },
   "jest": {
     "preset": "react-native"
   },
@@ -37,7 +37,6 @@
     "native-base": "^2.5.2",
     "react": "16.3.1",
     "react-native": "~0.55.2",
-    "react-native-blur": "^3.2.2",
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-code-push": "^5.4.0",
     "react-native-extended-stylesheet": "^0.8.1",
