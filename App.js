@@ -138,10 +138,9 @@ class App extends Component {
 
   openStore = () => {
     const url = Platform.select({
-      ios: 'itms://itunes.apple.com/us/app/WHS/id1298249748',
+      ios: 'itms-apps://itunes.apple.com/us/app/WHS/id1298249748',
       android: 'https://play.google.com/store/apps/details?id=com.li357.whs'
     });
-    console.log(url);
 
     Linking.openURL(url);
   }
