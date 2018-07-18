@@ -101,7 +101,7 @@ android {
         applicationId "com.li357.whs"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 3
+        versionCode 4
         versionName "2.0"
         ndk {
             abiFilters "x86", "armeabi-v7a"

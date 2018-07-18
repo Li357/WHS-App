@@ -113,7 +113,6 @@ export default class Dashboard extends Component {
   }
 
   updateCountdowns = (props, firstTimeSet = false, now = moment()) => {
-    const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
     const {
       start, end, schedule, isBreak, isSummer, hasAssembly,
     } = props.dayInfo;
@@ -142,6 +141,9 @@ export default class Dashboard extends Component {
       }
       return;
     }
+
+    // Only calculate schedule info if not break or summer
+    const { currentMod, nextClass } = this.calculateScheduleInfo(props, now);
 
     /**
      * Since getCurrentMod returns index + 1 (to give correct mod number for display), but
