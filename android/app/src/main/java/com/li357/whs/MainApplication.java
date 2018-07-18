@@ -8,7 +8,6 @@ import com.bugsnag.BugsnagReactNative;
 import com.rnfs.RNFSPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
-import com.cmcewen.blurview.BlurViewPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -39,8 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
             BugsnagReactNative.getPackage(),
             new RNFSPackage(),
             new ImageResizerPackage(),
-            new ImagePickerPackage(),
-            new BlurViewPackage()
+            new ImagePickerPackage()
       );
     }
 
