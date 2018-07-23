@@ -9,6 +9,7 @@ import moment from 'moment';
 import ScheduleCard from '../components/ScheduleCard';
 import withHamburger from '../util/withHamburger';
 import { bugsnag } from '../util/misc';
+import { isScheduleEmpty } from '../querySchedule';
 import { processFinalsOrAssembly } from '../util/processSchedule';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
@@ -33,10 +34,10 @@ export default class Schedule extends Component {
 
     return (
       /* eslint-disable */
-      Object.keys(schedule).length === 0
+      isScheduleEmpty(schedule)
       ? <View style={styles.noSchedule}>
           <Text style={styles.noScheduleText}>
-            There is no schedule to display currently. If the school year has started,
+            There is no schedule to display. If the school year has started,
             try manually refreshing in Settings.
           </Text>
         </View>

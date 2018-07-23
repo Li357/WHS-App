@@ -1,7 +1,7 @@
 import _, { minBy, maxBy, sortBy } from 'lodash';
 import moment from 'moment';
 
-import { findClassWithMod } from './querySchedule';
+import { findClassWithMod, isScheduleEmpty } from './querySchedule';
 import { ASSEMBLY_MOD } from '../constants/constants';
 
 // Internal function (for getMods) to get range of numbers, [start, end)
@@ -313,7 +313,7 @@ const onlyIfCurrentDay = fn => (content) => {
 };
 // On finals or assembly days, map the schedules into assembly or finals schedules
 const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
-  if (Object.keys(schedule).length === 0 || (!hasAssembly && !isFinals)) {
+  if (isScheduleEmpty(schedule) || (!hasAssembly && !isFinals)) {
     return schedule;
   }
 

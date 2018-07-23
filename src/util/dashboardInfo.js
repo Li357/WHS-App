@@ -67,6 +67,12 @@ const getDuringWeekendInfo = () => [{ value: 'Enjoy your weekend!' }];
 const getDuringBreakInfo = isSummer => [
   { value: `Enjoy your ${isSummer ? 'summer' : 'break'}!` },
 ];
+const getScheduleEmptyInfo = () => [
+  {
+    value: `Your schedule is currently empty.
+    If the school year has started, try manually refreshing in Settings.`,
+  },
+];
 
 export {
   getBeforeSchoolInfo,
@@ -75,4 +81,5 @@ export {
   getDuringModInfo,
   getDuringWeekendInfo,
   getDuringBreakInfo,
+  getScheduleEmptyInfo,
 };

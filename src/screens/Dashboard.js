@@ -14,7 +14,7 @@ import DashboardBlock from '../components/DashboardBlock';
 import CrossSectionBlock from '../components/CrossSectionBlock';
 import withHamburger from '../util/withHamburger';
 import { processFinalsOrAssembly } from '../util/processSchedule';
-import { getCurrentMod, getNextClass, isHalfMod } from '../util/querySchedule';
+import { getCurrentMod, getNextClass, isHalfMod, isScheduleEmpty } from '../util/querySchedule';
 import { bugsnag } from '../util/misc';
 import {
   getBeforeSchoolInfo,
@@ -23,10 +23,11 @@ import {
   getDuringModInfo,
   getDuringWeekendInfo,
   getDuringBreakInfo,
+  getScheduleEmptyInfo,
 } from '../util/dashboardInfo';
 import {
   HEIGHT,
-  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK, ASSEMBLY_MOD,
+  PASSING_PERIOD_FACTOR, AFTER_SCHOOL, BEFORE_SCHOOL, BREAK, ASSEMBLY_MOD, EMPTY,
 } from '../constants/constants';
 
 const mapStateToProps = ({
@@ -125,9 +126,10 @@ export default class Dashboard extends Component {
      * until an app state change (just for less complexity)
      */
 
-    // If it is either Summer or a break, there is no need to calculate countdowns
-    if (isBreak || isSummer) {
-      const newState = {
+    const emptySchedule = isScheduleEmpty(props.schedule);
+    // If it is either Summer or a break or empty schedule, no need to calculate countdowns
+    if (isBreak || isSummer || emptySchedule) {
+      let baseState = {
         currentMod: BREAK,
         nextClass: null,
         untilDayStart: 0,
@@ -137,10 +139,18 @@ export default class Dashboard extends Component {
         isBreak,
         isSummer,
       };
+
+      if (emptySchedule) {
+        baseState = {
+          ...baseState,
+          currentMod: EMPTY,
+        };
+      }
+
       if (firstTimeSet) {
-        this.state = newState;
+        this.state = baseState;
       } else {
-        this.setState(newState);
+        this.setState(baseState);
       }
       return;
     }
@@ -232,6 +242,10 @@ export default class Dashboard extends Component {
      */
     if (isSummer || isBreak) {
       return getDuringBreakInfo(isSummer);
+    }
+
+    if (currentMod === EMPTY) {
+      return getScheduleEmptyInfo();
     }
 
     const today = moment().day();

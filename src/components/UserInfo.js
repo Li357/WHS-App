@@ -7,6 +7,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
 import { reportError, selectProps } from '../util/misc';
+import { isScheduleEmpty } from '../util/querySchedule';
 import { setProfilePhoto } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
@@ -48,7 +49,7 @@ export default class UserInfo extends PureComponent {
     const profilePhotoObj = { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
 
-    const userInfo = Object.keys(schedule).length === 0
+    const userInfo = isScheduleEmpty(schedule)
       ? Array(4).fill('N/A')
       : [dean, counselor, homeroom, id];
 
