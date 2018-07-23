@@ -313,7 +313,7 @@ const onlyIfCurrentDay = fn => (content) => {
 };
 // On finals or assembly days, map the schedules into assembly or finals schedules
 const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
-  if (!hasAssembly && !isFinals) {
+  if (Object.keys(schedule).length === 0 || (!hasAssembly && !isFinals)) {
     return schedule;
   }
 

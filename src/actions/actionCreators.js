@@ -86,7 +86,10 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const infoCard = $('.card-header + .card-block');
     const scheduleString = $('.page-content + script').contents()[0].data.trim();
     const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
-    const studentPicture = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
+    const pictureURL = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
+    const schoolPicture = pictureURL.includes('blank-user')
+      ? './assets/images/blank-user.png'
+      : pictureURL;
 
     // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
     const isTeacher = nameSubtitle === 'Teacher';
@@ -102,11 +105,11 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
      *  so they're technically not logged in and refetch can happen as necessary
      */
 
-    const processedSchedule = processSchedule(schedule);
+    const processedSchedule = schedule ? processSchedule(schedule) : {};
 
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
-    dispatch(setProfilePhoto(profilePhoto || studentPicture));
+    dispatch(setProfilePhoto(profilePhoto || schoolPicture));
     // Directly call fetchSpecialDates here for setDaySchedule
     await dispatch(fetchSpecialDates());
 
@@ -120,7 +123,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
-      name, nameSubtitle, ...studentInfo, processedSchedule, studentPicture, isTeacher,
+      name, nameSubtitle, ...studentInfo, processedSchedule, schoolPicture, isTeacher,
     ));
     /* eslint-enable function-paren-newline */
 

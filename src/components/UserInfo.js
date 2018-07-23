@@ -14,7 +14,7 @@ const mapStateToProps = selectProps(
   'username', 'name',
   'profilePhoto', 'schoolPicture',
   'counselor', 'homeroom', 'dean', 'id',
-  'isTeacher',
+  'isTeacher', 'schedule',
 );
 
 @connect(mapStateToProps)
@@ -43,10 +43,14 @@ export default class UserInfo extends PureComponent {
 
   render() {
     const {
-      name, classOf, profilePhoto, counselor, homeroom, dean, id, isTeacher,
+      name, classOf, profilePhoto, counselor, homeroom, dean, id, isTeacher, schedule,
     } = this.props;
     const profilePhotoObj = { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
+
+    const userInfo = Object.keys(schedule).length === 0
+      ? Array(4).fill('N/A')
+      : [dean, counselor, homeroom, id];
 
     return (
       <View style={styles.studentProfile}>
@@ -83,8 +87,8 @@ export default class UserInfo extends PureComponent {
                 <View style={styles.separator} />
                 <View style={styles.infoRight}>
                   {
-                    [dean, counselor, homeroom, id].map(value => (
-                      <Text key={value} style={styles.valueText}>{value}</Text>
+                    userInfo.map((value, index) => (
+                      <Text key={value === 'N/A' ? index : value} style={styles.valueText}>{value}</Text>
                     ))
                   }
                 </View>
