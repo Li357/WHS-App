@@ -12,10 +12,10 @@ import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
 import DashboardBlock from '../components/DashboardBlock';
 import CrossSectionBlock from '../components/CrossSectionBlock';
-import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
 import { processFinalsOrAssembly } from '../util/processSchedule';
 import { getCurrentMod, getNextClass, isHalfMod } from '../util/querySchedule';
+import { bugsnag } from '../util/misc';
 import {
   getBeforeSchoolInfo,
   getAfterSchoolInfo,
@@ -38,7 +38,6 @@ const mapStateToProps = ({
   ...ownProps,
 });
 
-@waitForAnimation
 @withHamburger
 @withNavigation
 @connect(mapStateToProps)
@@ -59,6 +58,7 @@ export default class Dashboard extends Component {
     });
     AppState.addEventListener('change', this.handleAppStateChange);
 
+    bugsnag.leaveBreadcrumb('Initial countdown start');
     this.updateCountdowns(props, true);
   }
 
@@ -70,6 +70,7 @@ export default class Dashboard extends Component {
   }
 
   handleAppStateChange = (newStatus) => {
+    bugsnag.leaveBreadcrumb(`DB change state: ${newStatus}`);
     switch (newStatus) {
       case 'inactive':
         this.clearCountdowns();
@@ -82,6 +83,7 @@ export default class Dashboard extends Component {
   }
 
   calculateScheduleInfo = ({ dayInfo, schedule }, now = moment()) => {
+    bugsnag.leaveBreadcrumb('Calculating schedule info');
     const currentMod = getCurrentMod(dayInfo, now);
     const nextClass = getNextClass(schedule, currentMod, now);
 
@@ -92,6 +94,7 @@ export default class Dashboard extends Component {
   }
 
   createCountdown = (key) => {
+    bugsnag.leaveBreadcrumb(`Create: ${key}`);
     const id = setInterval(() => {
       if (floor(this.state[key], -3) === 0) {
         /**
@@ -186,6 +189,7 @@ export default class Dashboard extends Component {
      * Clear and restart all countdowns on update, all countdowns will be updated when one
      * gets to 0, maintaining the inevitable countdown offset between counters
      */
+    bugsnag.leaveBreadcrumb('Updating countdown after zero');
     this.clearCountdowns();
     this.startCountdowns(currentMod, untilDayStart, untilDayEnd);
   }

@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 
 import ScheduleCard from '../components/ScheduleCard';
-import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
+import { bugsnag } from '../util/misc';
 import { processFinalsOrAssembly } from '../util/processSchedule';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
@@ -19,13 +19,13 @@ const mapStateToProps = ({
   specialDates,
 });
 
-@waitForAnimation
 @withHamburger
 @connect(mapStateToProps)
 export default class Schedule extends Component {
   renderItem = ({ item }) => <ScheduleCard content={item} {...this.props} />
 
   render() {
+    bugsnag.leaveBreadcrumb('Rendering schedule');
     // Monday is 0, Friday is 4
     const currentDay = moment().weekday();
 

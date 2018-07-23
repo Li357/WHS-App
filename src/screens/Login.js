@@ -8,7 +8,7 @@ import { Form, Input, Item, Button } from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 
-import { reportError, selectProps } from '../util/misc';
+import { reportError, selectProps, bugsnag } from '../util/misc';
 import { fetchUserInfo } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import logo from '../../assets/images/WHS.png';
@@ -49,6 +49,7 @@ export default class Login extends PureComponent {
       const { dispatch, navigation: { navigate } } = this.props;
       const { username, password } = this.state;
 
+      bugsnag.leaveBreadcrumb('Logging user in');
       const success = await dispatch(fetchUserInfo(username, password));
       if (success) {
         navigate('Dashboard');

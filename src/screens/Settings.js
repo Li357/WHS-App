@@ -6,16 +6,14 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 
-import waitForAnimation from '../util/waitForAnimation';
 import withHamburger from '../util/withHamburger';
-import { reportError } from '../util/misc';
+import { reportError, bugsnag } from '../util/misc';
 import { fetchUserInfo } from '../actions/actionCreators';
 
 const mapStateToProps = (state, ownProps) => ({
   ...state, ...ownProps,
 });
 
-@waitForAnimation
 @withHamburger
 @withNavigation
 @connect(mapStateToProps)
@@ -31,6 +29,7 @@ export default class Settings extends Component {
     try {
       const { dispatch, username, password } = this.props;
 
+      bugsnag.leaveBreadcrumb('Refreshing user info');
       const success = await dispatch(fetchUserInfo(username, password));
       if (success) {
         Alert.alert(

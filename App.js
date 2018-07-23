@@ -24,7 +24,7 @@ import {
   logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
-import { reportError } from './src/util/misc';
+import { reportError, bugsnag } from './src/util/misc';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -78,6 +78,7 @@ export default class App extends Component {
     const { dayInfo } = store.getState();
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
     if (typeof dayInfo === 'undefined') {
+      bugsnag.leaveBreadcrumb('Logging v1.x user out');
       // Log out and reset store on update to v2 if the user is previous v1.x user
       store.dispatch(logOut());
     }
@@ -85,6 +86,7 @@ export default class App extends Component {
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       try {
+        bugsnag.leaveBreadcrumb('Refreshing day info - manual');
         const { dayInfo: { lastUpdate } } = store.getState();
         const now = moment();
         const today = now.day();
@@ -94,6 +96,7 @@ export default class App extends Component {
         ) {
           this.updateDayInfo(now);
         }
+        bugsnag.leaveBreadcrumb('Silently fetching other dates');
         await this.silentlyFetchOtherDates();
 
         const {
@@ -105,6 +108,7 @@ export default class App extends Component {
         } = store.getState();
 
         if (now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') && !refreshedSemesterTwo) {
+          bugsnag.leaveBreadcrumb('Refreshing semester two');
           // If in semester two and has not refreshed, refresh info
           store.dispatch(fetchUserInfo(username, password));
           store.dispatch(setRefreshed(true, true));
@@ -112,10 +116,12 @@ export default class App extends Component {
           now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
           && !refreshedSemesterOne
         ) {
+          bugsnag.leaveBreadcrumb('Refreshing semester one');
           // If in semester one and has not refreshed, refresh info
           store.dispatch(fetchUserInfo(username, password));
           store.dispatch(setRefreshed(true, false));
         } else if (now.isSameOrAfter(lastDay.clone().add(2, 'months'), 'day')) {
+          bugsnag.leaveBreadcrumb('Toggling refreshes - new year');
           /**
            * If two months after last day, refresh
            * The third argument bypasses the semesterOneStart < now < semesterTwoStart check
@@ -126,6 +132,7 @@ export default class App extends Component {
           store.dispatch(setRefreshed(false, false));
         }
 
+        bugsnag.leaveBreadcrumb('Updating profile photo');
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {
