@@ -7,7 +7,7 @@ import { store } from './initializeStore';
 const config = new Configuration();
 const bugsnag = new Client(config);
 
-config.codeBundleId = '2.0-b3';
+config.codeBundleId = '2.0-b4';
 config.registerBeforeSendCallback((report) => {
   // Filter out private information to keep reports anonymous
   const {

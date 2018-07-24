@@ -24,7 +24,10 @@
     "deploy:ios": "code-push release-react WHS-iOS ios --outputDir build/ios",
     "deploy:android": "code-push release-react WHS-Android android --outputDir build/android",
     "deploy:staging": "yarn run deploy:precheck && yarn run deploy:ios && yarn run deploy:android",
-    "deploy:production": "yarn run deploy:precheck && code-push promote WHS-iOS Staging Production"
+    "upload-sourcemaps:base": "bugsnag-sourcemaps upload --upload-sources --add-wildcard-prefix --api-key 3fb4434641f5a8e78c8a1ca4ad968cc5",
+    "upload-sourcemaps:ios": "yarn run upload-sourcemaps:base --source-map build/ios/CodePush/main.jsbundle.map --minified-file build/ios/CodePush/main.jsbundle --minified-url main.jsbundle",
+    "upload-sourcemaps:android": "yarn run upload-sourcemaps:base --source-map build/android/CodePush/index.android.bundle.map --minified-file build/android/CodePush/index.android.bundle --minified-url index.android.bundle",
+    "upload-sourcemaps": "yarn run upload-sourcemaps:ios && yarn run upload-sourcemaps:android"
   },
   "jest": {
     "preset": "react-native"

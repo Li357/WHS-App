@@ -56,7 +56,6 @@ export default class App extends Component {
     4: 'Syncing in progress...',
     5: 'Checking for updates...',
     7: 'Downloading update...',
-    8: 'Installing update...',
   }
   /* eslint-enable react/sort-comp */
 
@@ -208,12 +207,13 @@ export default class App extends Component {
     switch (status) {
       case codePush.SyncStatus.CHECKING_FOR_UPDATE:
       case codePush.SyncStatus.DOWNLOADING_PACKAGE:
-      case codePush.SyncStatus.INSTALLING_UPDATE:
       case codePush.SyncStatus.SYNC_IN_PROGRESS:
         this.setState({
           codePushFinished: false,
           codePushStatus: this.codePushStatuses[status],
         });
+        return;
+      case codePush.SyncStatus.UPDATE_INSTALLED:
         return;
       default:
         // This will only happen if there is an unknown error or code-push is finished
