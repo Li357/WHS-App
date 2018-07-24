@@ -89,7 +89,7 @@ export default class App extends Component {
   }
 
   handleRehydrate = async () => {
-    const { dayInfo } = store.getState();
+    const { dayInfo, schedule } = store.getState();
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
     if (typeof dayInfo === 'undefined') {
       bugsnag.leaveBreadcrumb('Logging v1.x user out');
@@ -99,6 +99,11 @@ export default class App extends Component {
 
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
+      if (typeof schedule === 'string') {
+        bugsnag.leaveBreadcrumb('Logging invalid user out');
+        store.dispatch(logOut());
+      }
+
       try {
         bugsnag.leaveBreadcrumb('Refreshing day info - manual');
         const { dayInfo: { lastUpdate } } = store.getState();
