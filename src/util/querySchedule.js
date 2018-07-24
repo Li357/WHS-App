@@ -174,7 +174,7 @@ const getDayInfo = (specialDates, date) => {
 };
 
 const decodeUnicode = string => JSON.parse(`"${string}"`);
-const isScheduleEmpty = schedule => Object.keys(schedule).length === 0;
+const isScheduleEmpty = schedule => schedule.length === 0;
 
 export {
   getCurrentMod, getNextClass,

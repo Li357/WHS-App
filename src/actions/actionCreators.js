@@ -32,7 +32,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
 const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
 const setUserInfo = createActionCreator(
   SET_USER_INFO,
-  'name', 'classOf', 'homeroom', 'counselor', 'dean', 'id', 'schedule', 'schoolPicture', 'isTeacher',
+  'name', 'classOf', 'schedule', 'schoolPicture', 'isTeacher', 'homeroom', 'counselor', 'dean', 'id',
 );
 const setCredentials = createActionCreator(
   SET_CREDENTIALS,
@@ -88,7 +88,7 @@ const fetchUserInfo = (
     const profilePhotoPrefix = 'background-image: url(';
 
     const pictureURL = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
-    const schoolPicture = pictureURL.includes('blank-user')
+    const schoolPicture = pictureURL.includes('blank-user') // Blank user images have urls of /dist/img/blank-user.png
       ? 'blank-user'
       : pictureURL;
 
@@ -102,22 +102,24 @@ const fetchUserInfo = (
     const infoCard = $('.card-header + .card-block');
     const scheduleString = $('.page-content + script').contents()[0].data.trim();
     const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
+    const isNewUser = schedule.length === 0;
 
     // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
     const isTeacher = nameSubtitle === 'Teacher';
-    const studentInfo = !isTeacher
-      ? infoCard
-        .find('.card-subtitle a, .card-text:last-child')
-        .contents()
-        .map((index, { data }) => data.split(':').slice(-1)[0].trim())
-      : [null, null, null, null];
+    const info = infoCard
+      .find('.card-subtitle a, .card-text:last-child')
+      .contents()
+      .map((index, { data }) => data.split(':').slice(-1)[0].trim());
+    const studentInfo = isNewUser
+      ? [null, ...info] // New users will only not be able to see their homeroom yet, so first is null
+      : info;
 
     /**
      *  Do all heavy lifting before setting credentials in case user interrupts user info fetching
      *  so they're technically not logged in and refetch can happen as necessary
      */
 
-    const processedSchedule = schedule ? processSchedule(schedule) : {};
+    const processedSchedule = processSchedule(schedule);
 
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
@@ -135,7 +137,8 @@ const fetchUserInfo = (
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
-      name, nameSubtitle, ...studentInfo, processedSchedule, schoolPicture, isTeacher,
+      name, nameSubtitle, processedSchedule, schoolPicture, isTeacher,
+      ...(isTeacher ? Array(4).fill(null) : studentInfo), // Teachers have all-null info array
     ));
     /* eslint-enable function-paren-newline */
 

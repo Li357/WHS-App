@@ -7,7 +7,6 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 
 import { reportError, selectProps } from '../util/misc';
-import { isScheduleEmpty } from '../util/querySchedule';
 import { setProfilePhoto } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
 import blankUser from '../../assets/images/blank-user.png';
@@ -16,7 +15,7 @@ const mapStateToProps = selectProps(
   'username', 'name',
   'profilePhoto', 'schoolPicture',
   'counselor', 'homeroom', 'dean', 'id',
-  'isTeacher', 'schedule',
+  'isTeacher',
 );
 
 @connect(mapStateToProps)
@@ -66,12 +65,9 @@ export default class UserInfo extends PureComponent {
 
   render() {
     const {
-      counselor, homeroom, dean, id, isTeacher, schedule,
+      counselor, homeroom, dean, id, isTeacher,
     } = this.props;
-
-    const userInfo = isScheduleEmpty(schedule) || isTeacher
-      ? Array(4).fill('N/A')
-      : [dean, counselor, homeroom, id];
+    const userInfo = [dean, counselor, homeroom, id];
 
     return (
       <View style={styles.studentProfile}>
@@ -99,8 +95,8 @@ export default class UserInfo extends PureComponent {
                   <View style={styles.infoRight}>
                     {
                       userInfo.map((value, index) => (
-                        <Text key={value === 'N/A' ? index : value} style={styles.valueText}>
-                          {value}
+                        <Text key={value || index} style={styles.valueText}>
+                          {value || 'N/A'}
                         </Text>
                       ))
                     }
