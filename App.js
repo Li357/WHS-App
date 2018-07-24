@@ -14,6 +14,7 @@ import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
 import Settings from './src/screens/Settings';
+import Loading from './src/screens/Loading';
 import DrawerContent from './src/components/DrawerContent';
 import {
   fetchUserInfo,
@@ -44,7 +45,21 @@ const codePushOptions = {
 
 @codePush(codePushOptions)
 export default class App extends Component {
-  state = { rehydrated: false }
+  state = {
+    rehydrated: false,
+    rehydrateStatus: '',
+    codePushFinished: false,
+    codePushStatus: 'Checking for updates...',
+    codePushProgress: 0,
+  }
+  /* eslint-disable react/sort-comp */
+  codePushStatuses = {
+    4: 'Syncing in progress...',
+    5: 'Checking for updates...',
+    7: 'Downloading update...',
+    8: 'Installing update...',
+  }
+  /* eslint-enable react/sort-comp */
 
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
@@ -69,8 +84,8 @@ export default class App extends Component {
         && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
       ) {
         this.updateDayInfo(now); // Pass already created instance
-        await this.silentlyFetchOtherDates();
       }
+      this.silentlyFetchData();
     }
   }
 
@@ -94,10 +109,13 @@ export default class App extends Component {
           lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
           && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat)
         ) {
+          this.setState({
+            rehydrationStatus: 'Updating today\'s information...',
+          });
           this.updateDayInfo(now);
         }
         bugsnag.leaveBreadcrumb('Silently fetching other dates');
-        await this.silentlyFetchOtherDates();
+        this.silentlyFetchData();
 
         const {
           specialDates: { semesterOneStart, semesterTwoStart, lastDay },
@@ -107,6 +125,9 @@ export default class App extends Component {
           password,
         } = store.getState();
 
+        this.setState({
+          rehydrationStatus: 'Auto-refreshing your information...',
+        });
         if (now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') && !refreshedSemesterTwo) {
           bugsnag.leaveBreadcrumb('Refreshing semester two');
           // If in semester two and has not refreshed, refresh info
@@ -129,10 +150,13 @@ export default class App extends Component {
            * (i.e. August 1st) and it refreshes, it should not refresh on the first day
            */
           store.dispatch(fetchUserInfo(username, password, true));
-          store.dispatch(setRefreshed(false, false));
+          store.dispatch(setRefreshed(true, false));
         }
 
         bugsnag.leaveBreadcrumb('Updating profile photo');
+        this.setState({
+          rehydrationStatus: 'Getting your profile picture...',
+        });
         // Since next line is async, must wait for it or else state will be set before it finishes
         await this.updateProfilePhoto();
       } catch (error) {
@@ -162,19 +186,49 @@ export default class App extends Component {
     store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
   }
 
-  silentlyFetchOtherDates = async () => {
+  silentlyFetchData = async () => {
     // We want to update dates every single app open, no need to report error if no internet
     try {
+      const { username, password, schoolPicture } = store.getState();
+
       await store.dispatch(fetchOtherDates());
+      if (schoolPicture.includes('blank-user')) {
+        await store.dispatch(fetchUserInfo(username, password, false, true));
+      }
     /* eslint-disable no-empty */
     } catch (error) {}
     /* eslint-enable no-empty */
   }
 
-  render() {
-    const { rehydrated } = this.state;
-    let Navigator;
-    if (rehydrated) {
+  codePushStatusDidChange(status) {
+    switch (status) {
+      case codePush.SyncStatus.CHECKING_FOR_UPDATE:
+      case codePush.SyncStatus.DOWNLOADING_PACKAGE:
+      case codePush.SyncStatus.INSTALLING_UPDATE:
+      case codePush.SyncStatus.SYNC_IN_PROGRESS:
+        this.setState({
+          codePushFinished: false,
+          codePushStatus: this.codePushStatuses[status],
+        });
+        return;
+      default:
+        // This will only happen if there is an unknown error or code-push is finished
+        this.setState({
+          codePushFinished: true,
+        });
+    }
+  }
+
+  codePushDownloadDidProgress({ receivedBytes, totalBytes }) {
+    this.setState({
+      codePushProgress: receivedBytes / totalBytes,
+    });
+  }
+
+  renderApp = () => {
+    const { rehydrated, codePushFinished } = this.state;
+
+    if (rehydrated && codePushFinished) {
       const Drawer = createDrawerNavigator(
         {
           Dashboard: { screen: Dashboard },
@@ -191,28 +245,31 @@ export default class App extends Component {
         },
       );
 
-      Navigator = createSwitchNavigator(
+      const Navigator = createSwitchNavigator(
         {
           Login: { screen: Login },
           Drawer: { screen: Drawer },
         },
         { initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login' },
       );
+
+      return (<Navigator onNavigationStateChange={null} />);
     }
 
+    return (<Loading {...this.state} />);
+  }
+
+  render() {
     return (
       <Provider store={store}>
         <PersistGate
-          loading={null}
+          loading={<Loading {...this.state} />}
           persistor={persistor}
           onBeforeLift={this.handleRehydrate}
         >
           <View style={styles.container}>
             <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
-            {
-              rehydrated &&
-                <Navigator onNavigationStateChange={null} />
-            }
+            {this.renderApp()}
           </View>
         </PersistGate>
       </Provider>

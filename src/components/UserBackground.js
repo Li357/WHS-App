@@ -1,11 +1,13 @@
 import React from 'react';
 import { Image, View, StyleSheet, Platform } from 'react-native';
 
+import blankUser from '../../assets/images/blank-user.png';
+
 const UserBackground = ({ profilePhoto }) => (
   <View style={styles.blurContainer}>
     <Image
       blurRadius={Platform.OS === 'ios' ? 5 : 1}
-      source={{ uri: profilePhoto }}
+      source={profilePhoto === 'blank-user' ? blankUser : { uri: profilePhoto }}
       onLoadEnd={this.handleImageLoad}
       style={styles.blur}
     />

@@ -10,6 +10,7 @@ import { reportError, selectProps } from '../util/misc';
 import { isScheduleEmpty } from '../util/querySchedule';
 import { setProfilePhoto } from '../actions/actionCreators';
 import { WIDTH, HEIGHT } from '../constants/constants';
+import blankUser from '../../assets/images/blank-user.png';
 
 const mapStateToProps = selectProps(
   'username', 'name',
@@ -42,60 +43,73 @@ export default class UserInfo extends PureComponent {
     this.saveProfilePhoto(schoolPicture, true);
   }
 
-  render() {
-    const {
-      name, classOf, profilePhoto, counselor, homeroom, dean, id, isTeacher, schedule,
-    } = this.props;
-    const profilePhotoObj = { uri: profilePhoto };
+  renderForeground = () => {
+    const { name, classOf, profilePhoto } = this.props;
+    const profilePhotoObj = profilePhoto === 'blank-user' ? blankUser : { uri: profilePhoto };
     const customButtons = [{ name: 'reset', title: 'Reset Photo' }];
 
-    const userInfo = isScheduleEmpty(schedule)
+    return (
+      <View style={styles.slide}>
+        <PhotoUpload
+          onPhotoSelect={this.saveProfilePhoto}
+          customButtons={customButtons}
+          onTapCustomButton={this.handleReset}
+          containerStyle={StyleSheet.flatten(styles.photoUploader)}
+        >
+          <Thumbnail source={profilePhotoObj} style={styles.profilePhoto} />
+        </PhotoUpload>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.classOf}>{classOf}</Text>
+      </View>
+    );
+  }
+
+  render() {
+    const {
+      counselor, homeroom, dean, id, isTeacher, schedule,
+    } = this.props;
+
+    const userInfo = isScheduleEmpty(schedule) || isTeacher
       ? Array(4).fill('N/A')
       : [dean, counselor, homeroom, id];
 
     return (
       <View style={styles.studentProfile}>
-        <Carousel
-          autoplay={false}
-          bullets
-          style={styles.studentProfile}
-          bulletStyle={styles.bullet}
-          chosenBulletStyle={styles.bullet}
-          bulletsContainerStyle={styles.bulletsContainer}
-        >
-          <View style={styles.slide}>
-            <PhotoUpload
-              onPhotoSelect={this.saveProfilePhoto}
-              customButtons={customButtons}
-              onTapCustomButton={this.handleReset}
-              containerStyle={StyleSheet.flatten(styles.photoUploader)}
-            >
-              <Thumbnail source={profilePhotoObj} style={styles.profilePhoto} />
-            </PhotoUpload>
-            <Text style={styles.name}>{name}</Text>
-            <Text style={styles.classOf}>{classOf}</Text>
-          </View>
-          {
-            !isTeacher &&
-              <View style={styles.infoSlide}>
-                <View style={styles.infoLeft}>
-                  {
-                    ['Dean', 'Counselor', 'Homeroom', 'ID'].map(key => (
-                      <Text key={key} style={styles.keyText}>{key}</Text>
-                    ))
-                  }
+        {
+          !isTeacher
+            /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
+            ? <Carousel
+                autoplay={false}
+                bullets
+                style={styles.studentProfile}
+                bulletStyle={styles.bullet}
+                chosenBulletStyle={styles.bullet}
+                bulletsContainerStyle={styles.bulletsContainer}
+              >
+                {this.renderForeground()}
+                <View style={styles.infoSlide}>
+                  <View style={styles.infoLeft}>
+                    {
+                      ['Dean', 'Counselor', 'Homeroom', 'ID'].map(key => (
+                        <Text key={key} style={styles.keyText}>{key}</Text>
+                      ))
+                    }
+                  </View>
+                  <View style={styles.separator} />
+                  <View style={styles.infoRight}>
+                    {
+                      userInfo.map((value, index) => (
+                        <Text key={value === 'N/A' ? index : value} style={styles.valueText}>
+                          {value}
+                        </Text>
+                      ))
+                    }
+                  </View>
                 </View>
-                <View style={styles.separator} />
-                <View style={styles.infoRight}>
-                  {
-                    userInfo.map((value, index) => (
-                      <Text key={value === 'N/A' ? index : value} style={styles.valueText}>{value}</Text>
-                    ))
-                  }
-                </View>
-              </View>
-          }
-        </Carousel>
+              </Carousel>
+            : this.renderForeground()
+            /* eslint-enable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
+        }
       </View>
     );
   }

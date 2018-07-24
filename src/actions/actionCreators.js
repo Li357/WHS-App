@@ -12,6 +12,7 @@ import {
   SET_USER_INFO,
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
+  SET_SCHOOL_PICTURE,
   SET_SPECIAL_DATES,
   SET_DAY_INFO,
   SET_SCHEDULE,
@@ -38,6 +39,7 @@ const setCredentials = createActionCreator(
   'username', 'password',
 );
 const setProfilePhoto = createActionCreator(SET_PROFILE_PHOTO, 'profilePhoto');
+const setSchoolPicture = createActionCreator(SET_SCHOOL_PICTURE, 'schoolPicture');
 const setSpecialDates = createActionCreator(SET_SPECIAL_DATES, 'specialDates');
 const setDayInfo = createActionCreator(
   SET_DAY_INFO,
@@ -53,7 +55,11 @@ const logOut = createActionCreator(LOG_OUT);
  * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
  * different from the client-side XMLHttpRequest
  */
-const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
+/* eslint-disable function-paren-newline */
+const fetchUserInfo = (
+  username, password, beforeStartRefresh = false, onlyFetchSchoolPicture = false,
+) => (
+/* eslint-enable function-paren-newline */
   async (dispatch, getState) => {
     const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
 
@@ -81,15 +87,21 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
     const jsonPrefix = 'window._pageDataJson = \'';
     const profilePhotoPrefix = 'background-image: url(';
 
+    const pictureURL = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
+    const schoolPicture = pictureURL.includes('blank-user')
+      ? 'blank-user'
+      : pictureURL;
+
+    if (onlyFetchSchoolPicture) {
+      dispatch(setSchoolPicture(schoolPicture));
+      return true;
+    }
+
     // This is either 'Class of 20XX' or 'Teacher'
     const nameSubtitle = $('.header-title > h6').text();
     const infoCard = $('.card-header + .card-block');
     const scheduleString = $('.page-content + script').contents()[0].data.trim();
     const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
-    const pictureURL = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
-    const schoolPicture = pictureURL.includes('blank-user')
-      ? './assets/images/blank-user.png'
-      : pictureURL;
 
     // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
     const isTeacher = nameSubtitle === 'Teacher';
@@ -98,7 +110,7 @@ const fetchUserInfo = (username, password, beforeStartRefresh = false) => (
         .find('.card-subtitle a, .card-text:last-child')
         .contents()
         .map((index, { data }) => data.split(':').slice(-1)[0].trim())
-      : [null, null, null];
+      : [null, null, null, null];
 
     /**
      *  Do all heavy lifting before setting credentials in case user interrupts user info fetching

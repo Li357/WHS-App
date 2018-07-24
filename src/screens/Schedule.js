@@ -9,7 +9,7 @@ import moment from 'moment';
 import ScheduleCard from '../components/ScheduleCard';
 import withHamburger from '../util/withHamburger';
 import { bugsnag } from '../util/misc';
-import { isScheduleEmpty } from '../querySchedule';
+import { isScheduleEmpty } from '../util/querySchedule';
 import { processFinalsOrAssembly } from '../util/processSchedule';
 import { WIDTH, HEIGHT } from '../constants/constants';
 
@@ -33,25 +33,25 @@ export default class Schedule extends Component {
     const currentDay = moment().weekday();
 
     return (
-      /* eslint-disable */
       isScheduleEmpty(schedule)
-      ? <View style={styles.noSchedule}>
-          <Text style={styles.noScheduleText}>
-            There is no schedule to display. If the school year has started,
-            try manually refreshing in Settings.
-          </Text>
-        </View>
-      : <Carousel
-          loop
-          firstItem={Math.min(currentDay, 4)}
-          data={schedule}
-          renderItem={this.renderItem}
-          sliderWidth={WIDTH}
-          itemWidth={WIDTH * 0.8}
-          containerCustomStyle={styles.container}
-          contentContainerCustomStyle={styles.content}
-        />
-      /* eslint-enable */
+        /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
+        ? <View style={styles.noSchedule}>
+            <Text style={styles.noScheduleText}>
+              There is no schedule to display. If the school year has started,
+              try manually refreshing in Settings.
+            </Text>
+          </View>
+        : <Carousel
+            loop
+            firstItem={Math.min(currentDay, 4)}
+            data={schedule}
+            renderItem={this.renderItem}
+            sliderWidth={WIDTH}
+            itemWidth={WIDTH * 0.8}
+            containerCustomStyle={styles.container}
+            contentContainerCustomStyle={styles.content}
+          />
+        /* eslint-enable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
     );
   }
 }

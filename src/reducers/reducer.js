@@ -3,6 +3,7 @@ import {
   SET_USER_INFO,
   SET_CREDENTIALS,
   SET_PROFILE_PHOTO,
+  SET_SCHOOL_PICTURE,
   SET_SPECIAL_DATES,
   SET_SCHEDULE,
   SET_DAY_INFO,
@@ -94,6 +95,11 @@ const WHSApp = (state = initialState, {
       return {
         ...state,
         profilePhoto,
+      };
+    case SET_SCHOOL_PICTURE:
+      return {
+        ...state,
+        schoolPicture,
       };
     case SET_DAY_INFO:
       return {
