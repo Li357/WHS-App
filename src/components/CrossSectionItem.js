@@ -5,7 +5,6 @@ import { CardItem } from 'native-base';
 import { sum } from 'lodash';
 
 import { isHalfMod, decodeUnicode } from '../util/querySchedule';
-import { getMods } from '../util/processSchedule';
 import { MOD_ITEM_HEIGHT } from '../constants/constants';
 
 const CrossSectionItem = ({
@@ -61,17 +60,17 @@ const CrossSectionItem = ({
                 }, index, array) => {
                   const nextItem = array[index + 1];
                   const prevItem = array[index - 1];
-                  const ratio = nextItem ? nextItem.startMod - endMod : 0;
+                  const ratio = (nextItem ? nextItem.startMod : occupiedMods.slice(-1)) - endMod;
 
-                  // Array of 2s and 1s of current cross sectioned mod in column signifying ratios
-                  const flexRatios = getMods({ startMod, endMod }).map(mod => (
-                    isHalfMod(mod - Number(isAfterAssembly)) ? 1 : 2
-                  ));
-                  const wholeFlex = sum(flexRatios.slice(0, ratio + length + 1));
-                  const modItemFlex = sum(flexRatios.slice(0, length + 1));
+                  const prefix = startMod - occupiedMods[0];
                   /* eslint-disable function-paren-newline */
+                  const wholeFlex = sum(
+                    scheduleItemFlexRatios.slice(prefix, prefix + ratio + length),
+                  );
+                  const modItemFlex = sum(scheduleItemFlexRatios.slice(prefix, prefix + length));
+
                   const prefixFlex = sum(
-                    scheduleItemFlexRatios.slice(0, startMod - occupiedMods[0]),
+                    scheduleItemFlexRatios.slice(0, prefix),
                   );
                   /* eslint-enable function-paren-newline */
 

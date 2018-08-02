@@ -19,13 +19,12 @@ import DrawerContent from './src/components/DrawerContent';
 import {
   fetchUserInfo,
   fetchOtherDates,
-  setRefreshed,
   setProfilePhoto,
   setDayInfo,
   logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
-import { reportError, bugsnag } from './src/util/misc';
+import { reportError, bugsnag, triggerScheduleCaution } from './src/util/misc';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -105,7 +104,7 @@ export default class App extends Component {
 
       try {
         bugsnag.leaveBreadcrumb('Refreshing day info - manual');
-        const { dayInfo: { lastUpdate } } = store.getState();
+        const { dayInfo: { lastUpdate, isSummer } } = store.getState();
         const now = moment();
         const today = now.day();
         if (
@@ -128,32 +127,28 @@ export default class App extends Component {
           password,
         } = store.getState();
 
-        this.setState({
-          rehydrationStatus: 'Auto-refreshing your information...',
-        });
-        if (now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') && !refreshedSemesterTwo) {
-          bugsnag.leaveBreadcrumb('Refreshing semester two');
-          // If in semester two and has not refreshed, refresh info
-          store.dispatch(fetchUserInfo(username, password));
-          store.dispatch(setRefreshed(true, true));
-        } else if (
-          now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
-          && !refreshedSemesterOne
-        ) {
-          bugsnag.leaveBreadcrumb('Refreshing semester one');
-          // If in semester one and has not refreshed, refresh info
-          store.dispatch(fetchUserInfo(username, password));
-          store.dispatch(setRefreshed(true, false));
-        } else if (now.isSameOrAfter(lastDay.clone().add(2, 'months'), 'day')) {
-          bugsnag.leaveBreadcrumb('Toggling refreshes - new year');
-          /**
-           * If two months after last day, refresh
-           * The third argument bypasses the semesterOneStart < now < semesterTwoStart check
-           * because if someone opens up the app >two months after last school year's last day
-           * (i.e. August 1st) and it refreshes, it should not refresh on the first day
-           */
-          store.dispatch(fetchUserInfo(username, password, true));
-          store.dispatch(setRefreshed(true, false));
+        if (isSummer) {
+          triggerScheduleCaution(semesterOneStart);
+        } else {
+          this.setState({
+            rehydrationStatus: 'Auto-refreshing your information...',
+          });
+
+          if (
+            now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day')
+            && !refreshedSemesterTwo
+          ) {
+            bugsnag.leaveBreadcrumb('Refreshing semester two');
+            // If in semester two and has not refreshed, refresh info
+            await store.dispatch(fetchUserInfo(username, password));
+          } else if (
+            now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
+            && !refreshedSemesterOne
+          ) {
+            bugsnag.leaveBreadcrumb('Refreshing semester one');
+            // If in semester one and has not refreshed, refresh info
+            await store.dispatch(fetchUserInfo(username, password));
+          }
         }
 
         bugsnag.leaveBreadcrumb('Updating profile photo');

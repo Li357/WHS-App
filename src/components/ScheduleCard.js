@@ -94,9 +94,12 @@ export default class ScheduleCard extends Component {
       : userSchedule;
     /* eslint-enable indent */
 
-    // 20 is the margin, adds extra height for assemblies, remove height for Wednesdays
+    /**
+     * 20 is the margin, adds extra height for assemblies, remove half height for Wednesdays
+     * because Wednesdays have no homeroom, and homerooms are half height
+     */
     const progressBarHeight = MOD_ITEMS_HEIGHT +
-      ((hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT : 0));
+      ((hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT / 2 : 0));
 
     return (
       <Card style={styles.container}>

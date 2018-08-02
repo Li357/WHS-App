@@ -23,24 +23,27 @@ const getOccupiedMods = (scheduleItems) => {
  * endMod, then there must be an open mod
  */
 const interpolateOpenMods = scheduleItems => (
-  scheduleItems.reduce((withOpenMods, { endMod, sourceId }, index, array) => {
+  scheduleItems.reduce((withOpenMods, {
+    crossSectionedBlock, occupiedMods, endMod, sourceId,
+  }, index, array) => {
     const newArray = [...withOpenMods, array[index]];
     const next = array[index + 1];
     const nextStartMod = next && (next.startMod || next.occupiedMods[0]);
-    const lessThanNext = endMod < nextStartMod;
+    const adjustedEndMod = crossSectionedBlock ? occupiedMods.slice(-1)[0] : endMod;
+    const lessThanNext = adjustedEndMod < nextStartMod;
     if (
       lessThanNext // Either next exists and endMod < next startMod or cross-sectioned block
       || (!next && endMod !== 15) // Or next does not exist and endMod not 15 (last mod(s) are open)
     ) {
-      const openModLength = (next ? nextStartMod : 15) - endMod;
+      const openModLength = (next ? nextStartMod : 15) - adjustedEndMod;
       return [
         ...newArray,
         {
           sourceId: sourceId + 10000, // Set sourceType of open mods for keys in React iterations
           title: 'Open Mod',
-          startMod: endMod,
+          startMod: adjustedEndMod,
           length: openModLength, // If next does not exist, use 15
-          endMod: endMod + openModLength,
+          endMod: adjustedEndMod + openModLength,
         },
       ];
     }

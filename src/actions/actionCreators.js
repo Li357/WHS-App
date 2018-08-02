@@ -19,6 +19,7 @@ import {
   SET_REFRESHED,
   LOG_OUT,
 } from './actions';
+import { triggerScheduleCaution } from '../util/misc';
 
 const createActionCreator = (type, ...argNames) => (...args) => ({
   type,
@@ -133,6 +134,10 @@ const fetchUserInfo = (
     } = getState();
     const date = moment();
 
+    if (date.isBefore(semesterOneStart)) {
+      triggerScheduleCaution(semesterOneStart);
+    }
+
     // Set day info in user info fetch
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));
     /* eslint-disable function-paren-newline */
@@ -149,6 +154,8 @@ const fetchUserInfo = (
       || beforeStartRefresh
     ) {
       dispatch(setRefreshed(true, false));
+    } else {
+      dispatch(setRefreshed(false, false));
     }
     dispatch(setCredentials(username, password));
 
