@@ -159,7 +159,6 @@ android {
 }
 
 dependencies {
-    compile project(':bugsnag-react-native')
     implementation project(':react-native-code-push')
     implementation project(':bugsnag-react-native')
     implementation project(':react-native-fs')
