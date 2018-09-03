@@ -17,8 +17,8 @@ import Settings from './src/screens/Settings';
 import Loading from './src/screens/Loading';
 import DrawerContent from './src/components/DrawerContent';
 import {
+  fetchSpecialDates,
   fetchUserInfo,
-  fetchOtherDates,
   setProfilePhoto,
   setDayInfo,
   logOut,
@@ -189,7 +189,7 @@ export default class App extends Component {
     try {
       const { username, password, schoolPicture } = store.getState();
 
-      await store.dispatch(fetchOtherDates());
+      await store.dispatch(fetchSpecialDates());
       if (schoolPicture.includes('blank-user')) {
         await store.dispatch(fetchUserInfo(username, password, false, true));
       }

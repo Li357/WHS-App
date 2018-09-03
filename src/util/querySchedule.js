@@ -153,7 +153,7 @@ const isHalfMod = modNumber => modNumber >= 4 && modNumber <= 11;
  */
 const getDayInfo = (specialDates, date) => {
   const {
-    semesterOneStart, lastDay, noSchoolDates, otherNoSchoolDates,
+    semesterOneStart, lastDay, noSchoolDates,
   } = specialDates;
   const { schedule, isFinals, hasAssembly } = selectSchedule(specialDates, date);
   const range = [
@@ -161,7 +161,7 @@ const getDayInfo = (specialDates, date) => {
     schedule.slice(-1)[0][1],
   ].map(time => moment(`${time}:00`, 'k:mm:ss'));
 
-  const isBreak = [...noSchoolDates, ...otherNoSchoolDates].some(day => day.isSame(date, 'day'));
+  const isBreak = noSchoolDates.some(day => day.isSame(date, 'day'));
   /**
    * This check either checks if it is after the last day, because around two months after
    * last day, dates are refreshed and lastDay is next year, so then can check if date is before

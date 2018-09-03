@@ -1,20 +1,38 @@
 import { Alert } from 'react-native';
 import { Client, Configuration } from 'bugsnag-react-native';
 import moment from 'moment';
+import { mapValues } from 'lodash';
 
 import { store } from './initializeStore';
+
+const containsMoments = ['dayInfo', 'specialDates'];
 
 // Bugsnag client singleton for app-wide use
 const config = new Configuration();
 const bugsnag = new Client(config);
 
-config.codeBundleId = '2.0-b6';
+config.codeBundleId = '2.0-b7';
 config.registerBeforeSendCallback((report) => {
   // Filter out private information to keep reports anonymous
   const {
     username, name, password, id, ...currentState
   } = store.getState();
   const newState = Object.keys(currentState).reduce((stateObj, key) => {
+    if (containsMoments.includes(key)) {
+      // eslint-disable-next-line no-param-reassign
+      stateObj[key] = mapValues(currentState[key], (value) => {
+        /* eslint-disable no-underscore-dangle */
+        if (value && value._isValid) {
+          return value.toDate().toString();
+        } else if (Array.isArray(value) && value[0]._isValid) {
+          return value.map(date => date.toDate().toString());
+        }
+        /* eslint-enable no-underscore-dangle */
+        return value;
+      });
+      return stateObj;
+    }
+
     if (typeof currentState[key] !== 'object') {
       // Bugsnag will only record tabs that are object-ified
       /* eslint-disable no-param-reassign */

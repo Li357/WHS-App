@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import processSchedule from '../util/processSchedule';
 import { getDayInfo } from '../util/querySchedule';
-import { REQUEST_TIMEOUT } from '../constants/constants';
+import { API, REQUEST_TIMEOUT, SCHOOL_WEBSITE } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
   SET_USER_INFO,
@@ -51,18 +51,13 @@ const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
 const logOut = createActionCreator(LOG_OUT);
 
-/**
- * Function returns false on failed login
- * NOTE: This cannot be migrated to the express server because Node's HTTPS module is fundamentally
- * different from the client-side XMLHttpRequest
- */
 /* eslint-disable function-paren-newline */
 const fetchUserInfo = (
   username, password, beforeStartRefresh = false, onlyFetchSchoolPicture = false,
 ) => (
 /* eslint-enable function-paren-newline */
   async (dispatch, getState) => {
-    const loginURL = `https://westside-web.azurewebsites.net/account/login?Username=${username}&Password=${password}`;
+    const loginURL = `${SCHOOL_WEBSITE}/account/login?Username=${username}&Password=${password}`;
 
     // First request clears the user from previous signin
     await fetch(loginURL, {
@@ -163,17 +158,23 @@ const fetchUserInfo = (
   }
 );
 
-const toMoment = date => moment(date, 'MMMM D YYYY');
 const mapValuesToMoment = json => (
-  mapValues(json, value => (
-    Array.isArray(value) ? value.map(toMoment) : toMoment(value)
+  mapValues(json, valueOrValues => (
+    Array.isArray(valueOrValues)
+      ? valueOrValues.map(value => moment(value))
+      : moment(valueOrValues)
   ))
 );
 // Function returns false on failed fetch of dates
 const fetchSpecialDates = () => async (dispatch) => {
-  // Connect to express server which gets school calendar PDF
+  const now = moment();
+  const month = now.month();
+  const currentYear = now.year();
+  const startYear = month < 5 ? currentYear - 1 : currentYear;
+
+  // Connect to express server which gets school dates
   const specialDatesResponse = await fetch(
-    'https://whs-server.herokuapp.com/specialDates',
+    `${API}/specialDates?year=${startYear}&onlyDates=true`,
     { timeout: REQUEST_TIMEOUT },
   );
   if (specialDatesResponse.ok) {
@@ -184,26 +185,9 @@ const fetchSpecialDates = () => async (dispatch) => {
   return false;
 };
 
-const fetchOtherDates = () => async (dispatch, getState) => {
-  const otherDatesResponse = await fetch(
-    'https://whs-server.herokuapp.com/otherDates',
-    { timeout: REQUEST_TIMEOUT / 6 },
-  );
-  if (otherDatesResponse.ok) {
-    const json = await otherDatesResponse.json();
-    const { specialDates } = getState();
-    dispatch(setSpecialDates({
-      ...specialDates,
-      ...mapValuesToMoment(json),
-    }));
-    return true;
-  }
-  return false;
-};
-
 export {
   setUserInfo, setProfilePhoto, setSchedule,
   setDayInfo, setRefreshed,
-  fetchUserInfo, fetchSpecialDates, fetchOtherDates,
+  fetchUserInfo, fetchSpecialDates,
   logOut,
 };

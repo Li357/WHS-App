@@ -42,6 +42,7 @@
     "react-native": "0.55.4",
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-code-push": "^5.4.0",
+    "react-native-dialog": "^5.1.0",
     "react-native-extended-stylesheet": "^0.8.1",
     "react-native-fetch-polyfill": "^1.1.2",
     "react-native-looped-carousel": "^0.1.13",
