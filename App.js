@@ -82,7 +82,6 @@ export default class App extends Component {
       ) {
         this.updateDayInfo(now); // Pass already created instance
       }
-      this.silentlyFetchData();
     }
   }
 
