@@ -49,7 +49,14 @@ export default class Dashboard extends Component {
   constructor(props) {
     super(props);
 
-    const { navigation } = props;
+    const { navigation, username, password } = props;
+
+    // To navigate back to Login if logged out in handleRehydrate
+    if (username.length === 0 || password.length === 0) {
+      navigation.navigate('Login');
+      return;
+    }
+
     // This needs to be in the constructor for it to be registered by React Navigation
     this.blurSubscriber = navigation.addListener('willBlur', this.clearCountdowns);
     // Start countdowns back when user navigates back to dashboard

@@ -99,14 +99,17 @@ const fetchUserInfo = (
     const scheduleString = $('.page-content + script').contents()[0].data.trim();
     const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
     const isNewUser = schedule.length === 0;
-
     // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
     const isTeacher = nameSubtitle === 'Teacher';
-    const info = infoCard
-      .find('.card-subtitle a, .card-text:last-child')
-      .contents()
-      .map((index, { data }) => data.split(':').slice(-1)[0].trim());
-    const studentInfo = isNewUser
+    /* eslint-disable indent */
+    const info = !isTeacher
+      ? infoCard
+          .find('.card-subtitle a, .card-text:last-child')
+          .contents()
+          .map((index, { data }) => data.split(':').slice(-1)[0].trim())
+      : Array(4).fill(null);
+    /* eslint-enable indent */
+    const processedInfo = isNewUser && !isTeacher
       ? [null, ...info] // New users will only not be able to see their homeroom yet, so first is null
       : info;
 
@@ -138,7 +141,7 @@ const fetchUserInfo = (
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, processedSchedule, schoolPicture, isTeacher,
-      ...(isTeacher ? Array(4).fill(null) : studentInfo), // Teachers have all-null info array
+      ...processedInfo, // Teachers have all-null info array
     ));
     /* eslint-enable function-paren-newline */
 

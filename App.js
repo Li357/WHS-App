@@ -8,6 +8,7 @@ import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 import momentDurationFormat from 'moment-duration-format';
+import { xor } from 'lodash';
 
 import { store, persistor, storage } from './src/util/initializeStore';
 import Login from './src/screens/Login';
@@ -87,12 +88,23 @@ export default class App extends Component {
 
   handleRehydrate = async () => {
     const { dayInfo, schedule } = store.getState();
+
+    /* LEGACY BUG/UPDATE LOGOUT HANDLERS */
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
     if (typeof dayInfo === 'undefined') {
       bugsnag.leaveBreadcrumb('Logging v1.x user out');
       // Log out and reset store on update to v2 if the user is previous v1.x user
       store.dispatch(logOut());
     }
+
+    // Handle case where teacher's schedules have at least one day completely class-less, causing dashboard bug
+    const days = Object.keys(schedule);
+    if (xor(Array(5).fill().map((item, i) => i), days).length !== 0) {
+      bugsnag.leaveBreadcrumb('Logging invalid teacher out');
+      // Log out and reset store on update to v2 if the user is previous v1.x user
+      store.dispatch(logOut());
+    }
+    /* END LEGACY BUG/UPDATE LOGOUT HANDLERS */
 
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {

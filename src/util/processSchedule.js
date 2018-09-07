@@ -22,10 +22,33 @@ const getOccupiedMods = (scheduleItems) => {
  * and searching the next item. If the next item's startMod is greater than the current item's
  * endMod, then there must be an open mod
  */
-const interpolateOpenMods = scheduleItems => (
-  scheduleItems.reduce((withOpenMods, {
-    crossSectionedBlock, occupiedMods, endMod, sourceId,
+const interpolateOpenMods = (scheduleItems, day) => {
+  // Handle staff members that have no classes in a particular day
+  if (scheduleItems.length === 0) {
+    return [{
+      sourceId: 50000,
+      title: 'Open Mod',
+      startMod: 0,
+      endMod: 15,
+      day: day + 1, // indices are 0-based
+    }];
+  }
+
+  return scheduleItems.reduce((withOpenMods, {
+    crossSectionedBlock, occupiedMods, endMod, sourceId, sourceType, startMod,
   }, index, array) => {
+    // Handles case where homeroom is not first mod, i.e. for staff who don't have homerooms
+    let prevOpenMod = [];
+    if (index === 0 && sourceType !== 'homeroom') {
+      prevOpenMod = [{
+        sourceId: sourceId + 9999,
+        title: 'Open Mod',
+        startMod: 0,
+        length: startMod,
+        endMod: startMod,
+      }];
+    }
+
     const newArray = [...withOpenMods, array[index]];
     const next = array[index + 1];
     const nextStartMod = next && (next.startMod || next.occupiedMods[0]);
@@ -37,9 +60,10 @@ const interpolateOpenMods = scheduleItems => (
     ) {
       const openModLength = (next ? nextStartMod : 15) - adjustedEndMod;
       return [
+        ...prevOpenMod,
         ...newArray,
         {
-          sourceId: sourceId + 10000, // Set sourceType of open mods for keys in React iterations
+          sourceId: sourceId + 10000, // Set sourceId of open mods for keys in React iterations
           title: 'Open Mod',
           startMod: adjustedEndMod,
           length: openModLength, // If next does not exist, use 15
@@ -48,8 +72,8 @@ const interpolateOpenMods = scheduleItems => (
       ];
     }
     return newArray;
-  }, [])
-);
+  }, []);
+};
 
 // Internal function to return an array of scheduleItems between the specified bounds
 const getModsInBetween = (start, end, scheduleItems) => (
@@ -341,12 +365,20 @@ const processFinalsOrAssembly = (schedule, hasAssembly, isFinals) => {
 const processSchedule = schedule => (
   _(schedule)
     .groupBy('day')
+    .defaults({
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+    })
     .values()
     /* eslint-disable function-paren-newline */
-    .map(dayArray => interpolateOpenMods(
+    .map((dayArray, day) => interpolateOpenMods(
       interpolateCrossSectionedMods(
         sortBy(dayArray, ['startMod', 'length']),
       ),
+      day,
     ))
     /* eslint-enable function-paren-newline */
     .value()

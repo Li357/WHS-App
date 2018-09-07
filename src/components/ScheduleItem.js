@@ -66,7 +66,7 @@ const styles = EStyleSheet.create({
     justifyContent: 'center',
   },
   separator: {
-    height: '90%',
+    height: '100%',
     borderLeftColor: 'lightgrey',
     borderLeftWidth: 1,
     marginRight: 15,
