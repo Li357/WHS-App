@@ -8,7 +8,6 @@ import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 import momentDurationFormat from 'moment-duration-format';
-import { xor } from 'lodash';
 
 import { store, persistor, storage } from './src/util/initializeStore';
 import Login from './src/screens/Login';
@@ -98,10 +97,15 @@ export default class App extends Component {
     }
 
     // Handle case where teacher's schedules have at least one day completely class-less, causing dashboard bug
-    const days = Object.keys(schedule);
-    if (xor(Array(5).fill().map((item, i) => i), days).length !== 0) {
+    if (schedule.length !== 5) {
       bugsnag.leaveBreadcrumb('Logging invalid teacher out');
-      // Log out and reset store on update to v2 if the user is previous v1.x user
+      store.dispatch(logOut());
+    }
+
+    // Handle typo that open mods and first open mods have no day properties
+    const lacksDate = schedule.some(([firstClass]) => !firstClass.day);
+    if (lacksDate) {
+      bugsnag.leaveBreadcrumb('Logging invalid schedule out');
       store.dispatch(logOut());
     }
     /* END LEGACY BUG/UPDATE LOGOUT HANDLERS */

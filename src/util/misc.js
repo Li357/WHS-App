@@ -11,8 +11,8 @@ const containsMoments = ['dayInfo', 'specialDates'];
 const config = new Configuration();
 const bugsnag = new Client(config);
 
-config.codeBundleId = '2.0-b10';
 config.registerBeforeSendCallback((report) => {
+  config.codeBundleId = '2.0-b12';
   // Filter out private information to keep reports anonymous
   const {
     username, name, password, id, ...currentState

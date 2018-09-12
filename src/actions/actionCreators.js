@@ -124,7 +124,8 @@ const fetchUserInfo = (
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || schoolPicture));
     // Directly call fetchSpecialDates here for setDaySchedule
-    await dispatch(fetchSpecialDates());
+    const success = await dispatch(fetchSpecialDates());
+    if (!success) return false;
 
     const {
       specialDates,

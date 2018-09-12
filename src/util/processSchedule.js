@@ -35,17 +35,19 @@ const interpolateOpenMods = (scheduleItems, day) => {
   }
 
   return scheduleItems.reduce((withOpenMods, {
-    crossSectionedBlock, occupiedMods, endMod, sourceId, sourceType, startMod,
+    crossSectionedBlock, occupiedMods, endMod, sourceId, startMod, day: itemDay,
   }, index, array) => {
     // Handles case where homeroom is not first mod, i.e. for staff who don't have homerooms
     let prevOpenMod = [];
-    if (index === 0 && sourceType !== 'homeroom') {
+    // If first class in array and does not start at homeroom, then pad with open mod
+    if (index === 0 && startMod !== 0) {
       prevOpenMod = [{
         sourceId: sourceId + 9999,
         title: 'Open Mod',
         startMod: 0,
         length: startMod,
         endMod: startMod,
+        day: itemDay,
       }];
     }
 
@@ -68,6 +70,7 @@ const interpolateOpenMods = (scheduleItems, day) => {
           startMod: adjustedEndMod,
           length: openModLength, // If next does not exist, use 15
           endMod: adjustedEndMod + openModLength,
+          day: itemDay,
         },
       ];
     }
