@@ -116,15 +116,19 @@ const hasDayMatch = (array, target) => array.some(day => day.isSame(target, 'day
  * info from express server
  */
 const selectSchedule = ({
-  lastDay: secondFinalsDay, assemblyDates, lateStartDates, earlyDismissalDates,
+  lastDay: secondSemSecondDay, semesterOneEnd, assemblyDates, lateStartDates, earlyDismissalDates,
 }, date) => {
   let schedule;
-  const firstFinalsDay = secondFinalsDay.clone().subtract(1, 'd');
+  const secondSemFirstDay = secondSemSecondDay.clone().subtract(1, 'd');
+  const isSecondSemFinals = date.isSame(secondSemSecondDay, 'day') || date.isSame(secondSemFirstDay, 'day');
+
+  const firstSemFirstDay = semesterOneEnd.clone().subtract(1, 'd');
+  const isFirstSemFinals = date.isSame(semesterOneEnd, 'day') || date.isSame(firstSemFirstDay, 'day');
+
   const isLateStart = hasDayMatch(lateStartDates, date);
-  const isFinals = date.isSame(secondFinalsDay, 'day') || date.isSame(firstFinalsDay, 'day');
   const hasAssembly = hasDayMatch(assemblyDates, date);
 
-  if (isFinals) {
+  if (isFirstSemFinals || isSecondSemFinals) {
     // Since teachers have an extra "mod" of grading on finals day
     schedule = SCHEDULES.FINALS;
   } else if (date.day() === 3) {
