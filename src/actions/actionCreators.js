@@ -73,7 +73,7 @@ const fetchUserInfo = (
 
     const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
-    const name = $('title').text().split('|')[0].trim();
+    const name = $('title').text().split('|')[0].replace(/overview/ig, '').trim();
 
     if (error !== '') { // If error exists
       dispatch(setLoginError(true));

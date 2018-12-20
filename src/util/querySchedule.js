@@ -122,13 +122,16 @@ const selectSchedule = ({
   const secondSemFirstDay = secondSemSecondDay.clone().subtract(1, 'd');
   const isSecondSemFinals = date.isSame(secondSemSecondDay, 'day') || date.isSame(secondSemFirstDay, 'day');
 
-  const firstSemFirstDay = semesterOneEnd.clone().subtract(1, 'd');
-  const isFirstSemFinals = date.isSame(semesterOneEnd, 'day') || date.isSame(firstSemFirstDay, 'day');
+  const firstSemFirstDay = semesterOneEnd && semesterOneEnd.clone().subtract(1, 'd');
+  const isFirstSemFinals = semesterOneEnd
+    ? date.isSame(semesterOneEnd, 'day') || date.isSame(firstSemFirstDay, 'day')
+    : false;
+  const isFinals = isFirstSemFinals || isSecondSemFinals;
 
   const isLateStart = hasDayMatch(lateStartDates, date);
   const hasAssembly = hasDayMatch(assemblyDates, date);
 
-  if (isFirstSemFinals || isSecondSemFinals) {
+  if (isFinals) {
     // Since teachers have an extra "mod" of grading on finals day
     schedule = SCHEDULES.FINALS;
   } else if (date.day() === 3) {
