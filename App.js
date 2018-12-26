@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { createSwitchNavigator } from 'react-navigation';
-import { createDrawerNavigator } from 'react-navigation-drawer'; // Using my fork
+import {
+  createAppContainer,
+  createSwitchNavigator,
+  createDrawerNavigator,
+} from '@react-navigation/native';
 import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
@@ -258,7 +261,6 @@ export default class App extends Component {
           },
         },
       );
-
       const Navigator = createSwitchNavigator(
         {
           Login: { screen: Login },
@@ -266,8 +268,9 @@ export default class App extends Component {
         },
         { initialRouteName: hasLoggedIn() ? 'Drawer' : 'Login' },
       );
+      const AppContainer = createAppContainer(Navigator);
 
-      return (<Navigator onNavigationStateChange={null} />);
+      return (<AppContainer onNavigationStateChange={null} />);
     }
 
     return (<Loading {...this.state} />);
