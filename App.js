@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, StrictMode } from 'react';
 import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -278,18 +278,20 @@ export default class App extends Component {
 
   render() {
     return (
-      <Provider store={store}>
-        <PersistGate
-          loading={<Loading {...this.state} />}
-          persistor={persistor}
-          onBeforeLift={this.handleRehydrate}
-        >
-          <View style={styles.container}>
-            <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
-            {this.renderApp()}
-          </View>
-        </PersistGate>
-      </Provider>
+      <StrictMode>
+        <Provider store={store}>
+          <PersistGate
+            loading={<Loading {...this.state} />}
+            persistor={persistor}
+            onBeforeLift={this.handleRehydrate}
+          >
+            <View style={styles.container}>
+              <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
+              {this.renderApp()}
+            </View>
+          </PersistGate>
+        </Provider>
+      </StrictMode>
     );
   }
 }
