@@ -25,7 +25,7 @@ const styles = EStyleSheet.create({
   text: {
     fontFamily: '$fontLight',
     fontSize: 17,
-    marginTop: 5,
+    marginTop: 10,
   },
   bar: { marginTop: 10 },
 });

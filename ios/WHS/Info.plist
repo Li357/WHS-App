@@ -42,7 +42,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>WHS wants to use your camera.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>WHS wants to access your photo library.</string>
 	<key>UIAppFonts</key>

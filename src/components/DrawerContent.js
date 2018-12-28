@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ImageBackground, Text } from 'react-native';
+import { View, ImageBackground, Text, ScrollView } from 'react-native';
 import { Container, Button, Icon } from 'native-base';
 import { DrawerItems } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -24,21 +24,26 @@ export default class DrawerContent extends Component {
 
   render() {
     const now = moment();
+    const { otherSchedules } = this.props;
 
     return (
       <Container style={styles.container}>
-        <ImageBackground source={background} style={styles.header}>
-          <View style={styles.dateContainer}>
-            <Text style={styles.weekday}>{now.format('dddd')}</Text>
-            <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
-          </View>
-        </ImageBackground>
-        <DrawerItems {...this.props} itemsContainerStyle={styles.items} />
-        <View style={styles.separator} />
-        <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
-          <Icon name="md-log-out" style={styles.icon} />
-          <Text allowFontScaling style={styles.text}>Logout</Text>
-        </Button>
+        <View style={styles.imageContainer}>
+          <ImageBackground source={background} style={styles.header}>
+            <View style={styles.dateContainer}>
+              <Text style={styles.weekday}>{now.format('dddd')}</Text>
+              <Text style={styles.date}>{now.format('MMM D, YYYY')}</Text>
+            </View>
+          </ImageBackground>
+        </View>
+        <ScrollView>
+          <DrawerItems {...this.props} itemsContainerStyle={styles.items} />
+          <View style={styles.separator} />
+          <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
+            <Icon name="md-log-out" style={styles.icon} />
+            <Text allowFontScaling style={styles.text}>Logout</Text>
+          </Button>
+        </ScrollView>
       </Container>
     );
   }
@@ -46,12 +51,8 @@ export default class DrawerContent extends Component {
 
 const styles = EStyleSheet.create({
   container: { flex: 1 },
-  header: {
-    alignSelf: 'stretch',
-    width: null,
-    position: 'relative',
-    height: '30%',
-  },
+  imageContainer: { height: '30%' },
+  header: { height: '100%' },
   dateContainer: {
     position: 'absolute',
     bottom: '10%',

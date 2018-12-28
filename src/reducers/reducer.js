@@ -8,6 +8,8 @@ import {
   SET_SCHEDULE,
   SET_DAY_INFO,
   SET_REFRESHED,
+  SET_OTHER_SCHEDULES,
+  SET_QR,
   LOG_OUT,
 } from '../actions/actions';
 
@@ -25,6 +27,8 @@ const initialState = {
   schedule: [],
   profilePhoto: null,
   schoolPicture: null,
+  qr: '',
+  otherSchedules: [],
   dayInfo: {
     start: null,
     end: null,
@@ -56,6 +60,8 @@ const WHSApp = (state = initialState, {
   schedule,
   profilePhoto,
   schoolPicture,
+  otherSchedules,
+  qr,
   dayStart,
   dayEnd,
   daySchedule,
@@ -75,10 +81,16 @@ const WHSApp = (state = initialState, {
         ...state,
         loginError,
       };
+    case SET_OTHER_SCHEDULES:
+      return {
+        ...state,
+        otherSchedules,
+      };
     case SET_USER_INFO:
       return {
         ...state,
         ...userInfo,
+        qr,
         schedule,
         schoolPicture,
       };
@@ -127,6 +139,11 @@ const WHSApp = (state = initialState, {
         ...state,
         refreshedSemesterOne,
         refreshedSemesterTwo,
+      };
+    case SET_QR:
+      return {
+        ...state,
+        qr,
       };
     case LOG_OUT:
       return initialState;

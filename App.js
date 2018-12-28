@@ -6,7 +6,7 @@ import {
   createAppContainer,
   createSwitchNavigator,
   createDrawerNavigator,
-} from '@react-navigation/native';
+} from 'react-navigation';
 import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
@@ -16,6 +16,7 @@ import { store, persistor, storage } from './src/util/initializeStore';
 import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import Schedule from './src/screens/Schedule';
+import AddSchedule from './src/screens/AddSchedule';
 import Settings from './src/screens/Settings';
 import Loading from './src/screens/Loading';
 import DrawerContent from './src/components/DrawerContent';
@@ -250,6 +251,7 @@ export default class App extends Component {
         {
           Dashboard: { screen: Dashboard },
           Schedule: { screen: Schedule },
+          'Add Schedule': { screen: AddSchedule },
           Settings: { screen: Settings },
         },
         {
@@ -278,20 +280,18 @@ export default class App extends Component {
 
   render() {
     return (
-      <StrictMode>
-        <Provider store={store}>
-          <PersistGate
-            loading={<Loading {...this.state} />}
-            persistor={persistor}
-            onBeforeLift={this.handleRehydrate}
-          >
-            <View style={styles.container}>
-              <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
-              {this.renderApp()}
-            </View>
-          </PersistGate>
-        </Provider>
-      </StrictMode>
+      <Provider store={store}>
+        <PersistGate
+          loading={<Loading {...this.state} />}
+          persistor={persistor}
+          onBeforeLift={this.handleRehydrate}
+        >
+          <View style={styles.container}>
+            <StatusBar barStyle={`${Platform.OS === 'android' ? 'light' : 'dark'}-content`} />
+            {this.renderApp()}
+          </View>
+        </PersistGate>
+      </Provider>
     );
   }
 }

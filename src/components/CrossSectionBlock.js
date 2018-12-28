@@ -1,7 +1,9 @@
 import React from 'react';
 import { Text } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { List, ListItem, Left, Right } from 'native-base';
+import {
+  List, ListItem, Left, Right,
+} from 'native-base';
 
 import { decodeUnicode } from '../util/querySchedule';
 

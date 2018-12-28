@@ -17,8 +17,11 @@ import {
   SET_DAY_INFO,
   SET_SCHEDULE,
   SET_REFRESHED,
+  SET_OTHER_SCHEDULES,
+  SET_QR,
   LOG_OUT,
 } from './actions';
+import { generateBase64Link } from '../util/qr';
 import { triggerScheduleCaution } from '../util/misc';
 
 const createActionCreator = (type, ...argNames) => (...args) => ({
@@ -33,7 +36,7 @@ const createActionCreator = (type, ...argNames) => (...args) => ({
 const setLoginError = createActionCreator(SET_LOGIN_ERROR, 'loginError');
 const setUserInfo = createActionCreator(
   SET_USER_INFO,
-  'name', 'classOf', 'schedule', 'schoolPicture', 'isTeacher', 'homeroom', 'counselor', 'dean', 'id',
+  'name', 'classOf', 'schedule', 'schoolPicture', 'isTeacher', 'homeroom', 'counselor', 'dean', 'id', 'qr',
 );
 const setCredentials = createActionCreator(
   SET_CREDENTIALS,
@@ -49,6 +52,8 @@ const setDayInfo = createActionCreator(
 );
 const setSchedule = createActionCreator(SET_SCHEDULE, 'schedule');
 const setRefreshed = createActionCreator(SET_REFRESHED, 'refreshedSemesterOne', 'refreshedSemesterTwo');
+const setOtherSchedules = createActionCreator(SET_OTHER_SCHEDULES, 'otherSchedules');
+const setQR = createActionCreator(SET_QR, 'qr');
 const logOut = createActionCreator(LOG_OUT);
 
 /* eslint-disable function-paren-newline */
@@ -70,6 +75,10 @@ const fetchUserInfo = (
       timeout: REQUEST_TIMEOUT,
     });
     const userpageHTML = await userpageResponse.text();
+
+    if (!userpageResponse.ok) {
+      return false;
+    }
 
     const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
@@ -107,6 +116,7 @@ const fetchUserInfo = (
           .find('.card-subtitle a, .card-text:last-child')
           .contents()
           .map((index, { data }) => data.split(':').slice(-1)[0].trim())
+          .toArray()
       : Array(4).fill(null);
     /* eslint-enable indent */
     const processedInfo = isNewUser && !isTeacher
@@ -139,10 +149,15 @@ const fetchUserInfo = (
 
     // Set day info in user info fetch
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));
+
+    // Generate link from slimmer schedule, not processed with open mods and cross-sections
+    const qr = await generateBase64Link(processedSchedule, name);
+
     /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, processedSchedule, schoolPicture, isTeacher,
       ...processedInfo, // Teachers have all-null info array
+      qr,
     ));
     /* eslint-enable function-paren-newline */
 
@@ -190,7 +205,7 @@ const fetchSpecialDates = () => async (dispatch) => {
 };
 
 export {
-  setUserInfo, setProfilePhoto, setSchedule,
+  setUserInfo, setQR, setProfilePhoto, setSchedule,
   setDayInfo, setRefreshed,
   fetchUserInfo, fetchSpecialDates,
   logOut,

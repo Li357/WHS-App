@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   hamburgerContainer: {
     position: 'absolute',
-    top: '2.5%',
+    top: '5%',
     left: '2.5%',
   },
   hamburger: {

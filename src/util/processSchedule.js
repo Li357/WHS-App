@@ -388,4 +388,6 @@ const processSchedule = schedule => (
 );
 
 export default processSchedule;
-export { getMods, mapToFinals, interpolateAssembly, processFinalsOrAssembly };
+export {
+  getMods, mapToFinals, interpolateAssembly, processFinalsOrAssembly,
+};
