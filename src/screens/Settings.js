@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Alert, View, Text } from 'react-native';
-import { List, ListItem, Left, Body, Icon } from 'native-base';
+import {
+  List, ListItem, Left, Body, Icon,
+} from 'native-base';
 import Dialog from 'react-native-dialog';
 import { CircleSnail } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';

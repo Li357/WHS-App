@@ -11,7 +11,8 @@ const containsMoments = ['dayInfo', 'specialDates'];
 const config = new Configuration();
 const bugsnag = new Client(config);
 
-config.notifyReleaseStages = ['staging', 'production'];
+config.releaseStage = process.env.NODE_ENV;
+config.notifyReleaseStages = ['production'];
 config.registerBeforeSendCallback((report) => {
   config.codeBundleId = '2.0-b12';
   // Filter out private information to keep reports anonymous
@@ -25,7 +26,9 @@ config.registerBeforeSendCallback((report) => {
         /* eslint-disable no-underscore-dangle */
         if (value && value._isValid) {
           return value.toDate().toString();
-        } else if (Array.isArray(value) && value[0] && value[0]._isValid) {
+        }
+        
+        if (Array.isArray(value) && value[0] && value[0]._isValid) {
           return value.map(date => date.toDate().toString());
         }
         /* eslint-enable no-underscore-dangle */

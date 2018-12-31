@@ -14,7 +14,9 @@ const getCurrentMod = ({
 }, date = moment()) => {
   if (date.isAfter(end)) {
     return AFTER_SCHOOL;
-  } else if (date.isBefore(start)) {
+  }
+  
+  if (date.isBefore(start)) {
     return BEFORE_SCHOOL;
   }
 

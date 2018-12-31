@@ -1,4 +1,5 @@
 import React from 'react';
+import { ScrollView } from 'react-native';
 import { Item, Input, Icon, Button, List } from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
@@ -6,16 +7,18 @@ const SearchBar = ({ renderItem, value, onChange, onCancel, data, ...props }) =>
   <>
     <Item style={styles.searchBar}>
       <Icon type="MaterialIcons" name="search" />
-      <Input placeholder="Search teachers" onChangeText={onChange} value={value} />
+      <Input placeholder="Search teachers" onChangeText={onChange} value={value} autoCorrect={false} />
       <Button transparent style={styles.cancelButton} onPress={onCancel}>
         <Icon type="MaterialIcons" name="close" style={styles.cancelIcon} />
       </Button>
     </Item>
     {
       data.length > 0 &&
-        <List data={data} style={styles.searchResults}>
-          {data.map(renderItem)}
-        </List>
+        <ScrollView style={styles.searchResults}>
+          <List data={data}>
+            {data.map(renderItem)}
+          </List>
+        </ScrollView>
     }
   </>
 );

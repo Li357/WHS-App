@@ -16,6 +16,8 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 - [ ] Update teacher schedules automatically
 - [ ] ON HOLD - Dark mode
 
+- [ ] Migrate from Moment to something less heavy
+
 - [ ] Better bug reports
 - [ ] Fix UX on app update where screen flashes twice
 - [ ] Fix dashboard layout UX (jumpy)

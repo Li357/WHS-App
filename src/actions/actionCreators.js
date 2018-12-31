@@ -150,7 +150,7 @@ const fetchUserInfo = (
     // Set day info in user info fetch
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));
 
-    // Generate link from slimmer schedule, not processed with open mods and cross-sections
+    // Generate QR Code
     const qr = await generateBase64Link(processedSchedule, name);
 
     /* eslint-disable function-paren-newline */
@@ -206,7 +206,7 @@ const fetchSpecialDates = () => async (dispatch) => {
 
 export {
   setUserInfo, setQR, setProfilePhoto, setSchedule,
-  setDayInfo, setRefreshed,
+  setDayInfo, setRefreshed, setOtherSchedules,
   fetchUserInfo, fetchSpecialDates,
   logOut,
 };

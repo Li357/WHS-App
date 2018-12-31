@@ -3,7 +3,6 @@ import { AppState, Switch, View, Text, ScrollView } from 'react-native';
 import { Card, CardItem } from 'native-base';
 import { VerticalBar } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
 import ScheduleItem from './ScheduleItem';
@@ -12,14 +11,14 @@ import { selectSchedule } from '../util/querySchedule';
 import { mapToFinals, interpolateAssembly } from '../util/processSchedule';
 import { MOD_ITEMS_HEIGHT, MOD_ITEM_HEIGHT, ASSEMBLY_MOD } from '../constants/constants';
 
-@withNavigation
 export default class ScheduleCard extends Component {
   constructor(props) {
     super(props);
-    this.focusSubscriber = this.props.navigation.addListener('didFocus', this.updateProgress);
+
+    const { dayInfo: { start, end }, navigation } = this.props;
+    this.focusSubscriber = navigation.addListener('didFocus', this.updateProgress);
     AppState.addEventListener('change', this.handleAppStateChange);
 
-    const { dayInfo: { start, end } } = this.props;
     const date = moment();
     this.state = {
       showTimes: false,

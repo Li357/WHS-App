@@ -1,7 +1,7 @@
 import { Dimensions } from 'react-native';
 
 const API = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:5000/api'
+  ? 'http://192.168.0.13:5000/api'
   : 'https://whs-server.herokuapp.com/api';
 const SCHOOL_WEBSITE = 'https://westside-web.azurewebsites.net';
 const REQUEST_TIMEOUT = 6000; // Universal timeout for requests

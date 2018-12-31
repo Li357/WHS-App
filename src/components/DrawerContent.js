@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import { View, ImageBackground, Text, ScrollView } from 'react-native';
+import {
+  View, ImageBackground, Text, ScrollView,
+} from 'react-native';
 import { Container, Button, Icon } from 'native-base';
-import { DrawerItems } from 'react-navigation';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { connect } from 'react-redux';
 import moment from 'moment';
 
+import DrawerItems from './DrawerItems';
 import { logOut } from '../actions/actionCreators';
 import { HEIGHT } from '../constants/constants';
 import background from '../../assets/images/background.png';
 
-const mapStateToProps = (state, ownProps) => ({
-  ...state, ...ownProps,
-});
+const mapStateToProps = ({ otherSchedules }) => ({ otherSchedules });
 
 @connect(mapStateToProps)
 export default class DrawerContent extends Component {
@@ -22,9 +22,12 @@ export default class DrawerContent extends Component {
     dispatch(logOut());
   }
 
+  handleSchedulePress = (...args) => {
+    this.props.navigation.navigate(...args);
+  }
+
   render() {
     const now = moment();
-    const { otherSchedules } = this.props;
 
     return (
       <Container style={styles.container}>
@@ -37,7 +40,11 @@ export default class DrawerContent extends Component {
           </ImageBackground>
         </View>
         <ScrollView>
-          <DrawerItems {...this.props} itemsContainerStyle={styles.items} />
+          <DrawerItems
+            {...this.props}
+            onSchedulePress={this.handleSchedulePress}
+            itemsContainerStyle={styles.items}
+          />
           <View style={styles.separator} />
           <Button iconLeft transparent onPress={this.handleLogout} style={styles.logout}>
             <Icon name="md-log-out" style={styles.icon} />

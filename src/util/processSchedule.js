@@ -74,7 +74,7 @@ const interpolateOpenMods = (scheduleItems, day) => {
         },
       ];
     }
-    return newArray;
+    return [...prevOpenMod, ...newArray];
   }, []);
 };
 

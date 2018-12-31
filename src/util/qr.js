@@ -1,5 +1,4 @@
-import { Alert } from 'react-native';
-import { inflate, deflate } from 'pako';
+import { deflate } from 'pako';
 import { Buffer } from 'buffer';
 
 import { API } from '../constants/constants';
@@ -7,7 +6,7 @@ import { API } from '../constants/constants';
 const generateBase64Link = async (schedule, name) => {
   const compressed = compressSchedule(schedule, name);
   const binary = deflate(JSON.stringify(compressed));
-  const base64 = Buffer.from(binary).toString('base64'); // Encode to base64
+  const base64 = Buffer.from(binary).toString('base64');
   const response = await fetch(
     `${API}/shorten?d=${base64}`,
     { method: 'POST' },
@@ -54,7 +53,7 @@ const compressSchedule = (schedule, name) => schedule.reduce(([S, D], daySchedul
 }, [
   [], // S are the schedule items,
   [[], [], [], [], []], // day schedules
-  name
+  name,
 ]);
 
 export {

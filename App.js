@@ -1,5 +1,7 @@
-import React, { Component, StrictMode } from 'react';
-import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import React, { Component } from 'react';
+import {
+  AppState, View, StyleSheet, StatusBar, Platform,
+} from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import {
@@ -54,6 +56,7 @@ export default class App extends Component {
     codePushStatus: 'Checking for updates...',
     codePushProgress: 0,
   }
+
   /* eslint-disable react/sort-comp */
   codePushStatuses = {
     4: 'Syncing in progress...',
@@ -250,7 +253,18 @@ export default class App extends Component {
       const Drawer = createDrawerNavigator(
         {
           Dashboard: { screen: Dashboard },
-          Schedule: { screen: Schedule },
+          'My Schedule': { screen: Schedule },
+
+          /**
+           * Since React Navigation doesn't support dynamic drawer routes, this
+           * creates a placeholder of up to 50 schedules named Schedule1 ... 50
+           * that are not visible by default in the drawer but are internally filled
+           */
+          ...Array(50).fill().reduce((acc, _, i) => ({
+            ...acc,
+            [`Schedule${i}`]: { screen: Schedule },
+          }), {}),
+          
           'Add Schedule': { screen: AddSchedule },
           Settings: { screen: Settings },
         },
