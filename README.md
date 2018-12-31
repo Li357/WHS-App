@@ -13,7 +13,8 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 - [ ] Finish integration with server (especially refreshing & schedule cautions)
 - [ ] QR Codes to share schedules (branch `qr`)
 - [ ] Teacher schedules
-- [ ] Dark mode
+- [ ] Update teacher schedules automatically
+- [ ] ON HOLD - Dark mode
 
 - [ ] Better bug reports
 - [ ] Fix UX on app update where screen flashes twice
