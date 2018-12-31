@@ -73,31 +73,6 @@ const selectProps = (...props) => state => (
   }, {})
 );
 
-const triggerScheduleCaution = (firstDay) => {
-  // Assume schedules are 'final' two days before first formal day of school
-  const schedulesFinalDay = firstDay.clone().subtract(1, 'day');
-  // Since incoming freshman have the first day reserved, the 'adjusted day' is the first formal day
-  const adjustedFirstDay = firstDay.clone().add(1, 'day');
-  if (moment().isBefore(schedulesFinalDay)) {
-    // Convert moment objects to human readable strings
-    const finalDate = schedulesFinalDay.format('MMMM Do');
-    const firstDate = adjustedFirstDay.format('MMMM Do');
-
-    /* eslint-disable indent */
-    Alert.alert(
-      'Caution',
-      `Many schedules are still changing and will not be considered final until ${finalDate}. ${''
-      }Please be sure to refresh your schedule on ${finalDate} so you attend the correct classes${''
-      } starting ${firstDate}.
-      ${''
-      }Please note: the course request deadline passed on July 31st, and counselors will not ${''
-      }accept any request for changes at this time.`,
-      [{ text: 'OK' }],
-    );
-    /* eslint-enable indent */
-  }
-};
-
 export {
-  reportError, selectProps, bugsnag, triggerScheduleCaution,
+  reportError, selectProps, bugsnag,
 };

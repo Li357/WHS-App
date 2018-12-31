@@ -22,7 +22,6 @@ import {
   LOG_OUT,
 } from './actions';
 import { generateBase64Link } from '../util/qr';
-import { triggerScheduleCaution } from '../util/misc';
 
 const createActionCreator = (type, ...argNames) => (...args) => ({
   type,
@@ -142,10 +141,6 @@ const fetchUserInfo = (
       specialDates: { semesterOneStart, semesterTwoStart, lastDay },
     } = getState();
     const date = moment();
-
-    if (date.isBefore(semesterOneStart)) {
-      triggerScheduleCaution(semesterOneStart);
-    }
 
     // Set day info in user info fetch
     dispatch(setDayInfo(...getDayInfo(specialDates, date)));

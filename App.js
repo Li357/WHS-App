@@ -30,7 +30,7 @@ import {
   logOut,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
-import { reportError, bugsnag, triggerScheduleCaution } from './src/util/misc';
+import { reportError, bugsnag } from './src/util/misc';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -149,28 +149,24 @@ export default class App extends Component {
           password,
         } = store.getState();
 
-        if (isSummer) {
-          triggerScheduleCaution(semesterOneStart);
-        } else {
           this.setState({
             rehydrationStatus: 'Auto-refreshing your information...',
           });
 
-          if (
-            now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') &&
-            !refreshedSemesterTwo
-          ) {
-            bugsnag.leaveBreadcrumb('Refreshing semester two');
-            // If in semester two and has not refreshed, refresh info
-            await store.dispatch(fetchUserInfo(username, password));
-          } else if (
-            now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day') &&
-            !refreshedSemesterOne
-          ) {
-            bugsnag.leaveBreadcrumb('Refreshing semester one');
-            // If in semester one and has not refreshed, refresh info
-            await store.dispatch(fetchUserInfo(username, password));
-          }
+        if (
+          now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') &&
+          !refreshedSemesterTwo
+        ) {
+          bugsnag.leaveBreadcrumb('Refreshing semester two');
+          // If in semester two and has not refreshed, refresh info
+          await store.dispatch(fetchUserInfo(username, password));
+        } else if (
+          now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day') &&
+          !refreshedSemesterOne
+        ) {
+          bugsnag.leaveBreadcrumb('Refreshing semester one');
+          // If in semester one and has not refreshed, refresh info
+          await store.dispatch(fetchUserInfo(username, password));
         }
 
         bugsnag.leaveBreadcrumb('Updating profile photo');
