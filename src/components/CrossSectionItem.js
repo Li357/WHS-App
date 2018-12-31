@@ -81,7 +81,7 @@ const CrossSectionItem = ({
                          * This pads the column if the first item in the column does not start at
                          * beginning of cross sectioned block
                          */
-                        !prevItem && startMod !== occupiedMods[0] &&
+                        !prevItem && startMod !== occupiedMods[0] && (
                           <View
                             style={[styles.empty, {
                               flex: prefixFlex,
@@ -89,6 +89,7 @@ const CrossSectionItem = ({
                               borderBottomColor: 'lightgrey',
                             }]}
                           />
+                        )
                       }
                       <View style={[styles.modItem, { flex: modItemFlex }]}>
                         <Text style={styles.titleText}>{decodeUnicode(title)}</Text>

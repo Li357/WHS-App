@@ -83,9 +83,9 @@ export default class App extends Component {
       const now = moment();
       const today = now.day();
       if (
-        newStatus === 'active'
-        && lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
-        && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
+        newStatus === 'active' &&
+        lastUpdate && !lastUpdate.isSame(now, 'day') && // Only update if not updated in one day
+        today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
       ) {
         this.updateDayInfo(now); // Pass already created instance
       }
@@ -130,8 +130,8 @@ export default class App extends Component {
         const now = moment();
         const today = now.day();
         if (
-          lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
-          && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat)
+          lastUpdate && !lastUpdate.isSame(now, 'day') && // Only update if not updated in one day
+          today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat)
         ) {
           this.setState({
             rehydrationStatus: 'Updating today\'s information...',
@@ -157,15 +157,15 @@ export default class App extends Component {
           });
 
           if (
-            now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day')
-            && !refreshedSemesterTwo
+            now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day') &&
+            !refreshedSemesterTwo
           ) {
             bugsnag.leaveBreadcrumb('Refreshing semester two');
             // If in semester two and has not refreshed, refresh info
             await store.dispatch(fetchUserInfo(username, password));
           } else if (
-            now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
-            && !refreshedSemesterOne
+            now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day') &&
+            !refreshedSemesterOne
           ) {
             bugsnag.leaveBreadcrumb('Refreshing semester one');
             // If in semester one and has not refreshed, refresh info
@@ -264,7 +264,7 @@ export default class App extends Component {
             ...acc,
             [`Schedule${i}`]: { screen: Schedule },
           }), {}),
-          
+
           'Add Schedule': { screen: AddSchedule },
           Settings: { screen: Settings },
         },
@@ -286,10 +286,10 @@ export default class App extends Component {
       );
       const AppContainer = createAppContainer(Navigator);
 
-      return (<AppContainer onNavigationStateChange={null} />);
+      return <AppContainer onNavigationStateChange={null} />;
     }
 
-    return (<Loading {...this.state} />);
+    return <Loading {...this.state} />;
   }
 
   render() {

@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
-import { AsyncStorage, View, Text, StyleSheet } from 'react-native';
+import {
+  AsyncStorage, View, Text, StyleSheet,
+} from 'react-native';
 import PhotoUpload from 'react-native-photo-upload';
 import { Thumbnail } from 'native-base';
 import Carousel from 'react-native-looped-carousel';
@@ -74,7 +76,8 @@ export default class UserInfo extends PureComponent {
         {
           !isTeacher
             /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
-            ? <Carousel
+            ? (
+              <Carousel
                 autoplay={false}
                 bullets
                 style={styles.studentProfile}
@@ -103,6 +106,7 @@ export default class UserInfo extends PureComponent {
                   </View>
                 </View>
               </Carousel>
+            )
             : this.renderForeground()
             /* eslint-enable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
         }

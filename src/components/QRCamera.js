@@ -16,9 +16,11 @@ const QRCamera = ({ onRead, onCancel }) => (
       ({ status }) => (
         status !== 'READY'
           ? <CircleSnail indeterminate size={50} />
-          : <Button bordered warning style={styles.cancelButton} onPress={onCancel}>
+          : (
+            <Button bordered warning style={styles.cancelButton} onPress={onCancel}>
               <Text style={styles.cancelText}>Cancel</Text>
             </Button>
+          )
       )
     }
   </RNCamera>

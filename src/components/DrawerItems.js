@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
 import TouchableItem from 'react-navigation-drawer/dist/views/TouchableItem';
 import { SafeAreaView } from 'react-navigation';
 
@@ -23,7 +24,7 @@ const DrawerItemContainer = ({
 // Other schedule route names are in the format Schedule1...50
 const otherScheduleKeyRegex = /Schedule(\d+)/;
 /**
- * Custom drawer item component to handle other schedules, 
+ * Custom drawer item component to handle other schedules,
  * see ReactNavigation.DrawerItems
  */
 const DrawerItems = ({
@@ -55,7 +56,12 @@ const DrawerItems = ({
         const focused = activeItemKey === route.key;
         const color = focused ? activeTintColor : inactiveTintColor;
         const backgroundColor = focused ? activeBackgroundColor : inactiveBackgroundColor;
-        const scene = { route, index, focused, tintColor: color };
+        const scene = {
+          route,
+          index,
+          focused,
+          tintColor: color,
+        };
         const extraLabelStyle = focused ? activeLabelStyle : inactiveLabelStyle;
 
         const sharedProps = {
@@ -65,7 +71,7 @@ const DrawerItems = ({
           itemStyle,
         };
         const compoundLabelStyle = [
-          styles.label, 
+          styles.label,
           { color },
           labelStyle,
           extraLabelStyle,
@@ -80,7 +86,10 @@ const DrawerItems = ({
           if (specificSchedule) {
             const { name } = specificSchedule;
             return (
-              <DrawerItemContainer {...sharedProps} onPress={() => onSchedulePress(route.key, specificSchedule)}>
+              <DrawerItemContainer
+                {...sharedProps}
+                onPress={() => onSchedulePress(route.key, specificSchedule)}
+              >
                 <View style={[styles.icon, iconContainerStyle]} />
                 <Text style={compoundLabelStyle}>{name}</Text>
               </DrawerItemContainer>
@@ -97,18 +106,24 @@ const DrawerItems = ({
         const accessibilityLabel = typeof label === 'string' ? label : undefined;
 
         return (
-          <DrawerItemContainer 
-            {...sharedProps} 
+          <DrawerItemContainer
+            {...sharedProps}
             accessibilityLabel={accessibilityLabel}
             onPress={() => onItemPress({ route, focused })}
           >
             {
               icon
-                ? <View style={[
-                    styles.icon,
-                    focused ? null : styles.inactiveIcon,
-                    iconContainerStyle,
-                  ]}>{icon}</View>
+                ? (
+                  <View
+                    style={[
+                      styles.icon,
+                      focused ? null : styles.inactiveIcon,
+                      iconContainerStyle,
+                    ]}
+                  >
+                    {icon}
+                  </View>
+                )
                 : null
             }
             {
@@ -118,7 +133,7 @@ const DrawerItems = ({
             }
           </DrawerItemContainer>
         );
-      }) 
+      })
     }
   </View>
 );
@@ -127,24 +142,24 @@ DrawerItems.defaultProps = {
   activeTintColor: '#2196f3',
   activeBackgroundColor: 'rgba(0, 0, 0, .04)',
   inactiveTintColor: 'rgba(0, 0, 0, .87)',
-  inactiveBackgroundColor: 'transparent'
+  inactiveBackgroundColor: 'transparent',
 };
 
 const styles = StyleSheet.create({
   container: { paddingVertical: 4 },
   item: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   icon: {
     marginHorizontal: 16,
     width: 24,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   inactiveIcon: { opacity: 0.62 },
   label: {
     margin: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 });
 

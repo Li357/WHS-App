@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { AppState, Switch, View, Text, ScrollView } from 'react-native';
+import {
+  AppState, Switch, View, Text, ScrollView,
+} from 'react-native';
 import { Card, CardItem } from 'native-base';
 import { VerticalBar } from 'react-native-progress';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -97,13 +99,13 @@ export default class ScheduleCard extends Component {
      * 20 is the margin, adds extra height for assemblies, remove half height for Wednesdays
      * because Wednesdays have no homeroom, and homerooms are half height
      */
-    const progressBarHeight = MOD_ITEMS_HEIGHT +
-      ((hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT / 2 : 0));
+    const progressBarHeight = MOD_ITEMS_HEIGHT
+      + ((hasAssembly ? MOD_ITEM_HEIGHT : 0) - 20 - (isWednesday ? MOD_ITEM_HEIGHT / 2 : 0));
 
     return (
       <Card style={styles.container}>
         <CardItem header bordered style={styles.header}>
-          <Text style={styles.day}>{cardDate.format('dddd')} </Text>
+          <Text style={styles.day}>{cardDate.format('dddd ')}</Text>
           <Text style={styles.date}>{cardDate.format('MMM DD')}</Text>
           <Switch
             value={this.state.showTimes}
@@ -114,7 +116,7 @@ export default class ScheduleCard extends Component {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {
-              isCurrentDay && // Only show day progress on current day's schedule
+              isCurrentDay && ( // Only show day progress on current day's schedule
                 <View style={styles.barContainer}>
                   <VerticalBar
                     progress={progress}
@@ -122,6 +124,7 @@ export default class ScheduleCard extends Component {
                     style={styles.bar}
                   />
                 </View>
+              )
             }
             <View style={{ width: isCurrentDay ? '85%' : '100%' }}>
               {
@@ -135,12 +138,15 @@ export default class ScheduleCard extends Component {
                   /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location */
                   return (
                     crossSectionedBlock
-                      ? <CrossSectionItem
+                      ? (
+                        <CrossSectionItem
                           key={sourceId}
                           isAfterAssembly={isAfterAssembly}
                           {...item}
                         />
-                      : <ScheduleItem
+                      )
+                      : (
+                        <ScheduleItem
                           key={sourceId}
                           isFinals={isFinals}
                           isLastDay={isLastDay}
@@ -148,6 +154,7 @@ export default class ScheduleCard extends Component {
                           isAfterAssembly={isAfterAssembly}
                           {...item}
                         />
+                      )
                   );
                   /* eslint-enable react/jsx-indent-props, react/jsx-closing-bracket-location */
                 })

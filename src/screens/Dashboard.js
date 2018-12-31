@@ -14,7 +14,9 @@ import DashboardBlock from '../components/DashboardBlock';
 import CrossSectionBlock from '../components/CrossSectionBlock';
 import withHamburger from '../util/withHamburger';
 import { processFinalsOrAssembly } from '../util/processSchedule';
-import { getCurrentMod, getNextClass, isHalfMod, isScheduleEmpty } from '../util/querySchedule';
+import {
+  getCurrentMod, getNextClass, isHalfMod, isScheduleEmpty,
+} from '../util/querySchedule';
 import { bugsnag } from '../util/misc';
 import {
   getBeforeSchoolInfo,
@@ -312,6 +314,7 @@ export default class Dashboard extends Component {
   }
 
   renderForeground = () => <UserInfo {...this.props} />
+
   renderBackground = () => <UserBackground {...this.props} />
 
   render() {

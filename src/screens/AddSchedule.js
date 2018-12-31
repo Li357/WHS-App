@@ -4,7 +4,9 @@ import { connect } from 'react-redux';
 import { CircleSnail } from 'react-native-progress';
 import QRCode from 'react-native-qrcode';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { Button, Text, Icon, ListItem, Left, Body, Thumbnail, Right } from 'native-base';
+import {
+  Button, Text, Icon, ListItem, Left, Body, Thumbnail, Right,
+} from 'native-base';
 import { debounce } from 'lodash';
 import { load } from 'react-native-cheerio';
 
@@ -32,15 +34,16 @@ export default class AddSchedule extends PureComponent {
   }
 
   componentDidMount() {
-    const { qr, dispatch, schedule } = this.props;
+    const {
+      qr, dispatch, schedule, name,
+    } = this.props;
 
     if (!qr) {
       InteractionManager.runAfterInteractions(async () => {
         try {
           const shortLink = await generateBase64Link(schedule, name);
           dispatch(setQR(shortLink));
-        } catch(error) {
-          console.log(error);
+        } catch (error) {
           reportError(
             'Something went wrong while generating your QR code. Please check your internet connection.',
             error,
@@ -88,6 +91,7 @@ export default class AddSchedule extends PureComponent {
   }
 
   /* handlers for teacher searching */
+  /* eslint-disable-next-line react/sort-comp */
   search = debounce(async (query) => {
     if (query.length === 0) {
       this.cancelSearch();
@@ -100,17 +104,17 @@ export default class AddSchedule extends PureComponent {
       { credentials: 'include' },
     );
     await this.loginIfNot(
-      response.headers.get('content-type').includes('html'), 
-      () => this.search(query)
+      response.headers.get('content-type').includes('html'),
+      () => this.search(query),
     );
 
     const { teachers } = await response.json();
     const alreadySelectedTeacherKeys = this.props.otherSchedules.map(o => o.key); // keys are teacher ids
     this.setState({
-      teachers: teachers.filter(({ id }) => !alreadySelectedTeacherKeys[id])
+      teachers: teachers.filter(({ id }) => !alreadySelectedTeacherKeys[id]),
     });
   }, 500)
-  
+
   onChange = (query) => {
     this.setState({ query });
     this.search(query);
@@ -142,12 +146,19 @@ export default class AddSchedule extends PureComponent {
     this.cancelSearch();
   }
 
-  renderTeacher = ({ firstName, lastName, profilePictureUri, id }) => {
+  renderTeacher = ({
+    firstName, lastName, profilePictureUri, id,
+  }) => {
     const source = profilePictureUri ? { uri: profilePictureUri } : BlankUser;
     const name = `${firstName} ${lastName}`;
 
     return (
-      <ListItem key={id} avatar onPress={() => this.addTeacherSchedule(id, name)} style={styles.resultRow}>
+      <ListItem
+        key={id}
+        avatar
+        onPress={() => this.addTeacherSchedule(id, name)}
+        style={styles.resultRow}
+      >
         <Left style={styles.avatarContainer}><Thumbnail source={source} /></Left>
         <Body style={styles.teacherContainer}>
           <Text style={styles.teacherInfo}>{name}</Text>
@@ -164,7 +175,8 @@ export default class AddSchedule extends PureComponent {
     return (
       this.state.scanning
         ? <QRCamera onRead={this.onRead} onCancel={this.stopScanning} />
-        : <View style={styles.container}>
+        : (
+          <View style={styles.container}>
             <SearchBar
               value={query}
               onCancel={this.cancelSearch}
@@ -174,7 +186,8 @@ export default class AddSchedule extends PureComponent {
             />
             {
               qr
-                ? <>
+                ? (
+                  <>
                     <Text style={styles.text}>
                       Let other students scan this code to share your schedule.
                     </Text>
@@ -186,12 +199,16 @@ export default class AddSchedule extends PureComponent {
                       Student schedules will not automatically refresh.
                     </Text>
                   </>
-                : <>
+                )
+                : (
+                  <>
                     <CircleSnail indeterminate size={50} />
                     <Text style={styles.text}>Generating QR code...</Text>
                   </>
+                )
             }
           </View>
+        )
     );
   }
 }
@@ -207,7 +224,7 @@ const styles = EStyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   scanButton: {
     alignSelf: 'center',

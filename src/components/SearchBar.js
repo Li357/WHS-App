@@ -1,9 +1,13 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
-import { Item, Input, Icon, Button, List } from 'native-base';
+import {
+  Item, Input, Icon, Button, List,
+} from 'native-base';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-const SearchBar = ({ renderItem, value, onChange, onCancel, data, ...props }) => (
+const SearchBar = ({
+  renderItem, value, onChange, onCancel, data,
+}) => (
   <>
     <Item style={styles.searchBar}>
       <Icon type="MaterialIcons" name="search" />
@@ -13,12 +17,13 @@ const SearchBar = ({ renderItem, value, onChange, onCancel, data, ...props }) =>
       </Button>
     </Item>
     {
-      data.length > 0 &&
+      data.length > 0 && (
         <ScrollView style={styles.searchResults}>
           <List data={data}>
             {data.map(renderItem)}
           </List>
         </ScrollView>
+      )
     }
   </>
 );

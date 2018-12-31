@@ -88,7 +88,7 @@ export default class Settings extends Component {
               {
                 refreshing
                   ? <CircleSnail color="black" size={25} />
-                : <Icon type="MaterialIcons" name="refresh" />
+                  : <Icon type="MaterialIcons" name="refresh" />
               }
             </Left>
             <Body><Text>Refresh Your Information</Text></Body>

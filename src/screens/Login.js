@@ -4,7 +4,9 @@ import {
   KeyboardAvoidingView, Image, Text,
 } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { Form, Input, Item, Button } from 'native-base';
+import {
+  Form, Input, Item, Button,
+} from 'native-base';
 import { CircleSnail } from 'react-native-progress';
 import { connect } from 'react-redux';
 

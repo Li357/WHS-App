@@ -27,7 +27,7 @@ config.registerBeforeSendCallback((report) => {
         if (value && value._isValid) {
           return value.toDate().toString();
         }
-        
+
         if (Array.isArray(value) && value[0] && value[0]._isValid) {
           return value.map(date => date.toDate().toString());
         }

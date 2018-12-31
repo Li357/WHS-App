@@ -15,7 +15,7 @@ const getCurrentMod = ({
   if (date.isAfter(end)) {
     return AFTER_SCHOOL;
   }
-  
+
   if (date.isBefore(start)) {
     return BEFORE_SCHOOL;
   }

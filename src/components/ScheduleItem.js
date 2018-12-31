@@ -30,10 +30,10 @@ const ScheduleItem = ({
               // This displays mods 5 - 8 (finals mods) on the last day, shifts one for assembly
               ? (modNumber + (isLastDay ? 4 : 0)) - Number(isAfterAssembly)
               : 'HR';
-            const displayMod = title === 'Assembly' ||
-              (hasAssembly && scheduleItem.startMod === ASSEMBLY_MOD) // Handles timestable 'AS'
-                ? 'AS'
-                : number;
+            // Handles timestable 'AS'
+            const displayMod = title === 'Assembly' || (hasAssembly && scheduleItem.startMod === ASSEMBLY_MOD)
+              ? 'AS'
+              : number;
 
             return (
               <View key={modNumber} style={[styles.modNumber, { height: modHeights[index] }]}>
