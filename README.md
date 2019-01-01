@@ -3,12 +3,7 @@
 A schedule & mod information app for [WHS](http://whs.westside66.org/). Created
 with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2018 Andrew Li, MIT License.
 
-## v2
-
-Complete rewrite and redesign with NativeBase. Now with linting and better code. Using multiple
-deployment targets for CodePush testing and Bugsnag for crashlytics.
-
-## TODO
+## TODO - v3
 
 - [x] Finish integration with server (especially refreshing & schedule cautions)
 - [x] QR Codes to share schedules (branch `qr`)
@@ -22,6 +17,11 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 - [ ] Fix UX on app update where screen flashes twice
 - [ ] Fix dashboard layout UX (jumpy)
 - [x] Update dependencies
+
+## v2
+
+Complete rewrite and redesign with NativeBase. Now with linting and better code. Using multiple
+deployment targets for CodePush testing and Bugsnag for crashlytics.
 
 ## v1 (latest 1.0.2)
 

@@ -1,6 +1,6 @@
 {
-  "name": "WHS",
-  "version": "2.0.0",
+  "name": "whs",
+  "version": "3.0.0",
   "private": true,
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.2.3",
