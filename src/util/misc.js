@@ -12,10 +12,10 @@ const bugsnag = (() => {
   config.releaseStage = process.env.NODE_ENV;
   config.notifyReleaseStages = ['production'];
   config.registerBeforeSendCallback((report) => {
-    config.codeBundleId = '2.0-b12';
+    config.codeBundleId = '3.0-b0';
     // Filter out private information to keep reports anonymous
     const {
-      username, name, password, id, ...currentState
+      name, password, id, ...currentState // need username for further contact
     } = store.getState();
     const newState = Object.keys(currentState).reduce((stateObj, key) => {
       if (containsMoments.includes(key)) {

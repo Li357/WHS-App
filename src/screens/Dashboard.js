@@ -12,7 +12,7 @@ import UserInfo from '../components/UserInfo';
 import UserBackground from '../components/UserBackground';
 import DashboardBlock from '../components/DashboardBlock';
 import CrossSectionBlock from '../components/CrossSectionBlock';
-import withHamburger from '../util/withHamburger';
+import withHamburger from '../components/withHamburger';
 import { processFinalsOrAssembly } from '../util/processSchedule';
 import {
   getCurrentMod, getNextClass, isHalfMod, isScheduleEmpty,

@@ -9,11 +9,11 @@ import { CircleSnail } from 'react-native-progress';
 import moment from 'moment';
 
 import ScheduleCard from '../components/ScheduleCard';
-import withHamburger from '../util/withHamburger';
+import withHamburger from '../components/withHamburger';
 import { bugsnag, selectProps } from '../util/misc';
 import { isScheduleEmpty } from '../util/querySchedule';
 import { processFinalsOrAssembly } from '../util/processSchedule';
-import { WIDTH, HEIGHT } from '../constants/constants';
+import { WIDTH } from '../constants/constants';
 
 const mapStateToProps = selectProps('dayInfo', 'schedule', 'specialDates');
 
@@ -108,8 +108,8 @@ const styles = EStyleSheet.create({
     fontSize: 20,
     fontFamily: '$fontRegular',
     textAlign: 'center',
-    marginTop: HEIGHT * 0.075,
-    marginBottom: HEIGHT * 0.025
+    marginTop: '12.5%',
+    marginBottom: '5%',
   },
   noScheduleText: {
     fontFamily: '$fontLight',

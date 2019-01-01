@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
-import { Alert, View, Text } from 'react-native';
 import {
-  List, ListItem, Left, Body, Icon,
+  Alert, View, Text, TouchableOpacity,
+} from 'react-native';
+import {
+  List, ListItem, Left, Body, Right, Icon,
 } from 'native-base';
 import Dialog from 'react-native-dialog';
 import { CircleSnail } from 'react-native-progress';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 
-import withHamburger from '../util/withHamburger';
+import withHamburger from '../components/withHamburger';
 import { reportError, bugsnag } from '../util/misc';
-import { fetchUserInfo } from '../actions/actionCreators';
+import { fetchUserInfo, setOtherSchedules } from '../actions/actionCreators';
 
 const mapStateToProps = (state, ownProps) => ({
   ...state, ...ownProps,
@@ -21,13 +24,10 @@ const mapStateToProps = (state, ownProps) => ({
 @withNavigation
 @connect(mapStateToProps)
 export default class Settings extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      refreshing: false,
-      reportDialogVisible: false,
-      bugReport: '',
-    };
+  state = {
+    refreshing: false,
+    reportDialogVisible: false,
+    bugReport: '',
   }
 
   handleRefresh = async () => {
@@ -74,6 +74,32 @@ export default class Settings extends Component {
     this.setState({ bugReport: text });
   }
 
+  onScheduleRowChange = ({ data }) => {
+    this.props.dispatch(setOtherSchedules(data));
+  }
+
+  removeSchedule = (index) => {
+    const { dispatch, otherSchedules } = this.props;
+    dispatch(setOtherSchedules(otherSchedules.filter((_, i) => i !== index)));
+  }
+
+  renderScheduleRow = ({
+    item: { name }, index, move, moveEnd,
+  }) => (
+    <ListItem>
+      <Body>
+        <TouchableOpacity onLongPress={move} onPressOut={moveEnd}>
+          <Text>{name}</Text>
+        </TouchableOpacity>
+      </Body>
+      <Right>
+        <TouchableOpacity onPress={() => this.removeSchedule(index)}>
+          <Icon type="MaterialIcons" name="close" />
+        </TouchableOpacity>
+      </Right>
+    </ListItem>
+  );
+
   render() {
     const { refreshing, reportDialogVisible, bugReport } = this.state;
 
@@ -97,6 +123,15 @@ export default class Settings extends Component {
             <Left><Icon type="MaterialIcons" name="error" style={{ fontSize: 25 }} /></Left>
             <Body><Text>Report Bug</Text></Body>
           </ListItem>
+          <ListItem itemHeader>
+            <Text style={styles.header}>Schedules</Text>
+          </ListItem>
+          <DraggableFlatList
+            data={this.props.otherSchedules}
+            onMoveEnd={this.onScheduleRowChange}
+            keyExtractor={schedule => schedule.name}
+            renderItem={this.renderScheduleRow}
+          />
         </List>
         <Dialog.Container visible={reportDialogVisible}>
           <Dialog.Title>Report Bug</Dialog.Title>

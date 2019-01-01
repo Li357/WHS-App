@@ -15,7 +15,7 @@ import { generateBase64Link, decodeScheduleQRCode } from '../util/qr';
 import processSchedule from '../util/processSchedule';
 import { getScheduleFromHTML, parseHTMLFromURL } from '../util/fetchSchedule';
 import { setQR, setOtherSchedules } from '../actions/actionCreators';
-import withHamburger from '../util/withHamburger';
+import withHamburger from '../components/withHamburger';
 import QRCamera from '../components/QRCamera';
 import SearchBar from '../components/SearchBar';
 import { SCHOOL_WEBSITE, WIDTH } from '../constants/constants';
@@ -57,14 +57,16 @@ export default class AddSchedule extends PureComponent {
   addSchedule = ({ url, name, schedule }) => {
     const processed = processSchedule(schedule);
     const newSchedule = { url, name, schedule: processed };
-    const { otherSchedules, dispatch } = this.props; 
+    const { otherSchedules, dispatch } = this.props;
 
-    const indexIfAlreadyExists = otherSchedules.findIndex(({ name: currName }) => currName === name);
+    const indexIfAlreadyExists = otherSchedules.findIndex(({ name: currName }) => (
+      currName === name
+    ));
     if (indexIfAlreadyExists === -1) {
       dispatch(setOtherSchedules([
         ...otherSchedules,
         newSchedule,
-      ]));  
+      ]));
     } else {
       // Override currently saved schedule
       dispatch(setOtherSchedules(otherSchedules.map((currSchedule, i) => (

@@ -10,15 +10,15 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 
 ## TODO
 
-- [ ] Finish integration with server (especially refreshing & schedule cautions)
-- [ ] QR Codes to share schedules (branch `qr`)
-- [ ] Teacher schedules
-- [ ] Update teacher schedules automatically
+- [x] Finish integration with server (especially refreshing & schedule cautions)
+- [x] QR Codes to share schedules (branch `qr`)
+- [x] Teacher schedules
+- [x] Update teacher schedules automatically
 - [ ] ON HOLD - Dark mode
 
 - [ ] Migrate from Moment to something less heavy
 
-- [ ] Better bug reports
+- [x] Better bug reports
 - [ ] Fix UX on app update where screen flashes twice
 - [ ] Fix dashboard layout UX (jumpy)
 - [x] Update dependencies
