@@ -1,11 +1,18 @@
 import { AsyncStorage } from 'react-native';
-import { load } from 'react-native-cheerio';
 import fetch from 'react-native-fetch-polyfill';
 import { mapValues } from 'lodash';
 import moment from 'moment';
 
 import processSchedule from '../util/processSchedule';
 import { getDayInfo } from '../util/querySchedule';
+import {
+  parseHTMLFromURL,
+  fetchUserHTML,
+  getUserInfoFromHTML,
+  getScheduleFromHTML,
+  getSchoolPictureFromHTML,
+  fetchOtherTeacherSchedules,
+} from '../util/fetchSchedule';
 import { API, REQUEST_TIMEOUT, SCHOOL_WEBSITE } from '../constants/constants';
 import {
   SET_LOGIN_ERROR,
@@ -55,119 +62,81 @@ const setOtherSchedules = createActionCreator(SET_OTHER_SCHEDULES, 'otherSchedul
 const setQR = createActionCreator(SET_QR, 'qr');
 const logOut = createActionCreator(LOG_OUT);
 
-/* eslint-disable function-paren-newline */
-const fetchUserInfo = (
-  username, password, beforeStartRefresh = false, onlyFetchSchoolPicture = false,
-) => (
-/* eslint-enable function-paren-newline */
+const fetchSchoolPicture = (...credentials) => (
+  async (dispatch) => {
+    const $ = await fetchUserHTML(...credentials);
+    if ($ === null) {
+      return false;
+    }
+
+    const schoolPicture = await fetchSchoolPicture($);
+    dispatch(setSchoolPicture(schoolPicture));
+    return true;
+  }
+);
+
+const fetchUserInfo = (username, password) => (
   async (dispatch, getState) => {
     const loginURL = `${SCHOOL_WEBSITE}/account/login?Username=${username}&Password=${password}`;
 
-    // First request clears the user from previous signin
-    await fetch(loginURL, {
-      method: 'POST',
-      timeout: REQUEST_TIMEOUT,
-    });
+    const { username: oldUsername } = getState();
+    if (username !== oldUsername) {
+      // Extra fetch needed to clear current user for some reason
+      await fetch(loginURL, {
+        method: 'POST',
+        timeout: REQUEST_TIMEOUT,
+      });
+    }
 
-    const userpageResponse = await fetch(loginURL, {
-      method: 'POST',
-      timeout: REQUEST_TIMEOUT,
-    });
-    const userpageHTML = await userpageResponse.text();
-
-    if (!userpageResponse.ok) {
+    const $ = await parseHTMLFromURL(loginURL, { method: 'POST' });
+    if ($ === null) { // If the response was not okay, abort
       return false;
     }
 
-    const $ = load(userpageHTML);
     const error = $('.alert.alert-danger').text().trim();
-    const name = $('title').text().split('|')[0].replace(/overview/ig, '').trim();
-
-    if (error !== '') { // If error exists
+    if (error !== '') { // If error exists on login, either user/pass was wrong
       dispatch(setLoginError(true));
       return false;
     }
-
-    const jsonPrefix = 'window._pageDataJson = \'';
-    const profilePhotoPrefix = 'background-image: url(';
-
-    const pictureURL = $('.profile-picture').attr('style').slice(profilePhotoPrefix.length, -2);
-    const schoolPicture = pictureURL.includes('blank-user') // Blank user images have urls of /dist/img/blank-user.png
-      ? 'blank-user'
-      : pictureURL;
-
-    if (onlyFetchSchoolPicture) {
-      dispatch(setSchoolPicture(schoolPicture));
-      return true;
-    }
-
-    // This is either 'Class of 20XX' or 'Teacher'
-    const nameSubtitle = $('.header-title > h6').text();
-    const infoCard = $('.card-header + .card-block');
-    const scheduleString = $('.page-content + script').contents()[0].data.trim();
-    const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
-    const isNewUser = schedule.length === 0;
-    // Maps elements in infoCard to text, splitting and splicing handles 'School Number: '
-    const isTeacher = nameSubtitle === 'Teacher';
-    /* eslint-disable indent */
-    const info = !isTeacher
-      ? infoCard
-          .find('.card-subtitle a, .card-text:last-child')
-          .contents()
-          .map((index, { data }) => data.split(':').slice(-1)[0].trim())
-          .toArray()
-      : Array(4).fill(null);
-    /* eslint-enable indent */
-    const processedInfo = isNewUser && !isTeacher
-      ? [null, ...info] // New users will only not be able to see their homeroom yet, so first is null
-      : info;
 
     /**
      *  Do all heavy lifting before setting credentials in case user interrupts user info fetching
      *  so they're technically not logged in and refetch can happen as necessary
      */
 
+    const schedule = getScheduleFromHTML($);
+    const [name, nameSubtitle, isTeacher, processedInfo] = getUserInfoFromHTML($, schedule);
+    const schoolPicture = getSchoolPictureFromHTML($);
     const processedSchedule = processSchedule(schedule);
 
     // This prevents the erasure of profile photos on a user info fetch (for manual refreshes)
     const profilePhoto = await AsyncStorage.getItem(`${username}:profilePhoto`);
     dispatch(setProfilePhoto(profilePhoto || schoolPicture));
+
     // Directly call fetchSpecialDates here for setDaySchedule
     const success = await dispatch(fetchSpecialDates());
-    if (!success) return false;
+    if (!success) {
+      return false;
+    }
 
-    const {
-      specialDates,
-      specialDates: { semesterOneStart, semesterTwoStart, lastDay },
-    } = getState();
-    const date = moment();
+    // Set today's information
+    const { specialDates, otherSchedules } = getState();
+    const now = moment();
+    dispatch(setDayInfo(...getDayInfo(specialDates, now)));
 
-    // Set day info in user info fetch
-    dispatch(setDayInfo(...getDayInfo(specialDates, date)));
+    // Fetch other schedules
+    const newOtherSchedules = await fetchOtherTeacherSchedules(otherSchedules);
+    dispatch(setOtherSchedules(newOtherSchedules));
 
     // Generate QR Code
     const qr = await generateBase64Link(processedSchedule, name);
-
-    /* eslint-disable function-paren-newline */
     dispatch(setUserInfo(
       name, nameSubtitle, processedSchedule, schoolPicture, isTeacher,
       ...processedInfo, // Teachers have all-null info array
       qr,
     ));
-    /* eslint-enable function-paren-newline */
 
-    if (date.isSameOrAfter(semesterTwoStart, 'day') && date.isSameOrBefore(lastDay, 'day')) {
-      dispatch(setRefreshed(true, true));
-    } else if (
-      (date.isSameOrAfter(semesterOneStart, 'day') && date.isSameOrBefore(semesterTwoStart, 'day'))
-      || beforeStartRefresh
-    ) {
-      dispatch(setRefreshed(true, false));
-    } else {
-      dispatch(setRefreshed(false, false));
-    }
     dispatch(setCredentials(username, password));
-
     return true;
   }
 );
@@ -202,6 +171,6 @@ const fetchSpecialDates = () => async (dispatch) => {
 export {
   setUserInfo, setQR, setProfilePhoto, setSchedule,
   setDayInfo, setRefreshed, setOtherSchedules,
-  fetchUserInfo, fetchSpecialDates,
+  fetchUserInfo, fetchSpecialDates, fetchSchoolPicture,
   logOut,
 };

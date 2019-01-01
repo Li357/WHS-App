@@ -169,9 +169,7 @@ export default class ScheduleCard extends Component {
 
 const styles = EStyleSheet.create({
   container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-  },
+  header: { flexDirection: 'row' },
   timeSwitch: { marginLeft: 'auto' },
   day: {
     fontFamily: '$fontRegular',

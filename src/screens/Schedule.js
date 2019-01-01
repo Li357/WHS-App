@@ -53,11 +53,15 @@ export default class Schedule extends Component {
     const { processedSchedule, name, transitioned } = this.state;
 
     if (!transitioned) {
-      return <CircleSnail size={50} indeterminate />;
+      return (
+        <View style={styles.scheduleContainer}>
+          <CircleSnail size={50} indeterminate />
+        </View>
+      );
     }
 
     return (
-      <View style={styles.noSchedule}>
+      <View style={styles.scheduleContainer}>
         {
           isScheduleEmpty(processedSchedule)
             /* eslint-disable react/jsx-indent-props, react/jsx-closing-bracket-location, react/jsx-indent, indent */
@@ -69,16 +73,15 @@ export default class Schedule extends Component {
             )
             : (
               <>
-                <Text>{name}</Text>
+                <Text style={styles.scheduleName}>{name}</Text>
                 <Carousel
                   loop
                   firstItem={Math.min(currentDay, 4)}
-                  data={this.state.processedSchedule}
+                  data={processedSchedule}
                   renderItem={this.renderItem}
                   sliderWidth={WIDTH}
                   itemWidth={WIDTH * 0.8}
                   containerCustomStyle={styles.container}
-                  contentContainerCustomStyle={styles.content}
                 />
               </>
             )
@@ -96,11 +99,17 @@ Schedule.navigationOptions = {
 };
 
 const styles = EStyleSheet.create({
-  noSchedule: {
+  scheduleContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+  },
+  scheduleName: {
+    fontSize: 20,
+    fontFamily: '$fontRegular',
+    textAlign: 'center',
+    marginTop: HEIGHT * 0.075,
+    marginBottom: HEIGHT * 0.025
   },
   noScheduleText: {
     fontFamily: '$fontLight',
@@ -108,6 +117,5 @@ const styles = EStyleSheet.create({
     textAlign: 'center',
   },
   container: { flex: 1 },
-  content: { marginTop: HEIGHT * 0.1 },
   icon: { fontSize: 20 },
 });

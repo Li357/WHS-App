@@ -32,6 +32,7 @@ const styles = EStyleSheet.create({
   preview: {
     flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'flex-end',
   },
   cancelButton: {

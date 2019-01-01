@@ -19,8 +19,7 @@
   },
   "globals": {
     "it": false,
-    "expect": false,
-    "fetch": false,
+    "expect": false
   },
   "parserOptions": {
     "ecmaFeatures": {

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { View, InteractionManager } from 'react-native';
+import { View, InteractionManager, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { CircleSnail } from 'react-native-progress';
 import QRCode from 'react-native-qrcode';
@@ -8,11 +8,12 @@ import {
   Button, Text, Icon, ListItem, Left, Body, Thumbnail, Right,
 } from 'native-base';
 import { debounce } from 'lodash';
-import { load } from 'react-native-cheerio';
+import fetch from 'react-native-fetch-polyfill';
 
 import { selectProps, reportError } from '../util/misc';
 import { generateBase64Link, decodeScheduleQRCode } from '../util/qr';
 import processSchedule from '../util/processSchedule';
+import { getScheduleFromHTML, parseHTMLFromURL } from '../util/fetchSchedule';
 import { setQR, setOtherSchedules } from '../actions/actionCreators';
 import withHamburger from '../util/withHamburger';
 import QRCamera from '../components/QRCamera';
@@ -55,12 +56,27 @@ export default class AddSchedule extends PureComponent {
 
   addSchedule = ({ url, name, schedule }) => {
     const processed = processSchedule(schedule);
-    const { otherSchedules, dispatch } = this.props;
+    const newSchedule = { url, name, schedule: processed };
+    const { otherSchedules, dispatch } = this.props; 
 
-    dispatch(setOtherSchedules([
-      ...otherSchedules,
-      { name, url, schedule: processed },
-    ]));
+    const indexIfAlreadyExists = otherSchedules.findIndex(({ name: currName }) => currName === name);
+    if (indexIfAlreadyExists === -1) {
+      dispatch(setOtherSchedules([
+        ...otherSchedules,
+        newSchedule,
+      ]));  
+    } else {
+      // Override currently saved schedule
+      dispatch(setOtherSchedules(otherSchedules.map((currSchedule, i) => (
+        i === indexIfAlreadyExists ? newSchedule : currSchedule
+      ))));
+    }
+
+    Alert.alert(
+      'Success',
+      `${name}'s schedule added!`,
+      [{ text: 'OK' }],
+    );
   }
 
   startScanning = () => {
@@ -73,8 +89,16 @@ export default class AddSchedule extends PureComponent {
 
   onRead = async ({ data }) => {
     this.stopScanning();
-    const scheduleAndName = await decodeScheduleQRCode(data);
-    this.addSchedule(scheduleAndName);
+
+    try {
+      const scheduleAndName = await decodeScheduleQRCode(data);
+      this.addSchedule(scheduleAndName);
+    } catch (error) {
+      reportError(
+        'An error occurred while decoding the QR code. Please check your internet connection.',
+        error,
+      );
+    }
   }
 
   // response is HTML content type that has title "Login | Westside" when not logged in
@@ -98,21 +122,28 @@ export default class AddSchedule extends PureComponent {
       return;
     }
 
-    // Recursive call to retry fetch if not logged in the first time
-    const response = await fetch(
-      `${SCHOOL_WEBSITE}/api/search?query=${query}&limit=5`,
-      { credentials: 'include' },
-    );
-    await this.loginIfNot(
-      response.headers.get('content-type').includes('html'),
-      () => this.search(query),
-    );
+    try {
+      // Recursive call to retry fetch if not logged in the first time
+      const response = await fetch(
+        `${SCHOOL_WEBSITE}/api/search?query=${query}&limit=5`,
+        { credentials: 'include' },
+      );
+      await this.loginIfNot(
+        response.headers.get('content-type').includes('html'),
+        () => this.search(query),
+      );
 
-    const { teachers } = await response.json();
-    const alreadySelectedTeacherKeys = this.props.otherSchedules.map(o => o.key); // keys are teacher ids
-    this.setState({
-      teachers: teachers.filter(({ id }) => !alreadySelectedTeacherKeys[id]),
-    });
+      const { teachers } = await response.json();
+      const alreadySelectedTeacherKeys = this.props.otherSchedules.map(o => o.key); // keys are teacher ids
+      this.setState({
+        teachers: teachers.filter(({ id }) => !alreadySelectedTeacherKeys[id]),
+      });
+    } catch (error) {
+      reportError(
+        'An error occurred while searching. Please check your internet connection.',
+        error,
+      );
+    }
   }, 500)
 
   onChange = (query) => {
@@ -128,22 +159,35 @@ export default class AddSchedule extends PureComponent {
   }
 
   addTeacherSchedule = async (id, name) => {
-    const url = `${SCHOOL_WEBSITE}/teachers/${id}`;
-    const response = await fetch(url, { credentials: 'include' });
-    const teacherHTML = await response.text();
-    const $ = load(teacherHTML);
+    try {
+      const url = `${SCHOOL_WEBSITE}/teachers/${id}`;
+      const $ = await parseHTMLFromURL(url);
+      if ($ === null) {
+        Alert.alert(
+          'Error',
+          "Something went wrong processing the teacher's schedule",
+          [{ text: 'OK' }],
+        );
+        return;
+      }
 
-    await this.loginIfNot(
-      $('title').text().includes('Login'),
-      () => this.addTeacherSchedule(id),
-    );
+      await this.loginIfNot(
+        $('title').text().includes('Login'),
+        () => this.addTeacherSchedule(id, name),
+      );
 
-    // TODO: Fix repetition
-    const jsonPrefix = 'window._pageDataJson = \'';
-    const scheduleString = $('.page-content + script').contents()[0].data.trim();
-    const { schedule } = JSON.parse(scheduleString.slice(jsonPrefix.length, -2));
-    this.addSchedule({ name, schedule, url });
-    this.cancelSearch();
+      this.addSchedule({
+        name,
+        url,
+        schedule: getScheduleFromHTML($),
+      });
+      this.cancelSearch();
+    } catch (error) {
+      reportError(
+        "An error occurred while getting the teacher's schedule. Please check your internet connection.",
+        error,
+      );
+    }
   }
 
   renderTeacher = ({
@@ -191,7 +235,11 @@ export default class AddSchedule extends PureComponent {
                     <Text style={styles.text}>
                       Let other students scan this code to share your schedule.
                     </Text>
-                    <QRCode value={qr} size={WIDTH * 0.7} />
+                    <QRCode
+                      value={qr}
+                      size={WIDTH * 0.7}
+                      canvasStyle={{ backgroundColor: 'transparent' }}
+                    />
                     <Button primary onPress={this.startScanning} style={styles.scanButton}>
                       <Text style={styles.scanText}>Scan code</Text>
                     </Button>
