@@ -7,7 +7,7 @@ import {
   createSwitchNavigator,
   createDrawerNavigator,
 } from '@react-navigation/native';
-import codePush from 'react-native-code-push';
+import codePush, { SyncStatus } from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
 import momentDurationFormat from 'moment-duration-format';
@@ -22,12 +22,14 @@ import DrawerContent from './src/components/DrawerContent';
 import {
   fetchSpecialDates,
   fetchUserInfo,
+  fetchSchoolPicture,
   setProfilePhoto,
   setDayInfo,
-  logOut,
+  setRefreshed,
 } from './src/actions/actionCreators';
 import { getDayInfo } from './src/util/querySchedule';
 import { reportError, bugsnag, triggerScheduleCaution } from './src/util/misc';
+import legacyHandlers from './src/util/legacyHandlers';
 
 // Update locale before using it in transform
 moment.updateLocale('en', {
@@ -75,105 +77,33 @@ export default class App extends Component {
        * This handler handles the case where the user does not quit the app but has it in the
        * background, in which case the app does some updates when they refocus the app
        */
-      const { dayInfo: { lastUpdate } } = store.getState();
-      const now = moment();
-      const today = now.day();
-      if (
-        newStatus === 'active'
-        && lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
-        && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat
-      ) {
-        this.updateDayInfo(now); // Pass already created instance
+      const isActive = newStatus === 'active';
+      if (isActive) {
+        this.updateDayInfoIfNeeded(); // Pass already created instance
       }
     }
   }
 
   handleRehydrate = async () => {
-    const { dayInfo, schedule } = store.getState();
-
-    /* LEGACY BUG/UPDATE LOGOUT HANDLERS */
-    // Checks for typeof undefined because v1.x users will not have dayInfo in store
-    if (typeof dayInfo === 'undefined') {
-      bugsnag.leaveBreadcrumb('Logging v1.x user out');
-      // Log out and reset store on update to v2 if the user is previous v1.x user
-      store.dispatch(logOut());
-    }
-
-    // Handle case where teacher's schedules have at least one day completely class-less, causing dashboard bug
-    if (schedule.length !== 5) {
-      bugsnag.leaveBreadcrumb('Logging invalid teacher out');
-      store.dispatch(logOut());
-    }
-
-    // Handle typo that open mods and first open mods have no day properties
-    const lacksDate = schedule.some(([firstClass]) => !firstClass.day);
-    if (lacksDate) {
-      bugsnag.leaveBreadcrumb('Logging invalid schedule out');
-      store.dispatch(logOut());
-    }
-    /* END LEGACY BUG/UPDATE LOGOUT HANDLERS */
+    // Legacy handlers to handle legacy issues when state rehydrates, such as defective schedules
+    legacyHandlers.forEach(handler => handler(store));
 
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
-      if (typeof schedule === 'string') {
-        bugsnag.leaveBreadcrumb('Logging invalid user out');
-        store.dispatch(logOut());
-      }
-
       try {
         bugsnag.leaveBreadcrumb('Refreshing day info - manual');
-        const { dayInfo: { lastUpdate, isSummer } } = store.getState();
-        const now = moment();
-        const today = now.day();
-        if (
-          lastUpdate && !lastUpdate.isSame(now, 'day') // Only update if not updated in one day
-          && today !== 0 && today < 6 // Ignores global locale, 0 is Sun, 6 is Sat)
-        ) {
-          this.setState({
-            rehydrationStatus: 'Updating today\'s information...',
-          });
-          this.updateDayInfo(now);
-        }
-        bugsnag.leaveBreadcrumb('Silently fetching other dates');
-        this.silentlyFetchData();
+        this.setStatus('Updating today\'s information...');
+        this.updateDayInfoIfNeeded(now);
 
-        const {
-          specialDates: { semesterOneStart, semesterTwoStart, lastDay },
-          refreshedSemesterOne,
-          refreshedSemesterTwo,
-          username,
-          password,
-        } = store.getState();
+        bugsnag.leaveBreadcrumb('Silently fetching special dates');
+        this.silentlyFetchDatesAndPicture();
 
-        if (isSummer) {
-          triggerScheduleCaution(semesterOneStart);
-        } else {
-          this.setState({
-            rehydrationStatus: 'Auto-refreshing your information...',
-          });
-
-          if (
-            now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day')
-            && !refreshedSemesterTwo
-          ) {
-            bugsnag.leaveBreadcrumb('Refreshing semester two');
-            // If in semester two and has not refreshed, refresh info
-            await store.dispatch(fetchUserInfo(username, password));
-          } else if (
-            now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterTwoStart, 'day')
-            && !refreshedSemesterOne
-          ) {
-            bugsnag.leaveBreadcrumb('Refreshing semester one');
-            // If in semester one and has not refreshed, refresh info
-            await store.dispatch(fetchUserInfo(username, password));
-          }
-        }
+        bugsnag.leaveBreadcrumb('Refreshing information');
+        this.setStatus('Auto-refreshing your information...');
+        this.refreshUserInfoIfNeeded(now);
 
         bugsnag.leaveBreadcrumb('Updating profile photo');
-        this.setState({
-          rehydrationStatus: 'Getting your profile picture...',
-        });
-        // Since next line is async, must wait for it or else state will be set before it finishes
+        this.setStatus('Getting your profile picture...');
         await this.updateProfilePhoto();
       } catch (error) {
         reportError(
@@ -186,9 +116,16 @@ export default class App extends Component {
     this.setState({ rehydrated: true });
   }
 
-  updateDayInfo = (date = moment()) => {
-    const { specialDates } = store.getState();
-    store.dispatch(setDayInfo(...getDayInfo(specialDates, date)));
+  updateDayInfoIfNeeded = (now = moment()) => {
+    const { dayInfo: { lastUpdate }, specialDates } = store.getState();
+    const today = now.day();
+
+    const hasUpdatedToday = lastUpdate && lastUpdated.isSame(now, 'day');
+    const isSchoolDay = today !== 0 && today < 6;
+
+    if (!hasUpdatedToday && isSchoolDay) {
+      store.dispatch(setDayInfo(...getDayInfo(specialDates, date)));
+    }
   }
 
   updateProfilePhoto = async () => {
@@ -202,44 +139,69 @@ export default class App extends Component {
     store.dispatch(setProfilePhoto(profilePhoto || schoolPicture));
   }
 
-  silentlyFetchData = async () => {
+  silentlyFetchDatesAndPicture = async () => {
     // We want to update dates every single app open, no need to report error if no internet
     try {
       const { username, password, schoolPicture } = store.getState();
 
       await store.dispatch(fetchSpecialDates());
       if (schoolPicture.includes('blank-user')) {
-        await store.dispatch(fetchUserInfo(username, password, false, true));
+        await store.dispatch(fetchSchoolPicture(username, password));
       }
     /* eslint-disable no-empty */
     } catch (error) {}
     /* eslint-enable no-empty */
   }
 
+  refreshUserInfoIfNeeded = async (now = moment()) => {
+    const {
+      specialDates: {
+        semesterOneStart,
+        semesterOneEnd,
+        semesterTwoStart,
+        lastDay,
+      },
+      refreshedSemesterOne,
+      refreshedSemesterTwo,
+      username,
+      password,
+    } = store.getState();
+    const isSemesterTwo = now.isSameOrAfter(semesterTwoStart, 'day') && now.isSameOrBefore(lastDay, 'day');
+    const isSemesterOne = now.isSameOrAfter(semesterOneStart, 'day') && now.isSameOrBefore(semesterOneEnd, 'day');
+
+    if (!isSemesterOne && !isSemesterTwo) {
+      return;
+    }
+
+    if (!refreshedSemesterTwo && isSemesterTwo) {
+      bugsnag.leaveBreadcrumb('Refreshing semester two');
+      store.dispatch(setRefreshed(true, true));
+    } else if (!refreshedSemesterOne && isSemesterOne) {
+      bugsnag.leaveBreadcrumb('Refreshing semester one');
+      store.dispatch(setRefreshed(true, false));
+    }
+
+    await store.dispatch(fetchUserInfo(username, password));
+  }
+
+  setStatus = status => this.setState({ rehydrateStatus: status });
+
   codePushStatusDidChange(status) {
     switch (status) {
-      case codePush.SyncStatus.CHECKING_FOR_UPDATE:
-      case codePush.SyncStatus.DOWNLOADING_PACKAGE:
-      case codePush.SyncStatus.SYNC_IN_PROGRESS:
-        this.setState({
-          codePushFinished: false,
-          codePushStatus: this.codePushStatuses[status],
-        });
-        return;
-      case codePush.SyncStatus.UPDATE_INSTALLED:
-        return;
+      case SyncStatus.CHECKING_FOR_UPDATE:
+      case SyncStatus.DOWNLOADING_PACKAGE:
+      case SyncStatus.SYNC_IN_PROGRESS:
+        this.setState({ codePushStatus: this.codePushStatuses[status] });
+        break;
+      case SyncStatus.UP_TO_DATE:
+      case SyncStatus.UNKNOWN_ERROR:
+        this.setState({ codePushFinished: true });
       default:
-        // This will only happen if there is an unknown error or code-push is finished
-        this.setState({
-          codePushFinished: true,
-        });
     }
   }
 
   codePushDownloadDidProgress({ receivedBytes, totalBytes }) {
-    this.setState({
-      codePushProgress: receivedBytes / totalBytes,
-    });
+    this.setState({ codePushProgress: receivedBytes / totalBytes });
   }
 
   renderApp = () => {

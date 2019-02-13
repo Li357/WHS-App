@@ -10,9 +10,7 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 
 ## TODO
 
-- [ ] Finish integration with server (especially refreshing & schedule cautions)
-- [ ] QR Codes to share schedules (branch `qr`)
-- [ ] Teacher schedules
+- [x] Teacher schedules - Need to merge from v3-abandoned into v3 
 - [ ] Dark mode
 
 - [ ] Better bug reports
@@ -20,9 +18,14 @@ deployment targets for CodePush testing and Bugsnag for crashlytics.
 - [ ] Fix dashboard layout UX (jumpy)
 - [x] Update dependencies
 
-## v1 (latest 1.0.2)
+- [ ] TypeScript
+- [ ] Unit Tests
 
-The source for version 1.0.2 and history for v1 is in [the v1 branch](https://github.com/Li357/WHS/tree/v1).
+Stuff to remove:
+- [ ] Moment.js (heavy dependency)
+- [ ] Premature optimization
+- [ ] Useless comments
+- [ ] ESLint comments (actually stay consistent)
 
 ### Rewrite Roadmap:
 
