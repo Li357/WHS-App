@@ -8,6 +8,18 @@ with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2
 Complete rewrite and redesign with NativeBase. Now with linting and better code. Using multiple
 deployment targets for CodePush testing and Bugsnag for crashlytics.
 
+## TODO
+
+- [ ] Finish integration with server (especially refreshing & schedule cautions)
+- [ ] QR Codes to share schedules (branch `qr`)
+- [ ] Teacher schedules
+- [ ] Dark mode
+
+- [ ] Better bug reports
+- [ ] Fix UX on app update where screen flashes twice
+- [ ] Fix dashboard layout UX (jumpy)
+- [x] Update dependencies
+
 ## v1 (latest 1.0.2)
 
 The source for version 1.0.2 and history for v1 is in [the v1 branch](https://github.com/Li357/WHS/tree/v1).
