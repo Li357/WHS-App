@@ -119,22 +119,27 @@ const selectSchedule = ({
   lastDay: secondSemSecondDay, semesterOneEnd, assemblyDates, lateStartDates, earlyDismissalDates,
 }, date) => {
   let schedule;
-  const secondSemFirstDay = secondSemSecondDay.clone().subtract(1, 'd');
-  const isSecondSemFinals = date.isSame(secondSemSecondDay, 'day') || date.isSame(secondSemFirstDay, 'day');
-
-  const firstSemFirstDay = semesterOneEnd && semesterOneEnd.clone().subtract(1, 'd');
-  const isFirstSemFinals = semesterOneEnd
-    ? date.isSame(semesterOneEnd, 'day') || date.isSame(firstSemFirstDay, 'day')
-    : false;
-  const isFinals = isFirstSemFinals || isSecondSemFinals;
-
   const isLateStart = hasDayMatch(lateStartDates, date);
   const hasAssembly = hasDayMatch(assemblyDates, date);
 
-  if (isFinals) {
-    // Since teachers have an extra "mod" of grading on finals day
-    schedule = SCHEDULES.FINALS;
-  } else if (date.day() === 3) {
+  if (secondSemSecondDay && semesterOneEnd) {
+    const secondSemFirstDay = secondSemSecondDay.clone().subtract(1, 'd');
+    const isSecondSemFinals = date.isSame(secondSemSecondDay, 'day') || date.isSame(secondSemFirstDay, 'day');
+
+    const firstSemFirstDay = semesterOneEnd.clone().subtract(1, 'd');
+    const isFirstSemFinals = date.isSame(semesterOneEnd, 'day') || date.isSame(firstSemFirstDay, 'day');
+    const isFinals = isFirstSemFinals || isSecondSemFinals;
+    if (isFinals) {
+      // Not exactly mutually exclusive with the rest of the cases so premature return
+      return {
+        schedule: SCHEDULES.FINALS,
+        isFinals,
+        hasAssembly,
+      };
+    }
+  }
+
+  if (date.day() === 3) {
     schedule = SCHEDULES[isLateStart ? 'LATE_START_WEDNESDAY' : 'WEDNESDAY'];
   } else if (isLateStart) {
     schedule = SCHEDULES.LATE_START;
@@ -146,7 +151,7 @@ const selectSchedule = ({
 
   return {
     schedule,
-    isFinals,
+    isFinals: false,
     hasAssembly,
   };
 };
@@ -174,8 +179,8 @@ const getDayInfo = (specialDates, date) => {
    * last day, dates are refreshed and lastDay is next year, so then can check if date is before
    * the date of semester one's start
    */
-  const isSummer = date.isAfter(lastDay, 'day')
-    || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart, 'day'));
+  const isSummer = lastDay === null ? false : (date.isAfter(lastDay, 'day')
+    || (lastDay.year() === date.year() + 1 && date.isBefore(semesterOneStart, 'day')));
 
   return [...range, schedule, date, isSummer, isBreak, hasAssembly, isFinals];
 };

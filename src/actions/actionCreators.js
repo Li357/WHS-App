@@ -183,7 +183,18 @@ const fetchSpecialDates = () => async (dispatch) => {
   );
   if (specialDatesResponse.ok) {
     const json = await specialDatesResponse.json();
-    dispatch(setSpecialDates(mapValuesToMoment(json)));
+    const withDefaults = {
+      noSchoolDates: [],
+      assemblyDates: [],
+      lateStartDates: [],
+      earlyDismissalDates: [],
+      semesterOneStart: null,
+      semesterOneEnd: null,
+      semesterTwoStart: null,
+      lastDay: null,
+      ...json,
+    };
+    dispatch(setSpecialDates(mapValuesToMoment(withDefaults)));
     return true;
   }
   return false;

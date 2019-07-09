@@ -12,7 +12,7 @@ const config = new Configuration();
 const bugsnag = new Client(config);
 
 config.registerBeforeSendCallback((report) => {
-  config.codeBundleId = '2.0-b12';
+  config.codeBundleId = '2.0-b13';
   // Filter out private information to keep reports anonymous
   const {
     username, name, password, id, ...currentState
@@ -84,10 +84,7 @@ const triggerScheduleCaution = (firstDay) => {
       'Caution',
       `Many schedules are still changing and will not be considered final until ${finalDate}. ${''
       }Please be sure to refresh your schedule on ${finalDate} so you attend the correct classes${''
-      } starting ${firstDate}.
-      ${''
-      }Please note: the course request deadline passed on July 31st, and counselors will not ${''
-      }accept any request for changes at this time.`,
+      } starting ${firstDate}.`,
       [{ text: 'OK' }],
     );
     /* eslint-enable indent */
