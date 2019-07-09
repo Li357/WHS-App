@@ -51,7 +51,7 @@ export default class UserInfo extends PureComponent {
       <View style={styles.slide}>
         <PhotoUpload
           onPhotoSelect={this.saveProfilePhoto}
-          customButtons={customButtons}
+          imagePickerProps={{ customButtons }}
           onTapCustomButton={this.handleReset}
           containerStyle={StyleSheet.flatten(styles.photoUploader)}
         >

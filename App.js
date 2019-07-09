@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { AppState, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { createSwitchNavigator } from 'react-navigation';
-import { createDrawerNavigator } from 'react-navigation-drawer'; // Using my fork
+import { createSwitchNavigator, createDrawerNavigator } from 'react-navigation';
 import codePush from 'react-native-code-push';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import moment from 'moment';
@@ -86,7 +85,7 @@ export default class App extends Component {
   }
 
   handleRehydrate = async () => {
-    const { dayInfo, schedule } = store.getState();
+    const { dayInfo, schedule, specialDates } = store.getState();
 
     /* LEGACY BUG/UPDATE LOGOUT HANDLERS */
     // Checks for typeof undefined because v1.x users will not have dayInfo in store
@@ -108,8 +107,20 @@ export default class App extends Component {
       bugsnag.leaveBreadcrumb('Logging invalid schedule out');
       store.dispatch(logOut());
     }
-    /* END LEGACY BUG/UPDATE LOGOUT HANDLERS */
 
+    if (specialDates) {
+      // assemblyDates, earlyDismissalDates, lateStartDates, noSchoolDates
+      // semesterOneStart, semesterOneEnd, semesterTwoStart, lastDay
+      // Fixes bug in <2.0-b12 with v2 express server
+      if (Object.keys(specialDates).length < 8) {
+        this.setState({
+          rehydrateStatus: 'Updating dates...',
+        });
+        bugsnag.leaveBreadcrumb('Fixing invalid specialDates');
+        await store.dispatch(fetchSpecialDates());
+      }
+    }
+    /* END LEGACY BUG/UPDATE LOGOUT HANDLERS */
     // This runs some preload manual rehydrating and calculating after auto rehydrate
     if (hasLoggedIn()) {
       if (typeof schedule === 'string') {
@@ -129,10 +140,13 @@ export default class App extends Component {
           this.setState({
             rehydrationStatus: 'Updating today\'s information...',
           });
+
+          bugsnag.leaveBreadcrumb('Silently fetching other dates');
+          await this.silentlyFetchData();
+
+          bugsnag.leaveBreadcrumb('Updating today\'s info');
           this.updateDayInfo(now);
         }
-        bugsnag.leaveBreadcrumb('Silently fetching other dates');
-        this.silentlyFetchData();
 
         const {
           specialDates: { semesterOneStart, semesterTwoStart, lastDay },

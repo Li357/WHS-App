@@ -5343,9 +5343,10 @@ react-native-parse-html@^2.2.6:
   dependencies:
     react-native-stream "^0.1.0"
 
-"react-native-photo-upload@git+https://github.com/Li357/react-native-photo-upload.git":
-  version "1.2.0"
-  resolved "git+https://github.com/Li357/react-native-photo-upload.git#301cf0707b3e92c8f641a1e03a969438cd78de32"
+react-native-photo-upload@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-photo-upload/-/react-native-photo-upload-1.3.0.tgz#bf442bb5ee56abb15926e0281847116a413b98b7"
+  integrity sha512-6kd8luPwU2DfYovd3xvLayVN+OoW00cBQD4afYlHadQFA+WinTy+mXEgYG/QV4txDSLS1EArMBaCR6h2sq2JAA==
   dependencies:
     prop-types "^15.5.10"
     react-native-fs "^2.5.1"
@@ -5477,12 +5478,6 @@ react-navigation-deprecated-tab-navigator@1.3.0:
 react-navigation-drawer@0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/react-navigation-drawer/-/react-navigation-drawer-0.4.3.tgz#c04c94e2429b7e724801af05bd0a93a79cb27f71"
-  dependencies:
-    react-native-drawer-layout-polyfill "^1.3.2"
-
-"react-navigation-drawer@git+https://github.com/Li357/react-navigation-drawer.git":
-  version "0.4.2"
-  resolved "git+https://github.com/Li357/react-navigation-drawer.git#3e3147d3dda6241379aac6e49ecdc7aa84a9f4b1"
   dependencies:
     react-native-drawer-layout-polyfill "^1.3.2"
 
