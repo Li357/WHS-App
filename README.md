@@ -1,5 +1,7 @@
 # WHS
 
+**Development has been moved to the [WHS](https://github.com/Li357/WHS) monorepo.**
+
 A schedule & mod information app for [WHS](http://whs.westside66.org/). Created
 with [React Native](https://facebook.github.io/react-native/) by Andrew Li. © 2017-Present Andrew Li, MIT License.
 
